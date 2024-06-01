@@ -1,0 +1,8 @@
+Host        =   "localhost"
+Port        =   80
+
+DbHost      =   "localhost"
+DbName      =   "mydb"
+DbUser      =   "user"
+DbPass      =   "password"
+DbSSLmode   =   "disable"
