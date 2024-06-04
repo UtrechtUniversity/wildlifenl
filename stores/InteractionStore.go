@@ -12,7 +12,7 @@ func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
 		db: db,
 		query: `
-		SELECT i."id", i."description", i."latitude", i."longitude", s."id", s."name", s."commonNameNL", s."commonNameEN", u."id", u."name"
+		SELECT i."id", i."createdAt", i."description", i."latitude", i."longitude", s."id", s."name", s."commonNameNL", s."commonNameEN", u."id", u."name"
 		FROM interaction i
 		INNER JOIN "species" s ON s."id" = i."speciesID"
 		INNER JOIN "user" u ON u."id" = i."userID"
@@ -30,7 +30,7 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 		var interaction models.Interaction
 		var species models.Species
 		var user models.User
-		rows.Scan(&interaction.ID, &interaction.Description, &interaction.Latitude, &interaction.Longitude, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN, &user.ID, &user.Name)
+		rows.Scan(&interaction.ID, &interaction.CreatedAt, &interaction.Description, &interaction.Latitude, &interaction.Longitude, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN, &user.ID, &user.Name)
 		interaction.Species = species
 		interaction.User = user
 		interactions = append(interactions, interaction)
@@ -61,6 +61,7 @@ func (s *InteractionStore) GetAll() ([]models.Interaction, error) {
 func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error) {
 	query := s.query + `
 		WHERE u."id" = $1
+		ORDER BY i."createdAt" DESC
 		`
 	rows, err := s.db.Query(query, userID)
 	return s.process(rows, err)

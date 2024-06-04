@@ -6,21 +6,24 @@ import (
 	"github.com/UtrechtUniversity/wildlifenl/models"
 )
 
-type Animals struct {
-	db *sql.DB
+type AnimalStore Store
+
+func NewAnimals(db *sql.DB) *AnimalStore {
+	s := AnimalStore{
+		db: db,
+		query: `
+		SELECT a."id", a."name", s."id", s."name", s."commonNameNL", s."commonNameEN"
+		FROM animal a
+		LEFT JOIN species s ON s.id = a."speciesID"
+		`,
+	}
+	return &s
 }
 
-func NewAnimals(db *sql.DB) *Animals {
-	return &Animals{db: db}
-}
-
-func (s *Animals) Get(id string) (*models.Animal, error) {
-	query := `
-			SELECT a."id", a."name", s."id", s."name", s."commonNameNL", s."commonNameEN"
-			FROM animal a
-			LEFT JOIN species s ON s.id = a."speciesID"
-			WHERE a."id" = $1
-		`
+func (s *AnimalStore) Get(id string) (*models.Animal, error) {
+	query := s.query + `
+		WHERE a."id" = $1
+	`
 	var animal models.Animal
 	var species models.Species
 	row := s.db.QueryRow(query, id)

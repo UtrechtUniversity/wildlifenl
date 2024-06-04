@@ -32,7 +32,7 @@ func (s *NoticeStore) process(rows *sql.Rows, err error) ([]models.Notice, error
 		var user models.User
 		rows.Scan(&notice.ID, &notice.Description, &notice.Latitude, &notice.Longitude, &noticeType.ID, &noticeType.NameNL, &noticeType.NameEN, &user.ID, &user.Name)
 		notice.Type = noticeType
-		notice.Reporter = user
+		notice.User = user
 		notices = append(notices, notice)
 	}
 	return notices, nil
@@ -66,7 +66,7 @@ func (s *NoticeStore) GetByUser(userID string) ([]models.Notice, error) {
 	return s.process(rows, err)
 }
 
-func (s *NoticeStore) Add(userID string, notice *models.Notice) (*models.Notice, error) {
+func (s *NoticeStore) Add(userID string, notice *models.NoticeRecord) (*models.Notice, error) {
 	query := `
 		INSERT INTO notice("description", "latitude", "longitude", "typeID", "userID") VALUES($1, $2, $3, $4, $5)
 		RETURNING "id"

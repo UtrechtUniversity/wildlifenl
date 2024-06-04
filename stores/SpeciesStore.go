@@ -48,6 +48,9 @@ func (s *SpeciesStore) Get(speciesID string) (*models.Species, error) {
 }
 
 func (s *SpeciesStore) GetAll() ([]models.Species, error) {
-	rows, err := s.db.Query(s.query)
+	query := s.query + `
+		ORDER BY s."name"
+	`
+	rows, err := s.db.Query(query)
 	return s.process(rows, err)
 }

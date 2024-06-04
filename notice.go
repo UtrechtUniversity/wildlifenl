@@ -11,13 +11,9 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type MyNoticesInput struct {
-	Input
-}
-
 type NewNoticeInput struct {
 	Input
-	Body *models.Notice `json:"notice"`
+	Body *models.NoticeRecord `json:"notice"`
 }
 
 type NoticeHolder struct {
@@ -84,7 +80,7 @@ func (s *noticeOperations) RegisterGetMy(api huma.API) {
 		Summary:     "Get my Notices",
 		Security:    []map[string][]string{{"auth": []string{}}},
 		Description: "Retrieve all notices made by the current user.",
-	}, func(ctx context.Context, input *MyNoticesInput) (*NoticesHolder, error) {
+	}, func(ctx context.Context, input *Input) (*NoticesHolder, error) {
 		notices, err := stores.NewNoticeStore(database).GetByUser(input.credential.UserID)
 		if err != nil {
 			log.Println("ERROR", logTrace(), err)
