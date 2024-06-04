@@ -42,7 +42,7 @@ erDiagram
     ANIMAL }o--|| SPECIES : is
     VISITOR-READING }o--|| AREA : has
     INTERACTION }o--o| SPECIES : with
-    INCIDENT }o--|| USER : reports
+    NOTICE }o--|| USER : reports
     ANSWER }o--|| INTERACTION : has
     USER }o--o{ ROLE : has
     ANSWER }o--|| QUESTION : has
