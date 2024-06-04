@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/danielgtaylor/huma/v2"
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
+	"github.com/danielgtaylor/huma/v2"
 )
 
 type NoticeTypesHolder struct {
@@ -16,7 +16,7 @@ type NoticeTypesHolder struct {
 
 type noticeTypeOperations struct{}
 
-func (s *noticeOperations) RegisterGetNoticeTypes(api huma.API) {
+func (s *noticeTypeOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: "get-noticeTypes",
 		Tags:        []string{"noticeType"},

@@ -1,7 +1,7 @@
 package models
 
 type Notice struct {
-	ID          string     `json:"id" format:"uuid" readOnly:"true" doc:"The ID of this notice."`
+	ID          string     `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this notice."`
 	Type        NoticeType `json:"type" doc:"The NoticeType of this notice."`
 	Description string     `json:"description" doc:"The description of this notice."`
 	Latitude    float64    `json:"latitude" minimum:"-89.999999" maximum:"89.999999" doc:"The latitude of the location associated with this notice."`

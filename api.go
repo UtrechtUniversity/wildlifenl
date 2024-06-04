@@ -12,11 +12,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/UtrechtUniversity/wildlifenl/models"
+	"github.com/UtrechtUniversity/wildlifenl/stores"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/patrickmn/go-cache"
-	"github.com/UtrechtUniversity/wildlifenl/models"
-	"github.com/UtrechtUniversity/wildlifenl/stores"
 
 	_ "github.com/lib/pq" // postgresql
 )
@@ -75,6 +75,7 @@ func Start(config *Configuration) error {
 	api.UseMiddleware(NewAuthMiddleware(api))
 	huma.AutoRegister(api, new(authOperations))
 	huma.AutoRegister(api, new(animalOperations))
+	huma.AutoRegister(api, new(interactionOperations))
 	huma.AutoRegister(api, new(meOperations))
 	huma.AutoRegister(api, new(noticeOperations))
 	huma.AutoRegister(api, new(noticeTypeOperations))

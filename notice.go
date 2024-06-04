@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/danielgtaylor/huma/v2"
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
+	"github.com/danielgtaylor/huma/v2"
 )
 
 type MyNoticesInput struct {
@@ -96,7 +96,7 @@ func (s *noticeOperations) RegisterGetMy(api huma.API) {
 
 func (s *noticeOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
-		OperationID: "add-notices",
+		OperationID: "add-notice",
 		Tags:        []string{"notice"},
 		Method:      http.MethodPost,
 		Path:        "/notice/",
