@@ -80,6 +80,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, new(noticeOperations))
 	huma.AutoRegister(api, new(noticeTypeOperations))
 	huma.AutoRegister(api, new(speciesOperations))
+	huma.AutoRegister(api, new(trackingEventOperations))
 	huma.AutoRegister(api, new(userOperations))
 	return http.ListenAndServe(config.Host+":"+strconv.Itoa(config.Port), router)
 }
