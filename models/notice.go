@@ -1,11 +1,13 @@
 package models
 
+import "time"
+
 type NoticeRecord struct {
-	ID          string  `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this notice."`
-	TypeID      int     `json:"typeID,omitempty" writeOnly:"true"`
-	Description string  `json:"description" doc:"The description of this notice."`
-	Latitude    float64 `json:"latitude" minimum:"-89.999999" maximum:"89.999999" doc:"The latitude of the location associated with this notice."`
-	Longitude   float64 `json:"longitude" minimum:"-179.999999" maximum:"179.999999" doc:"The longitude of the location associated with this notice."`
+	ID          string    `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this notice."`
+	Timestamp   time.Time `json:"timestamp" readOnly:"true" doc:"The moment that this notice was created"`
+	TypeID      int       `json:"typeID,omitempty" writeOnly:"true"`
+	Description string    `json:"description" doc:"The description of this notice."`
+	Location    Location  `json:"location" doc:"The location that this notice was created at."`
 }
 
 type Notice struct {

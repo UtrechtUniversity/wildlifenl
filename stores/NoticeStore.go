@@ -12,7 +12,7 @@ func NewNoticeStore(db *sql.DB) *NoticeStore {
 	s := NoticeStore{
 		db: db,
 		query: `
-		SELECT n."id", n."description", n."latitude", n."longitude", t."id", t."nameNL", t."nameEN", u."id", u."name"
+		SELECT n."id", n."timestamp", n."description", n."location", t."id", t."nameNL", t."nameEN", u."id", u."name"
 		FROM notice n
 		INNER JOIN "noticeType"	t ON t."id" = n."typeID"
 		INNER JOIN "user" u ON u."id" = n."userID"
@@ -30,7 +30,7 @@ func (s *NoticeStore) process(rows *sql.Rows, err error) ([]models.Notice, error
 		var notice models.Notice
 		var noticeType models.NoticeType
 		var user models.User
-		rows.Scan(&notice.ID, &notice.Description, &notice.Latitude, &notice.Longitude, &noticeType.ID, &noticeType.NameNL, &noticeType.NameEN, &user.ID, &user.Name)
+		rows.Scan(&notice.ID, &notice.Timestamp, &notice.Description, &notice.Location, &noticeType.ID, &noticeType.NameNL, &noticeType.NameEN, &user.ID, &user.Name)
 		notice.Type = noticeType
 		notice.User = user
 		notices = append(notices, notice)
@@ -68,11 +68,11 @@ func (s *NoticeStore) GetByUser(userID string) ([]models.Notice, error) {
 
 func (s *NoticeStore) Add(userID string, notice *models.NoticeRecord) (*models.Notice, error) {
 	query := `
-		INSERT INTO notice("description", "latitude", "longitude", "typeID", "userID") VALUES($1, $2, $3, $4, $5)
+		INSERT INTO notice("description", "location", "typeID", "userID") VALUES($1, $2, $3, $4)
 		RETURNING "id"
 	`
 	var id string
-	row := s.db.QueryRow(query, notice.Description, notice.Latitude, notice.Longitude, notice.TypeID, userID)
+	row := s.db.QueryRow(query, notice.Description, notice.Location, notice.TypeID, userID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
