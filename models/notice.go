@@ -5,7 +5,7 @@ type NoticeRecord struct {
 	TypeID      int     `json:"typeID,omitempty" writeOnly:"true"`
 	Description string  `json:"description" doc:"The description of this notice."`
 	Latitude    float64 `json:"latitude" minimum:"-89.999999" maximum:"89.999999" doc:"The latitude of the location associated with this notice."`
-	Longitude   float64 `json:"longitude" minimum:"-89.999999" maximum:"89.999999" doc:"The longitude of the location associated with this notice."`
+	Longitude   float64 `json:"longitude" minimum:"-179.999999" maximum:"179.999999" doc:"The longitude of the location associated with this notice."`
 }
 
 type Notice struct {
