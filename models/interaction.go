@@ -8,7 +8,7 @@ type InteractionRecord struct {
 	Description string    `json:"description" doc:"The description of this interaction."`
 	Latitude    float64   `json:"latitude" minimum:"-89.999999" maximum:"89.999999" doc:"The latitude of the location associated with this interaction."`
 	Longitude   float64   `json:"longitude" minimum:"-89.999999" maximum:"89.999999" doc:"The longitude of the location associated with this interaction."`
-	SpeciesID   string    `json:"speciesID" format:"uuid" writeOnly:"true"`
+	SpeciesID   string    `json:"speciesID,omitempty" format:"uuid" writeOnly:"true"`
 }
 
 type Interaction struct {

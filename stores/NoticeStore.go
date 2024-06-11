@@ -72,7 +72,7 @@ func (s *NoticeStore) Add(userID string, notice *models.NoticeRecord) (*models.N
 		RETURNING "id"
 	`
 	var id string
-	row := s.db.QueryRow(query, notice.Description, notice.Latitude, notice.Longitude, notice.Type.ID, userID)
+	row := s.db.QueryRow(query, notice.Description, notice.Latitude, notice.Longitude, notice.TypeID, userID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

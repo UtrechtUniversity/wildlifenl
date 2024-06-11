@@ -12,8 +12,10 @@ func NewUserStore(db *sql.DB) *UserStore {
 	s := UserStore{
 		db: db,
 		query: `
-		SELECT u."id", u."name"
+		SELECT u."id", u."name", r."id", r."name"
 		FROM "user" u
+		LEFT JOIN user_role x ON x."userID" = u."id"
+		LEFT JOIN role r ON r."id" = x."roleID"
 		`,
 	}
 	return &s
@@ -24,9 +26,23 @@ func (s *UserStore) process(rows *sql.Rows, err error) ([]models.User, error) {
 		return nil, err
 	}
 	users := make([]models.User, 0)
+	var user models.User
 	for rows.Next() {
-		var user models.User
-		rows.Scan(&user.ID, &user.Name)
+		var userID string
+		var userName string
+		var role models.Role
+		rows.Scan(&userID, &userName, &role.ID, &role.Name)
+		if user.ID != "" && user.ID != userID {
+			users = append(users, user)
+			user = models.User{}
+		}
+		user.ID = userID
+		user.Name = userName
+		if role.ID > 0 {
+			user.Roles = append(user.Roles, role)
+		}
+	}
+	if user.ID != "" {
 		users = append(users, user)
 	}
 	return users, nil

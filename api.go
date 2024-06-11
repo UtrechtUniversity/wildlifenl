@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"net/http"
-	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -17,8 +16,6 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/patrickmn/go-cache"
-
-	_ "github.com/lib/pq" // postgresql
 )
 
 const appName = "WildlifeNL"
@@ -30,33 +27,6 @@ var (
 	authRequests *cache.Cache
 )
 
-type Configuration struct {
-	Host      string
-	Port      int
-	DbHost    string
-	DbName    string
-	DbUser    string
-	DbPass    string
-	DbSSLmode string
-}
-
-type AuthenticationRequest struct {
-	appName  string
-	userName string
-	email    string
-	code     string
-}
-
-type Input struct {
-	credential *models.Credential
-}
-
-func (m *Input) Resolve(ctx huma.Context) []error {
-	token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
-	m.credential = getCredential(token)
-	return nil
-}
-
 func Start(config *Configuration) error {
 	connStr := "postgres://" + config.DbUser + ":" + config.DbPass + "@" + config.DbHost + "/" + config.DbName + "?sslmode=" + config.DbSSLmode
 	db, err := sql.Open("postgres", connStr)
@@ -65,23 +35,24 @@ func Start(config *Configuration) error {
 	}
 	db.SetConnMaxLifetime(1 * time.Hour)
 	database = db
-	sessions = cache.New(4*time.Hour, 12*time.Hour)
-	authRequests = cache.New(1*time.Hour, 12*time.Hour)
+	sessions = cache.New(time.Duration(config.CacheSessionDurationMin)*time.Minute, 12*time.Hour)
+	authRequests = cache.New(time.Duration(config.CacheAuthRequestDurationMin)*time.Minute, 12*time.Hour)
 	apiConfig := huma.DefaultConfig(appName, appVersion)
 	apiConfig.Security = []map[string][]string{{"auth": {}}}
 	apiConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{"auth": {Type: "http", Scheme: "bearer"}}
 	router := http.NewServeMux()
 	api := humago.New(router, apiConfig)
 	api.UseMiddleware(NewAuthMiddleware(api))
-	huma.AutoRegister(api, new(authOperations))
-	huma.AutoRegister(api, new(animalOperations))
-	huma.AutoRegister(api, new(interactionOperations))
-	huma.AutoRegister(api, new(meOperations))
-	huma.AutoRegister(api, new(noticeOperations))
-	huma.AutoRegister(api, new(noticeTypeOperations))
-	huma.AutoRegister(api, new(speciesOperations))
-	huma.AutoRegister(api, new(trackingEventOperations))
-	huma.AutoRegister(api, new(userOperations))
+	huma.AutoRegister(api, newAnimalOperations(database))
+	huma.AutoRegister(api, newAuthOperations(database))
+	huma.AutoRegister(api, newInteractionOperations(database))
+	huma.AutoRegister(api, newMeOperations(database))
+	huma.AutoRegister(api, newNoticeOperations(database))
+	huma.AutoRegister(api, newNoticeTypeOperations(database))
+	huma.AutoRegister(api, newRoleOperations(database))
+	huma.AutoRegister(api, newSpeciesOperations(database))
+	huma.AutoRegister(api, newTrackingEventOperations(database))
+	huma.AutoRegister(api, newUserOperations(database))
 	return http.ListenAndServe(config.Host+":"+strconv.Itoa(config.Port), router)
 }
 
@@ -146,11 +117,11 @@ func authenticate(displayNameApp, displayNameUser, email string) error {
 func authorize(email, code string) (*models.Credential, error) {
 	c, ok := authRequests.Get(email)
 	if !ok {
-		return nil, errors.New("email address not found")
+		return nil, errors.New("email address not found, possibly the code has expired")
 	}
 	authenticationRequest := c.(AuthenticationRequest)
 	if authenticationRequest.code != code {
-		return nil, errors.New("code does not match")
+		return nil, errors.New("provided code does not match the sent code")
 	}
 	account := stores.NewCredentialStore(database).Create(authenticationRequest.appName, authenticationRequest.userName, authenticationRequest.email)
 	sessions.SetDefault(account.Token, account)
@@ -167,20 +138,4 @@ func getCredential(token string) *models.Credential {
 	}
 	sessions.SetDefault(token, credential)
 	return credential
-}
-
-func scopesAsMarkdown(input []string) string {
-	result := make([]string, 0)
-	for _, value := range input {
-		result = append(result, "`"+value+"`")
-	}
-	return strings.Join(result, ", ")
-}
-
-func logTrace() string {
-	pc := make([]uintptr, 15)
-	n := runtime.Callers(2, pc)
-	frames := runtime.CallersFrames(pc[:n])
-	frame, _ := frames.Next()
-	return frame.File + " " + strconv.Itoa(frame.Line) + " " + frame.Function + ": "
 }

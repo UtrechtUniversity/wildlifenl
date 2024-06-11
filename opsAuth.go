@@ -2,14 +2,23 @@ package wildlifenl
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"net/http"
 
-	"github.com/danielgtaylor/huma/v2"
 	"github.com/UtrechtUniversity/wildlifenl/models"
+	"github.com/danielgtaylor/huma/v2"
 )
 
-type authOperations struct{}
+type authOperations Operations
+
+func newAuthOperations(database *sql.DB) *authOperations {
+	o := authOperations{
+		Database: database,
+		Endpoint: "auth",
+	}
+	return &o
+}
 
 type AuthenticationInput struct {
 	Body struct {
@@ -24,21 +33,20 @@ type AuthenticationResult struct {
 	Body string `json:"message"`
 }
 
-func (s *authOperations) RegisterAuthentication(api huma.API) {
+func (o *authOperations) RegisterAuthentication(api huma.API) {
+	name := "Authenticate"
+	description := "Start the log on process and request a code by email, then call Authorize with this code."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{}
+	method := http.MethodPost
 	huma.Register(api, huma.Operation{
-		OperationID: "authentication",
-		Tags:        []string{"auth"},
-		Method:      http.MethodPost,
-		Path:        "/auth/",
-		Summary:     "Authenticate",
-		Security:    []map[string][]string{{}},
-		Description: "Start the log on process and request a code by email, then call Authorize with this code.",
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *AuthenticationInput) (*AuthenticationResult, error) {
 		if err := authenticate(input.Body.DisplayNameApp, input.Body.DisplayNameUser, input.Body.Email); err != nil {
 			log.Println("ERROR authentication:", err)
 			return nil, huma.Error500InternalServerError("An email could not be sent to the provided email address.")
 		}
-		return &AuthenticationResult{Body: "Code sent to: " + input.Body.Email}, nil
+		return &AuthenticationResult{Body: "The authentication code has been sent to: " + input.Body.Email}, nil
 	})
 }
 
@@ -53,15 +61,14 @@ type AuthorizationResult struct {
 	Body *models.Credential `json:"credential"`
 }
 
-func (s *authOperations) RegisterAuthorisation(api huma.API) {
+func (o *authOperations) RegisterAuthorisation(api huma.API) {
+	name := "Authorize"
+	description := "Finalize the log on process by providing the code as received by email and get a bearer token."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{}
+	method := http.MethodPut
 	huma.Register(api, huma.Operation{
-		OperationID: "authorization",
-		Tags:        []string{"auth"},
-		Method:      http.MethodPut,
-		Path:        "/auth/",
-		Summary:     "Authorize",
-		Security:    []map[string][]string{{}},
-		Description: "Finalize the log on process by providing the code as received by email and get a bearer token.",
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *AuthorizationInput) (*AuthorizationResult, error) {
 		credential, err := authorize(input.Body.Email, input.Body.Code)
 		if err != nil {

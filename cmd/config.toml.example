@@ -6,3 +6,6 @@ DbName      =   "mydb"
 DbUser      =   "user"
 DbPass      =   "password"
 DbSSLmode   =   "disable"
+
+CacheSessionDurationMin     = 120
+CacheAuthRequestDurationMin = 30
