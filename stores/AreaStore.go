@@ -28,7 +28,9 @@ func (s *AreaStore) process(rows *sql.Rows, err error) ([]models.Area, error) {
 	for rows.Next() {
 		var area models.Area
 		var user models.User
-		rows.Scan(&area.ID, &area.Description, &area.Definition, &user.ID, &user.Name)
+		if err := rows.Scan(&area.ID, &area.Description, &area.Definition, &user.ID, &user.Name); err != nil {
+			return nil, err
+		}
 		area.User = user
 		notices = append(notices, area)
 	}

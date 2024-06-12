@@ -26,7 +26,9 @@ func (s *RoleStore) process(rows *sql.Rows, err error) ([]models.Role, error) {
 	roles := make([]models.Role, 0)
 	for rows.Next() {
 		var role models.Role
-		rows.Scan(&role.ID, &role.Name)
+		if err := rows.Scan(&role.ID, &role.Name); err != nil {
+			return nil, err
+		}
 		roles = append(roles, role)
 	}
 	return roles, nil

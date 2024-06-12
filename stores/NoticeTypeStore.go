@@ -26,7 +26,9 @@ func (s *NoticeTypeStore) process(rows *sql.Rows, err error) ([]models.NoticeTyp
 	noticeTypes := make([]models.NoticeType, 0)
 	for rows.Next() {
 		var noticeType models.NoticeType
-		rows.Scan(&noticeType.ID, &noticeType.NameNL, &noticeType.NameEN)
+		if err := rows.Scan(&noticeType.ID, &noticeType.NameNL, &noticeType.NameEN); err != nil {
+			return nil, err
+		}
 		noticeTypes = append(noticeTypes, noticeType)
 	}
 	return noticeTypes, nil

@@ -30,7 +30,9 @@ func (s *NoticeStore) process(rows *sql.Rows, err error) ([]models.Notice, error
 		var notice models.Notice
 		var noticeType models.NoticeType
 		var user models.User
-		rows.Scan(&notice.ID, &notice.Timestamp, &notice.Description, &notice.Location, &noticeType.ID, &noticeType.NameNL, &noticeType.NameEN, &user.ID, &user.Name)
+		if err := rows.Scan(&notice.ID, &notice.Timestamp, &notice.Description, &notice.Location, &noticeType.ID, &noticeType.NameNL, &noticeType.NameEN, &user.ID, &user.Name); err != nil {
+			return nil, err
+		}
 		notice.Type = noticeType
 		notice.User = user
 		notices = append(notices, notice)

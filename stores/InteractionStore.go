@@ -30,7 +30,9 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 		var interaction models.Interaction
 		var species models.Species
 		var user models.User
-		rows.Scan(&interaction.ID, &interaction.CreatedAt, &interaction.Description, &interaction.Latitude, &interaction.Longitude, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN, &user.ID, &user.Name)
+		if err := rows.Scan(&interaction.ID, &interaction.CreatedAt, &interaction.Description, &interaction.Latitude, &interaction.Longitude, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN, &user.ID, &user.Name); err != nil {
+			return nil, err
+		}
 		interaction.Species = species
 		interaction.User = user
 		interactions = append(interactions, interaction)

@@ -26,7 +26,9 @@ func (s *SpeciesStore) process(rows *sql.Rows, err error) ([]models.Species, err
 	speciesX := make([]models.Species, 0)
 	for rows.Next() {
 		var species models.Species
-		rows.Scan(&species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN)
+		if err := rows.Scan(&species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN); err != nil {
+			return nil, err
+		}
 		speciesX = append(speciesX, species)
 	}
 	return speciesX, nil

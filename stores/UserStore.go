@@ -31,7 +31,9 @@ func (s *UserStore) process(rows *sql.Rows, err error) ([]models.User, error) {
 		var userID string
 		var userName string
 		var role models.Role
-		rows.Scan(&userID, &userName, &role.ID, &role.Name)
+		if err := rows.Scan(&userID, &userName, &role.ID, &role.Name); err != nil {
+			return nil, err
+		}
 		if user.ID != "" && user.ID != userID {
 			users = append(users, user)
 			user = models.User{}
