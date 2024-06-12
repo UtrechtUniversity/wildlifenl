@@ -51,6 +51,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newMeOperations(database))
 	huma.AutoRegister(api, newNoticeOperations(database))
 	huma.AutoRegister(api, newNoticeTypeOperations(database))
+	huma.AutoRegister(api, newParkOperations(database))
 	huma.AutoRegister(api, newRoleOperations(database))
 	huma.AutoRegister(api, newSpeciesOperations(database))
 	huma.AutoRegister(api, newTrackingEventOperations(database))
