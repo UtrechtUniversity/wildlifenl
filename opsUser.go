@@ -28,7 +28,7 @@ func newUserOperations(database *sql.DB) *userOperations {
 	return &o
 }
 
-func (o *userOperations) RegisterGetUserByID(api huma.API) {
+func (o *userOperations) RegisterGetByID(api huma.API) {
 	name := "Get User By ID"
 	description := "Retrieve a specific user by ID."
 	path := "/" + o.Endpoint + "/{id}"
@@ -50,7 +50,7 @@ func (o *userOperations) RegisterGetUserByID(api huma.API) {
 	})
 }
 
-func (o *userOperations) RegisterGetAllUsers(api huma.API) {
+func (o *userOperations) RegisterGetAll(api huma.API) {
 	name := "Get all Users"
 	description := "Retrieve all users."
 	path := "/" + o.Endpoint + "/"
