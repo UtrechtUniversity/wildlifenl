@@ -40,10 +40,12 @@ func Start(config *Configuration) error {
 	apiConfig := huma.DefaultConfig(appName, appVersion)
 	apiConfig.Security = []map[string][]string{{"auth": {}}}
 	apiConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{"auth": {Type: "http", Scheme: "bearer"}}
+	apiConfig.DocsPath = "/"
 	router := http.NewServeMux()
 	api := humago.New(router, apiConfig)
 	api.UseMiddleware(NewAuthMiddleware(api))
 	huma.AutoRegister(api, newAnimalOperations(database))
+	huma.AutoRegister(api, newAreaOperations(database))
 	huma.AutoRegister(api, newAuthOperations(database))
 	huma.AutoRegister(api, newInteractionOperations(database))
 	huma.AutoRegister(api, newMeOperations(database))

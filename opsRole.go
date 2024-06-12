@@ -12,8 +12,8 @@ import (
 
 type AddRoleToUserInput struct {
 	Body *struct {
-		UserID string `json:"userID" format:"uuid"`
-		RoleID int    `json:"roleID"`
+		UserID string `json:"userID" format:"uuid" doc:"The ID of the user"`
+		RoleID int    `json:"roleID" minimum:"1" doc:"The ID of the role"`
 	}
 }
 

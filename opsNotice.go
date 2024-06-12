@@ -42,7 +42,7 @@ func (o *noticeOperations) RegisterGet(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" doc:"The ID of the notice." format:"uuid"`
+		ID string `path:"id" format:"uuid" doc:"The ID of the notice."`
 	}) (*NoticeHolder, error) {
 		notice, err := stores.NewNoticeStore(database).Get(input.ID)
 		if err != nil {

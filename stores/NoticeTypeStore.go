@@ -34,7 +34,7 @@ func (s *NoticeTypeStore) process(rows *sql.Rows, err error) ([]models.NoticeTyp
 
 func (s *NoticeTypeStore) GetAll() ([]models.NoticeType, error) {
 	query := s.query + `
-		ORDER BY t."text"
+		ORDER BY t."id"
 		`
 	rows, err := s.db.Query(query)
 	return s.process(rows, err)
