@@ -44,7 +44,7 @@ func (o *noticeOperations) RegisterGet(api huma.API) {
 	}, func(ctx context.Context, input *struct {
 		ID string `path:"id" format:"uuid" doc:"The ID of the notice."`
 	}) (*NoticeHolder, error) {
-		notice, err := stores.NewNoticeStore(database).Get(input.ID)
+		notice, err := stores.NewNoticeStore(relationalDB).Get(input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -64,7 +64,7 @@ func (o *noticeOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct{}) (*NoticesHolder, error) {
-		notices, err := stores.NewNoticeStore(database).GetAll()
+		notices, err := stores.NewNoticeStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -81,7 +81,7 @@ func (o *noticeOperations) RegisterGetMy(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *Input) (*NoticesHolder, error) {
-		notices, err := stores.NewNoticeStore(database).GetByUser(input.credential.UserID)
+		notices, err := stores.NewNoticeStore(relationalDB).GetByUser(input.credential.UserID)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -98,7 +98,7 @@ func (o *noticeOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewNoticeInput) (*NoticeHolder, error) {
-		notice, err := stores.NewNoticeStore(database).Add(input.credential.UserID, input.Body)
+		notice, err := stores.NewNoticeStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}

@@ -10,7 +10,7 @@ type AreaStore Store
 
 func NewAreaStore(db *sql.DB) *AreaStore {
 	s := AreaStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT a."id", a."description", a."definition", u."id", u."name"
 		FROM area a
@@ -41,7 +41,7 @@ func (s *AreaStore) Get(areaID string) (*models.Area, error) {
 	query := s.query + `
 		WHERE a."id" = $1
 		`
-	rows, err := s.db.Query(query, areaID)
+	rows, err := s.relationalDB.Query(query, areaID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func (s *AreaStore) Get(areaID string) (*models.Area, error) {
 }
 
 func (s *AreaStore) GetAll() ([]models.Area, error) {
-	rows, err := s.db.Query(s.query)
+	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
 }
 
@@ -61,7 +61,7 @@ func (s *AreaStore) GetByUser(userID string) ([]models.Area, error) {
 	query := s.query + `
 		WHERE u."id" = $1
 		`
-	rows, err := s.db.Query(query, userID)
+	rows, err := s.relationalDB.Query(query, userID)
 	return s.process(rows, err)
 }
 
@@ -71,7 +71,7 @@ func (s *AreaStore) Add(userID string, notice *models.AreaRecord) (*models.Area,
 		RETURNING "id"
 	`
 	var id string
-	row := s.db.QueryRow(query, notice.Description, notice.Definition, userID)
+	row := s.relationalDB.QueryRow(query, notice.Description, notice.Definition, userID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

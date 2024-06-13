@@ -10,7 +10,7 @@ type ParkStore Store
 
 func NewParkStore(db *sql.DB) *ParkStore {
 	s := ParkStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT p."id", p."name", p."definition"
 		FROM "park" p
@@ -38,7 +38,7 @@ func (s *ParkStore) Get(parkID string) (*models.Park, error) {
 	query := s.query + `
 		WHERE p."id" = $1
 		`
-	rows, err := s.db.Query(query, parkID)
+	rows, err := s.relationalDB.Query(query, parkID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (s *ParkStore) Get(parkID string) (*models.Park, error) {
 }
 
 func (s *ParkStore) GetAll() ([]models.Park, error) {
-	rows, err := s.db.Query(s.query)
+	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
 }
 
@@ -60,7 +60,7 @@ func (s *ParkStore) Add(park *models.Park) (*models.Park, error) {
 		RETURNING "id"
 	`
 	var id string
-	row := s.db.QueryRow(query, park.Name, park.Definition)
+	row := s.relationalDB.QueryRow(query, park.Name, park.Definition)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

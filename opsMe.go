@@ -37,7 +37,7 @@ func (o *meOperations) RegisterGet(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *MeInput) (*MeHolder, error) {
-		me, err := stores.NewMeStore(database).Get(input.credential.Token)
+		me, err := stores.NewMeStore(relationalDB).Get(input.credential.Token)
 		if err != nil {
 			return nil, handleError(err)
 		}

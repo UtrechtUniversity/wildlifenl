@@ -10,7 +10,7 @@ type InteractionStore Store
 
 func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT i."id", i."createdAt", i."description", i."latitude", i."longitude", s."id", s."name", s."commonNameNL", s."commonNameEN", u."id", u."name"
 		FROM interaction i
@@ -44,7 +44,7 @@ func (s *InteractionStore) Get(interactionID string) (*models.Interaction, error
 	query := s.query + `
 		WHERE i."id" = $1
 		`
-	rows, err := s.db.Query(query, interactionID)
+	rows, err := s.relationalDB.Query(query, interactionID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (s *InteractionStore) Get(interactionID string) (*models.Interaction, error
 }
 
 func (s *InteractionStore) GetAll() ([]models.Interaction, error) {
-	rows, err := s.db.Query(s.query)
+	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
 }
 
@@ -65,7 +65,7 @@ func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error
 		WHERE u."id" = $1
 		ORDER BY i."createdAt" DESC
 		`
-	rows, err := s.db.Query(query, userID)
+	rows, err := s.relationalDB.Query(query, userID)
 	return s.process(rows, err)
 }
 
@@ -75,7 +75,7 @@ func (s *InteractionStore) Add(userID string, interaction *models.InteractionRec
 		RETURNING "id"
 	`
 	var id string
-	row := s.db.QueryRow(query, interaction.Description, interaction.Latitude, interaction.Longitude, interaction.SpeciesID, userID)
+	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Latitude, interaction.Longitude, interaction.SpeciesID, userID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

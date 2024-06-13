@@ -39,7 +39,7 @@ func (o *userOperations) RegisterGetByID(api huma.API) {
 	}, func(ctx context.Context, input *struct {
 		ID string `path:"id" format:"uuid" doc:"The ID of the user."`
 	}) (*UserHolder, error) {
-		user, err := stores.NewUserStore(database).Get(input.ID)
+		user, err := stores.NewUserStore(relationalDB).Get(input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -59,7 +59,7 @@ func (o *userOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct{}) (*UsersHolder, error) {
-		users, err := stores.NewUserStore(database).GetAll()
+		users, err := stores.NewUserStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}

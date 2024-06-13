@@ -1,11 +1,15 @@
-Host        =   "localhost"
-Port        =   80
+Host                            =   "localhost"
+Port                            =   80
 
-DbHost      =   "localhost"
-DbName      =   "mydb"
-DbUser      =   "user"
-DbPass      =   "password"
-DbSSLmode   =   "disable"
+RelationalDatabaseHost          =   "localhost"
+RelationalDatabaseName          =   "mydb"
+RelationalDatabaseUser          =   "user"
+RelationalDatabasePass          =   "pass"
+RelationalDatabaseSSLmode       =   "disable"
 
-CacheSessionDurationMin     = 120
-CacheAuthRequestDurationMin = 30
+TimeseriesDatabaseURL           =   "https://url-to-influxdb-instance.ext/"
+TimeseriesDatabaseOrganization  =   "myOrganization"
+TimeseriesDatabaseToken         =   "token-from-influxdb-instance"
+
+CacheSessionDurationMinutes     =   120
+CacheAuthRequestDurationMinutes =   30

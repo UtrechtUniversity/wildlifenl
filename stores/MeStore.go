@@ -10,7 +10,7 @@ type MeStore Store
 
 func NewMeStore(db *sql.DB) *MeStore {
 	s := MeStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT u."id", u."name", u."email"
 		FROM "user" u
@@ -25,7 +25,7 @@ func (s *MeStore) Get(token string) (*models.Me, error) {
 		WHERE c."token" = $1
 	`
 	var me models.Me
-	row := s.db.QueryRow(query, token)
+	row := s.relationalDB.QueryRow(query, token)
 	if err := row.Scan(&me.ID, &me.Name, &me.Email); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil

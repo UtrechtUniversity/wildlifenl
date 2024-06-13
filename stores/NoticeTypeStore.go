@@ -10,7 +10,7 @@ type NoticeTypeStore Store
 
 func NewNoticeTypeStore(db *sql.DB) *NoticeTypeStore {
 	s := NoticeTypeStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT t."id", t."nameNL", t."nameEN"
 		FROM "noticeType" t
@@ -38,6 +38,6 @@ func (s *NoticeTypeStore) GetAll() ([]models.NoticeType, error) {
 	query := s.query + `
 		ORDER BY t."id"
 		`
-	rows, err := s.db.Query(query)
+	rows, err := s.relationalDB.Query(query)
 	return s.process(rows, err)
 }

@@ -8,9 +8,10 @@ import (
 
 type AnimalStore Store
 
-func NewAnimals(db *sql.DB) *AnimalStore {
+func NewAnimals(relationalDB *sql.DB, timeseriesDB *Timeseries) *AnimalStore {
 	s := AnimalStore{
-		db: db,
+		relationalDB: relationalDB,
+		timeseriesDB: timeseriesDB,
 		query: `
 		SELECT a."id", a."name", s."id", s."name", s."commonNameNL", s."commonNameEN"
 		FROM animal a
@@ -26,7 +27,7 @@ func (s *AnimalStore) Get(id string) (*models.Animal, error) {
 	`
 	var animal models.Animal
 	var species models.Species
-	row := s.db.QueryRow(query, id)
+	row := s.relationalDB.QueryRow(query, id)
 	if err := row.Scan(&animal.ID, &animal.Name, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil

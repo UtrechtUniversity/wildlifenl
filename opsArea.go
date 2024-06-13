@@ -44,7 +44,7 @@ func (o *areaOperations) RegisterGet(api huma.API) {
 	}, func(ctx context.Context, input *struct {
 		ID string `path:"id" format:"uuid" doc:"The ID of the area."`
 	}) (*AreaHolder, error) {
-		area, err := stores.NewAreaStore(database).Get(input.ID)
+		area, err := stores.NewAreaStore(relationalDB).Get(input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -64,7 +64,7 @@ func (o *areaOperations) RegisterGetMy(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *Input) (*AreasHolder, error) {
-		areas, err := stores.NewAreaStore(database).GetByUser(input.credential.UserID)
+		areas, err := stores.NewAreaStore(relationalDB).GetByUser(input.credential.UserID)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -81,7 +81,7 @@ func (o *areaOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewAreaInput) (*AreaHolder, error) {
-		area, err := stores.NewAreaStore(database).Add(input.credential.UserID, input.Body)
+		area, err := stores.NewAreaStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}

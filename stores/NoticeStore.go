@@ -10,7 +10,7 @@ type NoticeStore Store
 
 func NewNoticeStore(db *sql.DB) *NoticeStore {
 	s := NoticeStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT n."id", n."timestamp", n."description", n."location", t."id", t."nameNL", t."nameEN", u."id", u."name"
 		FROM notice n
@@ -44,7 +44,7 @@ func (s *NoticeStore) Get(noticeID string) (*models.Notice, error) {
 	query := s.query + `
 		WHERE n."id" = $1
 		`
-	rows, err := s.db.Query(query, noticeID)
+	rows, err := s.relationalDB.Query(query, noticeID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (s *NoticeStore) Get(noticeID string) (*models.Notice, error) {
 }
 
 func (s *NoticeStore) GetAll() ([]models.Notice, error) {
-	rows, err := s.db.Query(s.query)
+	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
 }
 
@@ -64,7 +64,7 @@ func (s *NoticeStore) GetByUser(userID string) ([]models.Notice, error) {
 	query := s.query + `
 		WHERE u."id" = $1
 		`
-	rows, err := s.db.Query(query, userID)
+	rows, err := s.relationalDB.Query(query, userID)
 	return s.process(rows, err)
 }
 
@@ -74,7 +74,7 @@ func (s *NoticeStore) Add(userID string, notice *models.NoticeRecord) (*models.N
 		RETURNING "id"
 	`
 	var id string
-	row := s.db.QueryRow(query, notice.Description, notice.Location, notice.TypeID, userID)
+	row := s.relationalDB.QueryRow(query, notice.Description, notice.Location, notice.TypeID, userID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

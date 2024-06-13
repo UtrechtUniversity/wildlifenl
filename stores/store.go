@@ -3,6 +3,7 @@ package stores
 import "database/sql"
 
 type Store struct {
-	db    *sql.DB
-	query string
+	relationalDB *sql.DB
+	timeseriesDB *Timeseries
+	query        string
 }

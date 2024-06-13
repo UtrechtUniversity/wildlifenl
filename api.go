@@ -22,21 +22,23 @@ const appName = "WildlifeNL"
 const appVersion = "0.1"
 
 var (
-	database     *sql.DB
+	relationalDB *sql.DB
+	timeseriesDB *stores.Timeseries
 	sessions     *cache.Cache
 	authRequests *cache.Cache
 )
 
 func Start(config *Configuration) error {
-	connStr := "postgres://" + config.DbUser + ":" + config.DbPass + "@" + config.DbHost + "/" + config.DbName + "?sslmode=" + config.DbSSLmode
+	connStr := "postgres://" + config.RelationalDatabaseUser + ":" + config.RelationalDatabasePass + "@" + config.RelationalDatabaseHost + "/" + config.RelationalDatabaseHost + "?sslmode=" + config.RelationalDatabaseSSLmode
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return fmt.Errorf("could not connect to database: %w", err)
 	}
 	db.SetConnMaxLifetime(1 * time.Hour)
-	database = db
-	sessions = cache.New(time.Duration(config.CacheSessionDurationMin)*time.Minute, 12*time.Hour)
-	authRequests = cache.New(time.Duration(config.CacheAuthRequestDurationMin)*time.Minute, 12*time.Hour)
+	relationalDB = db
+	timeseriesDB = stores.NewTimeseries(config.TimeseriesDatabaseURL, config.TimeseriesDatabaseOrganization, config.TimeseriesDatabaseToken)
+	sessions = cache.New(time.Duration(config.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
+	authRequests = cache.New(time.Duration(config.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
 	apiConfig := huma.DefaultConfig(appName, appVersion)
 	apiConfig.Security = []map[string][]string{{"auth": {}}}
 	apiConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{"auth": {Type: "http", Scheme: "bearer"}}
@@ -44,18 +46,18 @@ func Start(config *Configuration) error {
 	router := http.NewServeMux()
 	api := humago.New(router, apiConfig)
 	api.UseMiddleware(NewAuthMiddleware(api))
-	huma.AutoRegister(api, newAnimalOperations(database))
-	huma.AutoRegister(api, newAreaOperations(database))
-	huma.AutoRegister(api, newAuthOperations(database))
-	huma.AutoRegister(api, newInteractionOperations(database))
-	huma.AutoRegister(api, newMeOperations(database))
-	huma.AutoRegister(api, newNoticeOperations(database))
-	huma.AutoRegister(api, newNoticeTypeOperations(database))
-	huma.AutoRegister(api, newParkOperations(database))
-	huma.AutoRegister(api, newRoleOperations(database))
-	huma.AutoRegister(api, newSpeciesOperations(database))
-	huma.AutoRegister(api, newTrackingEventOperations(database))
-	huma.AutoRegister(api, newUserOperations(database))
+	huma.AutoRegister(api, newAnimalOperations(relationalDB))
+	huma.AutoRegister(api, newAreaOperations(relationalDB))
+	huma.AutoRegister(api, newAuthOperations(relationalDB))
+	huma.AutoRegister(api, newInteractionOperations(relationalDB))
+	huma.AutoRegister(api, newMeOperations(relationalDB))
+	huma.AutoRegister(api, newNoticeOperations(relationalDB))
+	huma.AutoRegister(api, newNoticeTypeOperations(relationalDB))
+	huma.AutoRegister(api, newParkOperations(relationalDB))
+	huma.AutoRegister(api, newRoleOperations(relationalDB))
+	huma.AutoRegister(api, newSpeciesOperations(relationalDB))
+	huma.AutoRegister(api, newTrackingEventOperations(relationalDB))
+	huma.AutoRegister(api, newUserOperations(relationalDB))
 	return http.ListenAndServe(config.Host+":"+strconv.Itoa(config.Port), router)
 }
 
@@ -126,7 +128,7 @@ func authorize(email, code string) (*models.Credential, error) {
 	if authenticationRequest.code != code {
 		return nil, errors.New("provided code does not match the sent code")
 	}
-	account := stores.NewCredentialStore(database).Create(authenticationRequest.appName, authenticationRequest.userName, authenticationRequest.email)
+	account := stores.NewCredentialStore(relationalDB).Create(authenticationRequest.appName, authenticationRequest.userName, authenticationRequest.email)
 	sessions.SetDefault(account.Token, account)
 	return account, nil
 }
@@ -135,7 +137,7 @@ func getCredential(token string) *models.Credential {
 	if credential, ok := sessions.Get(token); ok {
 		return credential.(*models.Credential)
 	}
-	credential := stores.NewCredentialStore(database).Get(token)
+	credential := stores.NewCredentialStore(relationalDB).Get(token)
 	if credential == nil {
 		return nil
 	}

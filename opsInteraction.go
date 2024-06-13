@@ -44,7 +44,7 @@ func (o *interactionOperations) RegisterGet(api huma.API) {
 	}, func(ctx context.Context, input *struct {
 		ID string `path:"id" doc:"The ID of the interaction." format:"uuid"`
 	}) (*InteractionHolder, error) {
-		interaction, err := stores.NewInteractionStore(database).Get(input.ID)
+		interaction, err := stores.NewInteractionStore(relationalDB).Get(input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -64,7 +64,7 @@ func (o *interactionOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct{}) (*InteractionsHolder, error) {
-		interactions, err := stores.NewInteractionStore(database).GetAll()
+		interactions, err := stores.NewInteractionStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -81,7 +81,7 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewInteractionInput) (*InteractionHolder, error) {
-		interaction, err := stores.NewInteractionStore(database).Add(input.credential.UserID, input.Body)
+		interaction, err := stores.NewInteractionStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}

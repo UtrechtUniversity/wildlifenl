@@ -10,7 +10,7 @@ type SpeciesStore Store
 
 func NewSpeciesStore(db *sql.DB) *SpeciesStore {
 	s := SpeciesStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT s."id", s."name", s."commonNameNL", s."commonNameEN"
 		FROM "species" s
@@ -38,7 +38,7 @@ func (s *SpeciesStore) Get(speciesID string) (*models.Species, error) {
 	query := s.query + `
 		WHERE s."id" = $1
 		`
-	rows, err := s.db.Query(query, speciesID)
+	rows, err := s.relationalDB.Query(query, speciesID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -53,6 +53,6 @@ func (s *SpeciesStore) GetAll() ([]models.Species, error) {
 	query := s.query + `
 		ORDER BY s."name"
 	`
-	rows, err := s.db.Query(query)
+	rows, err := s.relationalDB.Query(query)
 	return s.process(rows, err)
 }

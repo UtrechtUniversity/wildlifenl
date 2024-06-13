@@ -44,7 +44,7 @@ func (o *parkOperations) RegisterGet(api huma.API) {
 	}, func(ctx context.Context, input *struct {
 		ID string `path:"id" format:"uuid" doc:"The ID of the park."`
 	}) (*ParkHolder, error) {
-		park, err := stores.NewParkStore(database).Get(input.ID)
+		park, err := stores.NewParkStore(relationalDB).Get(input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -64,7 +64,7 @@ func (o *parkOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct{}) (output *ParksHolder, err error) {
-		parks, err := stores.NewParkStore(database).GetAll()
+		parks, err := stores.NewParkStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -81,7 +81,7 @@ func (o *parkOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewParkInput) (*ParkHolder, error) {
-		park, err := stores.NewParkStore(database).Add(input.Body)
+		park, err := stores.NewParkStore(relationalDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}

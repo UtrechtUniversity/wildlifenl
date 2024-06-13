@@ -33,7 +33,7 @@ func (o *noticeTypeOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct{}) (*NoticeTypesHolder, error) {
-		noticeTypes, err := stores.NewNoticeTypeStore(database).GetAll()
+		noticeTypes, err := stores.NewNoticeTypeStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}

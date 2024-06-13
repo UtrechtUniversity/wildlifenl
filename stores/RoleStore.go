@@ -10,7 +10,7 @@ type RoleStore Store
 
 func NewRoleStore(db *sql.DB) *RoleStore {
 	s := RoleStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT r."id", r."name"
 		FROM "role" r
@@ -38,7 +38,7 @@ func (s *RoleStore) GetAll() ([]models.Role, error) {
 	query := s.query + `
 		ORDER BY r."id"
 		`
-	rows, err := s.db.Query(query)
+	rows, err := s.relationalDB.Query(query)
 	return s.process(rows, err)
 }
 
@@ -46,7 +46,7 @@ func (s *RoleStore) AddRoleToUser(userID string, roleID int) error {
 	query := `
 		INSERT INTO user_role("userID", "roleID") VALUES($1, $2)
 	`
-	_, err := s.db.Exec(query, userID, roleID)
+	_, err := s.relationalDB.Exec(query, userID, roleID)
 	if err != nil {
 		return err
 	}

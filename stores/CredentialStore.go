@@ -10,7 +10,7 @@ type CredentialStore Store
 
 func NewCredentialStore(db *sql.DB) *CredentialStore {
 	s := CredentialStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT u."id", c."token", c."email", c."lastLogon", r."name"
 		FROM "user_role" x
@@ -26,7 +26,7 @@ func (s *CredentialStore) Get(token string) *models.Credential {
 	query := s.query + `
 		WHERE c."token" = $1
 	`
-	rows, err := s.db.Query(query, token)
+	rows, err := s.relationalDB.Query(query, token)
 	if err != nil {
 		return nil
 	}
@@ -47,7 +47,7 @@ func (s *CredentialStore) Create(appName, userName, email string) *models.Creden
 		ON CONFLICT("email") DO UPDATE SET "name" = $3 
 		RETURNING "id"
 	`
-	row := s.db.QueryRow(query, userName, email, userName)
+	row := s.relationalDB.QueryRow(query, userName, email, userName)
 	var userID string
 	if err := row.Scan(&userID); err == sql.ErrNoRows {
 		return nil
@@ -59,7 +59,7 @@ func (s *CredentialStore) Create(appName, userName, email string) *models.Creden
 		INNER JOIN "user" u ON u."id" = x."userID"
 		WHERE u."id" = $1;
 	`
-	rows, err := s.db.Query(query, userID)
+	rows, err := s.relationalDB.Query(query, userID)
 	if err != nil {
 		return nil
 	}
@@ -73,7 +73,7 @@ func (s *CredentialStore) Create(appName, userName, email string) *models.Creden
 		INSERT INTO credential("email", "appName") VALUES($1, $2)
 		RETURNING "token", "email", "lastLogon";
 	`
-	row = s.db.QueryRow(query, email, appName)
+	row = s.relationalDB.QueryRow(query, email, appName)
 	credential := models.Credential{UserID: userID}
 	if err := row.Scan(&credential.Token, &credential.Email, &credential.LastLogon); err != nil {
 		return nil

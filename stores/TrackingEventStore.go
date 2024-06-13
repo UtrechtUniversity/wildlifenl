@@ -11,7 +11,7 @@ type TrackingEventStore Store
 
 func NewTrackingEventStore(db *sql.DB) *TrackingEventStore {
 	s := TrackingEventStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT e."createdAt", e."latitude", e."longitude", u."id", u."name"
 		FROM "trackingEvent" e
@@ -43,7 +43,7 @@ func (s *TrackingEventStore) Get(createdAt time.Time, userID string) (*models.Tr
 		WHERE e."createdAt" = $1
 		AND u."id" = $2
 		`
-	rows, err := s.db.Query(query, createdAt, userID)
+	rows, err := s.relationalDB.Query(query, createdAt, userID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (s *TrackingEventStore) GetByUser(userID string) ([]models.TrackingEvent, e
 		WHERE u."id" = $1
 		ORDER BY e."createdAt" DESC
 		`
-	rows, err := s.db.Query(query, userID)
+	rows, err := s.relationalDB.Query(query, userID)
 	return s.process(rows, err)
 }
 
@@ -69,7 +69,7 @@ func (s *TrackingEventStore) Add(userID string, trackingEvent *models.TrackingEv
 		RETURNING "createdAt"
 	`
 	var createdAt time.Time
-	row := s.db.QueryRow(query, trackingEvent.Latitude, trackingEvent.Longitude, userID)
+	row := s.relationalDB.QueryRow(query, trackingEvent.Latitude, trackingEvent.Longitude, userID)
 	if err := row.Scan(&createdAt); err != nil {
 		return nil, err
 	}

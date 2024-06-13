@@ -40,7 +40,7 @@ func (o *roleOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct{}) (*RolesHolder, error) {
-		roles, err := stores.NewRoleStore(database).GetAll()
+		roles, err := stores.NewRoleStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -57,7 +57,7 @@ func (o *roleOperations) RegisterAddRoleToUser(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *AddRoleToUserInput) (*struct{}, error) {
-		err := stores.NewRoleStore(database).AddRoleToUser(input.Body.UserID, input.Body.RoleID)
+		err := stores.NewRoleStore(relationalDB).AddRoleToUser(input.Body.UserID, input.Body.RoleID)
 		if err != nil {
 			return nil, handleError(err)
 		}

@@ -10,7 +10,7 @@ type UserStore Store
 
 func NewUserStore(db *sql.DB) *UserStore {
 	s := UserStore{
-		db: db,
+		relationalDB: db,
 		query: `
 		SELECT u."id", u."name", r."id", r."name"
 		FROM "user" u
@@ -54,7 +54,7 @@ func (s *UserStore) Get(userID string) (*models.User, error) {
 	query := s.query + `
 		WHERE u."id" = $1
 		`
-	rows, err := s.db.Query(query, userID)
+	rows, err := s.relationalDB.Query(query, userID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -66,6 +66,6 @@ func (s *UserStore) Get(userID string) (*models.User, error) {
 }
 
 func (s *UserStore) GetAll() ([]models.User, error) {
-	rows, err := s.db.Query(s.query)
+	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
 }
