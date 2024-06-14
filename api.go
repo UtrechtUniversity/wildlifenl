@@ -29,7 +29,7 @@ var (
 )
 
 func Start(config *Configuration) error {
-	connStr := "postgres://" + config.RelationalDatabaseUser + ":" + config.RelationalDatabasePass + "@" + config.RelationalDatabaseHost + "/" + config.RelationalDatabaseHost + "?sslmode=" + config.RelationalDatabaseSSLmode
+	connStr := "postgres://" + config.RelationalDatabaseUser + ":" + config.RelationalDatabasePass + "@" + config.RelationalDatabaseHost + "/" + config.RelationalDatabaseName + "?sslmode=" + config.RelationalDatabaseSSLmode
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return fmt.Errorf("could not connect to database: %w", err)
