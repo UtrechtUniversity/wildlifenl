@@ -1,8 +1,8 @@
 # wildlifenl
 
-Project `wildlifenl` is the backend api for the WildlifeNL project.
+Project `wildlifenl` is the backend API for the WildlifeNL system.
 
-## Concepts
+## Entities
 
 ### Animal
 A specific instance of an animal. For example: that one horse. Usually this implies that the animal in question carries an animal-borne sensor for unique identifaction.
@@ -109,13 +109,13 @@ A circular area in the world with a central postion (latitude/longitude) and rad
 
 [ *Latitude, Longitude, Radius* ]
 
-## Conceptual Model
+## Entity-Relation Diagram
 
-![Conceptual Model](ConceptualModel.svg)
+![Entity-Relation Diagram](EntityRelationDiagram.svg)
 
-The blue concepts are stored in a relational database, whereas the green concepts are stored in a timeseries database. As a result the relationships between blue and green concepts are "by convention" of having the same IDs rather than them being enforced by any rules. For `Sensor-Reading` and `Borne-Sensor-Reading` this brings an advantage in the cases where data is ingested from external automated systems as it is therefore possible to accept and store these data, regardless of there being a way to use and retreive them in a meaningful context (even if there are no `Sensor-Installation` or `Borne-Sensor-Deployment` with the referenced ID), subsequently allowing that the installation or deployment that adds meaning be added later, rather than rejecting these data for the reason of there being no meaningful context, and perhaps make external automated systems fail. Note that this advantage is not needed for `Tracking-Reading` as it is highly unlikely for a new reading to refer to a userID that is unknown.
+The blue entities are stored in a relational database, whereas the green entities are stored in a timeseries database. As a result the relationships between blue and green entities are "by convention" of having the same IDs rather than them being enforced by any rules. For `Sensor-Reading` and `Borne-Sensor-Reading` this brings an advantage in the cases where data is ingested from external automated systems as it is therefore possible to accept and store these data, regardless of there being a way to use and retreive them in a meaningful context (even if there are no `Sensor-Installation` or `Borne-Sensor-Deployment` with the referenced ID), subsequently allowing that the installation or deployment that adds meaning be added later, rather than rejecting these data for the reason of there being no meaningful context, and perhaps make external automated systems fail. Note that this advantage is not needed for `Tracking-Reading` as it is highly unlikely for a new reading to refer to a userID that is unknown.
 
-Blue concepts with a red border are created internally as a result of logic rules (see below) and are therefore *de facto* read-only.
+Blue entities with a red border are created internally as a result of logic rules (see below) and are therefore *de facto* read-only.
 
 ## Logic rules
 
