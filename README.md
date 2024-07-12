@@ -123,7 +123,7 @@ Upon a new `Response` being posted, it should be checked whether this response r
 
 Upon a new `Tracking-Reading` being posted, including lat/long, it should be checked whether a non-deactivated `Message` exists that is associated to a `Species` for which there is an `Animal` that has a lat/long that is closer by the lat/long of the `Tracking-Reading` than the *`EncounterDistance`* value of that `Species`. Per animal for which this is true an `Encounter` must be created having the user location fields set to the lat/long of the `Tracking-Reading` and the animal location fields set to that of the animal in question. Then, a new `Conveyance` must be created and associated with the previously mentioned `Message` and `Encounter` and NOT with a `Response`. The `Conveyance` and its `Message` should be in the response body of the post request.
 
-Upon a new `Borne-Sensor-Reading` being posted, including lat/long, it should be checked whether a `Zone` exits that this lat/lang is within and whether a `Borne-Sensor-Deployment` exists for this reading. If so, a new `Alarm` must be created being associated with the `Zone` in question and the `Animal` that the `Borne-Sensor-Deployment` refers to. **TODO: Find a way to push this alarm to the user device.**
+Upon a new `Borne-Sensor-Reading` being posted, including lat/long, it should be checked whether a `Borne-Sensor-Deployment` exists for this reading, if so the location of the associated `Animal` should be updated. Then, it should be checked whether a `Zone` exits that this lat/lang is within. If so, a new `Alarm` must be created being associated with the `Zone` in question and the `Animal` that the `Borne-Sensor-Deployment` refers to. **TODO: Find a way to push this alarm to the user device.**
 
 ## Notes
 
