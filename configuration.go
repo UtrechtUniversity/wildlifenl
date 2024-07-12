@@ -4,6 +4,7 @@ type Configuration struct {
 	Host                            string
 	Port                            int
 	RelationalDatabaseHost          string
+	RelationalDatabasePort          int
 	RelationalDatabaseName          string
 	RelationalDatabaseUser          string
 	RelationalDatabasePass          string

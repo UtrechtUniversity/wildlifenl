@@ -29,14 +29,12 @@ var (
 )
 
 func Start(config *Configuration) error {
-	connStr := "postgres://" + config.RelationalDatabaseUser + ":" + config.RelationalDatabasePass + "@" + config.RelationalDatabaseHost + "/" + config.RelationalDatabaseName + "?sslmode=" + config.RelationalDatabaseSSLmode
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		return fmt.Errorf("could not connect to database: %w", err)
+	if err := loadRelationalDB(config); err != nil {
+		return fmt.Errorf("could not connect to relational database: %w", err)
 	}
-	db.SetConnMaxLifetime(1 * time.Hour)
-	relationalDB = db
-	timeseriesDB = stores.NewTimeseries(config.TimeseriesDatabaseURL, config.TimeseriesDatabaseOrganization, config.TimeseriesDatabaseToken)
+	if err := loadTimeseriesDB(config); err != nil {
+		return fmt.Errorf("could not connect to timeseries database: %w", err)
+	}
 	sessions = cache.New(time.Duration(config.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
 	authRequests = cache.New(time.Duration(config.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
 	apiConfig := huma.DefaultConfig(appName, appVersion)
@@ -59,6 +57,26 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newTrackingEventOperations(relationalDB))
 	huma.AutoRegister(api, newUserOperations(relationalDB))
 	return http.ListenAndServe(config.Host+":"+strconv.Itoa(config.Port), router)
+}
+
+func loadRelationalDB(config *Configuration) error {
+	connStr := "postgres://" + config.RelationalDatabaseUser + ":" + config.RelationalDatabasePass + "@" + config.RelationalDatabaseHost
+	if config.RelationalDatabasePort > 0 {
+		connStr += ":" + strconv.Itoa(config.RelationalDatabasePort)
+	}
+	connStr += "/" + config.RelationalDatabaseName + "?sslmode=" + config.RelationalDatabaseSSLmode
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		return err
+	}
+	db.SetConnMaxLifetime(1 * time.Hour)
+	relationalDB = db
+	return relationalDB.Ping()
+}
+
+func loadTimeseriesDB(config *Configuration) error {
+	timeseriesDB = stores.NewTimeseries(config.TimeseriesDatabaseURL, config.TimeseriesDatabaseOrganization, config.TimeseriesDatabaseToken)
+	return timeseriesDB.Ping()
 }
 
 func NewAuthMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context)) {

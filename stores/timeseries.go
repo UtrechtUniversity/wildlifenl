@@ -1,6 +1,9 @@
 package stores
 
 import (
+	"context"
+	"errors"
+
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 )
@@ -16,6 +19,17 @@ func NewTimeseries(url string, organization string, token string) *Timeseries {
 		organization: organization,
 	}
 	return &t
+}
+
+func (t *Timeseries) Ping() error {
+	ok, err := t.client.Ping(context.Background())
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return errors.New("server is down")
+	}
+	return nil
 }
 
 func (t *Timeseries) Writer(bucket string) api.WriteAPIBlocking {
