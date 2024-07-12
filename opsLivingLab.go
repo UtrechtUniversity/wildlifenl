@@ -10,81 +10,81 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewParkInput struct {
+type NewLivingLabInput struct {
 	Input
-	Body *models.Park `json:"park"`
+	Body *models.LivingLab `json:"livinglab"`
 }
 
-type ParkHolder struct {
-	Body *models.Park `json:"park"`
+type LivingLabHolder struct {
+	Body *models.LivingLab `json:"livinglab"`
 }
 
-type ParksHolder struct {
-	Body []models.Park `json:"parks"`
+type LivingLabsHolder struct {
+	Body []models.LivingLab `json:"livinglabs"`
 }
 
-type parkOperations Operations
+type livinglabOperations Operations
 
-func newParkOperations(database *sql.DB) *parkOperations {
-	o := parkOperations{
+func newLivingLabOperations(database *sql.DB) *livinglabOperations {
+	o := livinglabOperations{
 		Database: database,
-		Endpoint: "park",
+		Endpoint: "livinglab",
 	}
 	return &o
 }
 
-func (o *parkOperations) RegisterGet(api huma.API) {
-	name := "Get Park By ID"
-	description := "Retrieve a specific park by ID."
+func (o *livinglabOperations) RegisterGet(api huma.API) {
+	name := "Get LivingLab By ID"
+	description := "Retrieve a specific living lab by ID."
 	path := "/" + o.Endpoint + "/{id}"
 	scopes := []string{}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" format:"uuid" doc:"The ID of the park."`
-	}) (*ParkHolder, error) {
-		park, err := stores.NewParkStore(relationalDB).Get(input.ID)
+		ID string `path:"id" format:"uuid" doc:"The ID of the livinglab."`
+	}) (*LivingLabHolder, error) {
+		livinglab, err := stores.NewLivingLabStore(relationalDB).Get(input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}
-		if park == nil {
+		if livinglab == nil {
 			return nil, generateNotFoundByIDError(o.Endpoint, input.ID)
 		}
-		return &ParkHolder{Body: park}, nil
+		return &LivingLabHolder{Body: livinglab}, nil
 	})
 }
 
-func (o *parkOperations) RegisterGetAll(api huma.API) {
-	name := "Get all Parks"
-	description := "Retrieve all parks."
+func (o *livinglabOperations) RegisterGetAll(api huma.API) {
+	name := "Get all LivingLabs"
+	description := "Retrieve all living labs."
 	path := "/" + o.Endpoint + "/"
 	scopes := []string{}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (output *ParksHolder, err error) {
-		parks, err := stores.NewParkStore(relationalDB).GetAll()
+	}, func(ctx context.Context, input *struct{}) (output *LivingLabsHolder, err error) {
+		livinglabs, err := stores.NewLivingLabStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}
-		return &ParksHolder{Body: parks}, nil
+		return &LivingLabsHolder{Body: livinglabs}, nil
 	})
 }
 
-func (o *parkOperations) RegisterAdd(api huma.API) {
-	name := "Add New Park"
-	description := "Submit a new park."
+func (o *livinglabOperations) RegisterAdd(api huma.API) {
+	name := "Add New LivingLab"
+	description := "Submit a new living lab."
 	path := "/" + o.Endpoint + "/"
 	scopes := []string{"administrator"}
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewParkInput) (*ParkHolder, error) {
-		park, err := stores.NewParkStore(relationalDB).Add(input.Body)
+	}, func(ctx context.Context, input *NewLivingLabInput) (*LivingLabHolder, error) {
+		livinglab, err := stores.NewLivingLabStore(relationalDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
-		return &ParkHolder{Body: park}, nil
+		return &LivingLabHolder{Body: livinglab}, nil
 	})
 }

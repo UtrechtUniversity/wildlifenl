@@ -51,7 +51,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newMeOperations(relationalDB))
 	huma.AutoRegister(api, newNoticeOperations(relationalDB))
 	huma.AutoRegister(api, newNoticeTypeOperations(relationalDB))
-	huma.AutoRegister(api, newParkOperations(relationalDB))
+	huma.AutoRegister(api, newLivingLabOperations(relationalDB))
 	huma.AutoRegister(api, newRoleOperations(relationalDB))
 	huma.AutoRegister(api, newSpeciesOperations(relationalDB))
 	huma.AutoRegister(api, newTrackingEventOperations(relationalDB))
