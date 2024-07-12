@@ -5,6 +5,8 @@ WORKDIR /app
 
 COPY go.mod go.sum ./
 RUN go mod download
+RUN go get github.com/UtrechtUniversity/wildlifenl/models
+RUN go get github.com/UtrechtUniversity/wildlifenl/stores
 
 COPY *.go ./
 COPY cmd/*.go cmd/
