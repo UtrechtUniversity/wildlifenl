@@ -81,6 +81,9 @@ func (o *authOperations) RegisterAuthorisation(api huma.API) {
 	}, func(ctx context.Context, input *AuthorizationInput) (*AuthorizationResult, error) {
 		credential, err := authorize(input.Body.Email, input.Body.Code)
 		if err != nil {
+			return nil, handleError(err)
+		}
+		if credential == nil {
 			return nil, huma.Error403Forbidden("The combination of email and code does not match a previous authentication")
 		}
 		return &AuthorizationResult{Body: credential}, nil
