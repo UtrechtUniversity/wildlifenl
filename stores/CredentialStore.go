@@ -49,7 +49,7 @@ func (s *CredentialStore) Create(appName, userName, email string) (*models.Crede
 	`
 	row := s.relationalDB.QueryRow(query, userName, email, userName)
 	var userID string
-	if err := row.Scan(&userID); err == sql.ErrNoRows {
+	if err := row.Scan(&userID); err != nil {
 		return nil, err
 	}
 	query = `
