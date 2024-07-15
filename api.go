@@ -148,7 +148,10 @@ func authorize(email, code string) (*models.Credential, error) {
 	if authenticationRequest.code != code {
 		return nil, errors.New("provided code does not match the sent code")
 	}
-	account := stores.NewCredentialStore(relationalDB).Create(authenticationRequest.appName, authenticationRequest.userName, authenticationRequest.email)
+	account, err := stores.NewCredentialStore(relationalDB).Create(authenticationRequest.appName, authenticationRequest.userName, authenticationRequest.email)
+	if err != nil {
+		return nil, err
+	}
 	sessions.SetDefault(account.Token, account)
 	return account, nil
 }

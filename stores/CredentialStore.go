@@ -41,7 +41,7 @@ func (s *CredentialStore) Get(token string) *models.Credential {
 	return &credential
 }
 
-func (s *CredentialStore) Create(appName, userName, email string) *models.Credential {
+func (s *CredentialStore) Create(appName, userName, email string) (*models.Credential, error) {
 	query := `
 		INSERT INTO "user"("name", "email") VALUES($1, $2) 
 		ON CONFLICT("email") DO UPDATE SET "name" = $3 
@@ -50,7 +50,7 @@ func (s *CredentialStore) Create(appName, userName, email string) *models.Creden
 	row := s.relationalDB.QueryRow(query, userName, email, userName)
 	var userID string
 	if err := row.Scan(&userID); err == sql.ErrNoRows {
-		return nil
+		return nil, err
 	}
 	query = `
 		SELECT r."name"
@@ -61,7 +61,7 @@ func (s *CredentialStore) Create(appName, userName, email string) *models.Creden
 	`
 	rows, err := s.relationalDB.Query(query, userID)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	scopes := make([]string, 0)
 	for rows.Next() {
@@ -76,8 +76,8 @@ func (s *CredentialStore) Create(appName, userName, email string) *models.Creden
 	row = s.relationalDB.QueryRow(query, email, appName)
 	credential := models.Credential{UserID: userID}
 	if err := row.Scan(&credential.Token, &credential.Email, &credential.LastLogon); err != nil {
-		return nil
+		return nil, err
 	}
 	credential.Scopes = scopes
-	return &credential
+	return &credential, nil
 }
