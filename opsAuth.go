@@ -46,7 +46,16 @@ func (o *authOperations) RegisterAuthentication(api huma.API) {
 			log.Println("ERROR authentication:", err)
 			return nil, huma.Error500InternalServerError("An email could not be sent to the provided email address.")
 		}
-		return &AuthenticationResult{Body: "The authentication code has been sent to: " + input.Body.Email}, nil
+
+		// TODO add mailing code, then remove code below.
+		code := ""
+		if value, ok := authRequests.Get(input.Body.Email); ok {
+			code = value.(AuthenticationRequest).code
+		}
+		return &AuthenticationResult{Body: "The authentication code: " + code}, nil
+		// ----
+
+		// return &AuthenticationResult{Body: "The authentication code has been sent to: " + input.Body.Email}, nil
 	})
 }
 
