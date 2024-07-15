@@ -99,7 +99,7 @@ func (s *BorneSensorReadingStore) Add(borneSensorReading *models.BorneSensorRead
 		return err
 	}
 	query := `
-		UPDATE animal SET "location" = $1
+		UPDATE animal SET "location" = $1, "locationTimestamp" = now()
 		FROM animal a
 		JOIN "borneSensorDeployment" d on a."id" = d."animalID"
 		WHERE d."sensorID" = $2
