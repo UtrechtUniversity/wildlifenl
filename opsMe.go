@@ -3,7 +3,6 @@ package wildlifenl
 import (
 	"context"
 	"database/sql"
-	"log"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -38,7 +37,6 @@ func (o *meOperations) RegisterGet(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *MeInput) (*MeHolder, error) {
-		log.Println("Credential Token:", input.credential.Token)
 		me, err := stores.NewMeStore(relationalDB).Get(input.credential.Token)
 		if err != nil {
 			return nil, handleError(err)
