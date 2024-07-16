@@ -81,7 +81,7 @@ func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) 
 }
 
 func (s *BorneSensorReadingStore) Add(borneSensorReading *models.BorneSensorReading) error {
-	writer := s.timeseriesDB.Writer("animal")
+	writer := s.timeseriesDB.Writer("animals")
 	tags := map[string]string{
 		"sensorID": borneSensorReading.SensorID,
 	}
