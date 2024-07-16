@@ -13,10 +13,6 @@ type Input struct {
 
 func (m *Input) Resolve(ctx huma.Context) []error {
 	token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
-	credential, err := getCredential(token)
-	if err != nil {
-		return []error{err}
-	}
-	m.credential = credential
+	m.credential = getCredential(token)
 	return nil
 }
