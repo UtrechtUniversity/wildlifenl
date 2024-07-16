@@ -163,7 +163,7 @@ func getCredential(token string) *models.Credential {
 	}
 	credential, err := stores.NewCredentialStore(relationalDB).Get(token)
 	if err != nil {
-		log.Fatal("ERROR when using credential store:", err)
+		log.Fatal("ERROR getting credential from store:", err)
 	}
 	if credential == nil {
 		return nil

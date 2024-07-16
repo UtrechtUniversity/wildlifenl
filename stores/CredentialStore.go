@@ -13,10 +13,10 @@ func NewCredentialStore(db *sql.DB) *CredentialStore {
 		relationalDB: db,
 		query: `
 		SELECT u."id", c."token", c."email", c."lastLogon", r."name"
-		FROM "user_role" x
-		INNER JOIN "role" r ON r."id" = x."roleID"
-		INNER JOIN "user" u ON u."id" = x."userID"
-		INNER JOIN "credential" c on c."email" = u."email"
+		FROM "credential" c
+		INNER JOIN "user" u ON u."email" = C."email"
+		LEFT JOIN "user_role" x ON x."userID" = u."id"
+		LEFT JOIN "role" r ON r."id" = x."roleID"
 		`,
 	}
 	return &s
