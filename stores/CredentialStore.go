@@ -22,13 +22,13 @@ func NewCredentialStore(db *sql.DB) *CredentialStore {
 	return &s
 }
 
-func (s *CredentialStore) Get(token string) *models.Credential {
+func (s *CredentialStore) Get(token string) (*models.Credential, error) {
 	query := s.query + `
 		WHERE c."token" = $1
 	`
 	rows, err := s.relationalDB.Query(query, token)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	credential := models.Credential{
 		Scopes: make([]string, 0),
@@ -38,7 +38,7 @@ func (s *CredentialStore) Get(token string) *models.Credential {
 		rows.Scan(&credential.UserID, &credential.Token, &credential.Email, &credential.LastLogon, &role)
 		credential.Scopes = append(credential.Scopes, role)
 	}
-	return &credential
+	return &credential, nil
 }
 
 func (s *CredentialStore) Create(appName, userName, email string) (*models.Credential, error) {

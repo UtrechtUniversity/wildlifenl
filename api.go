@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand/v2"
 	"net/http"
 	"slices"
@@ -101,7 +102,10 @@ func NewAuthMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Conte
 			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Missing bearer token.")
 			return
 		}
-		account := getCredential(token)
+		account, err := getCredential(token)
+		if err != nil {
+			log.Println("ERROR:", err)
+		}
 		if account == nil {
 			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Invalid bearer token.")
 			return
@@ -156,14 +160,17 @@ func authorize(email, code string) (*models.Credential, error) {
 	return account, nil
 }
 
-func getCredential(token string) *models.Credential {
+func getCredential(token string) (*models.Credential, error) {
 	if credential, ok := sessions.Get(token); ok {
-		return credential.(*models.Credential)
+		return credential.(*models.Credential), nil
 	}
-	credential := stores.NewCredentialStore(relationalDB).Get(token)
+	credential, err := stores.NewCredentialStore(relationalDB).Get(token)
+	if err != nil {
+		return nil, err
+	}
 	if credential == nil {
-		return nil
+		return nil, nil
 	}
 	sessions.SetDefault(token, credential)
-	return credential
+	return credential, nil
 }
