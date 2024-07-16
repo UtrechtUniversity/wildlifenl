@@ -17,7 +17,7 @@ func NewBorneSensorReadingStore(relationalDB *sql.DB, timeseriesDB *Timeseries) 
 		relationalDB: relationalDB,
 		timeseriesDB: timeseriesDB,
 		query: `
-			from(bucket: "animal")
+			from(bucket: "animals")
         	|> range(start: -60m)
 		`,
 	}
