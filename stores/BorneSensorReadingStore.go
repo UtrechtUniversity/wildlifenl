@@ -3,7 +3,6 @@ package stores
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -18,7 +17,7 @@ func NewBorneSensorReadingStore(relationalDB *sql.DB, timeseriesDB *Timeseries) 
 		timeseriesDB: timeseriesDB,
 		query: `
 			from(bucket: "animals")
-        	|> range(start: -60m)
+        	|> range(start: -360d)
 		`,
 	}
 	return &s
@@ -44,26 +43,43 @@ func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) 
 		}
 		reading, ok := sensor[r.Time()]
 		if !ok {
-			reading = &models.BorneSensorReading{Location: models.Point{}}
+			reading = &models.BorneSensorReading{}
 			sensor[r.Time()] = reading
 		}
 		switch r.Field() {
 		case "latitude":
+			if reading.Location == nil {
+				reading.Location = &models.Point{}
+			}
 			reading.Location.Latitude = r.Value().(float64)
 		case "longitude":
+			if reading.Location == nil {
+				reading.Location = &models.Point{}
+			}
 			reading.Location.Longitude = r.Value().(float64)
-		case "heartbeat":
-			if value, ok := r.Value().(int64); ok {
-				v := int(value)
-				reading.Heartbeat = &v
+		case "altitude":
+			if value, ok := r.Value().(float64); ok {
+				reading.Altitude = &value
 			}
 		case "temperature":
-			if value, ok := r.Value().(int64); ok {
-				v := int(value)
-				reading.Temperature = &v
+			if value, ok := r.Value().(float64); ok {
+				reading.Temperature = &value
 			}
-		default:
-			fmt.Println("unknown field:", r.Field())
+		case "acceleroX":
+			if reading.Accelero == nil {
+				reading.Accelero = &models.Accelero{}
+			}
+			reading.Accelero.X = r.Value().(float64)
+		case "acceleroY":
+			if reading.Accelero == nil {
+				reading.Accelero = &models.Accelero{}
+			}
+			reading.Accelero.Y = r.Value().(float64)
+		case "acceleroZ":
+			if reading.Accelero == nil {
+				reading.Accelero = &models.Accelero{}
+			}
+			reading.Accelero.Z = r.Value().(float64)
 		}
 	}
 	if err := records.Err(); err != nil {
@@ -81,32 +97,43 @@ func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) 
 }
 
 func (s *BorneSensorReadingStore) Add(borneSensorReading *models.BorneSensorReading) error {
-	writer := s.timeseriesDB.Writer("animals")
-	tags := map[string]string{
-		"sensorID": borneSensorReading.SensorID,
-	}
 	fields := make(map[string]any)
-	fields["latitude"] = borneSensorReading.Location.Latitude
-	fields["longitude"] = borneSensorReading.Location.Longitude
-	if borneSensorReading.Heartbeat != nil {
-		fields["heartbeat"] = *borneSensorReading.Heartbeat
+	if borneSensorReading.Location != nil {
+		fields["latitude"] = borneSensorReading.Location.Latitude
+		fields["longitude"] = borneSensorReading.Location.Longitude
+	}
+	if borneSensorReading.Altitude != nil {
+		fields["altitude"] = *borneSensorReading.Altitude
 	}
 	if borneSensorReading.Temperature != nil {
 		fields["temperature"] = *borneSensorReading.Temperature
 	}
-	point := write.NewPoint("borne-sensor", tags, fields, time.Now())
-	if err := writer.WritePoint(context.Background(), point); err != nil {
-		return err
+	if borneSensorReading.Accelero != nil {
+		fields["acceleroX"] = borneSensorReading.Accelero.X
+		fields["acceleroY"] = borneSensorReading.Accelero.Y
+		fields["acceleroZ"] = borneSensorReading.Accelero.Z
 	}
-	query := `
-		UPDATE animal SET "location" = $1, "locationTimestamp" = now()
-		FROM animal a
-		JOIN "borneSensorDeployment" d on a."id" = d."animalID"
-		WHERE d."sensorID" = $2
-	`
-	_, err := s.relationalDB.Exec(query, borneSensorReading.Location, borneSensorReading.SensorID)
-	if err != nil {
-		return err
+	if len(fields) > 0 {
+		writer := s.timeseriesDB.Writer("animals")
+		tags := map[string]string{
+			"sensorID": borneSensorReading.SensorID,
+		}
+		point := write.NewPoint("borne-sensor", tags, fields, borneSensorReading.Timestamp.Local())
+		if err := writer.WritePoint(context.Background(), point); err != nil {
+			return err
+		}
+	}
+	if borneSensorReading.Location != nil {
+		query := `
+			UPDATE animal SET "location" = $1, "locationTimestamp" = $2
+			FROM animal a
+			JOIN "borneSensorDeployment" d on a."id" = d."animalID"
+			WHERE d."sensorID" = $3
+		`
+		_, err := s.relationalDB.Exec(query, borneSensorReading.Location, borneSensorReading.Timestamp, borneSensorReading.SensorID)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

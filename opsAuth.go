@@ -40,7 +40,7 @@ func (o *authOperations) RegisterAuthentication(api huma.API) {
 	scopes := []string{}
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: nil,
 	}, func(ctx context.Context, input *AuthenticationInput) (*AuthenticationResult, error) {
 		if err := authenticate(input.Body.DisplayNameApp, input.Body.DisplayNameUser, input.Body.Email); err != nil {
 			log.Println("ERROR authentication:", err)
@@ -77,7 +77,7 @@ func (o *authOperations) RegisterAuthorisation(api huma.API) {
 	scopes := []string{}
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes),
 	}, func(ctx context.Context, input *AuthorizationInput) (*AuthorizationResult, error) {
 		credential, err := authorize(input.Body.Email, input.Body.Code)
 		if err != nil {
