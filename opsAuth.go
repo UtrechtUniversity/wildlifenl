@@ -35,12 +35,12 @@ type AuthenticationResult struct {
 
 func (o *authOperations) RegisterAuthentication(api huma.API) {
 	name := "Authenticate"
-	description := "Start the log on process and request a code by email, then call Authorize with this code."
+	description := "Start the login process and request a code by email, then call Authorize with this code."
 	path := "/" + o.Endpoint + "/"
 	scopes := []string{}
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: nil,
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"": scopes}},
 	}, func(ctx context.Context, input *AuthenticationInput) (*AuthenticationResult, error) {
 		if err := authenticate(input.Body.DisplayNameApp, input.Body.DisplayNameUser, input.Body.Email); err != nil {
 			log.Println("ERROR authentication:", err)
@@ -72,12 +72,12 @@ type AuthorizationResult struct {
 
 func (o *authOperations) RegisterAuthorisation(api huma.API) {
 	name := "Authorize"
-	description := "Finalize the log on process by providing the code as received by email and get a bearer token."
+	description := "Finalize the login process by providing the code as received by email and get a bearer token."
 	path := "/" + o.Endpoint + "/"
 	scopes := []string{}
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes),
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"": scopes}},
 	}, func(ctx context.Context, input *AuthorizationInput) (*AuthorizationResult, error) {
 		credential, err := authorize(input.Body.Email, input.Body.Code)
 		if err != nil {
