@@ -12,7 +12,7 @@ func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
 		relationalDB: db,
 		query: `
-		SELECT i."id", i."createdAt", i."description", i."latitude", i."longitude", s."id", s."name", s."commonNameNL", s."commonNameEN", u."id", u."name"
+		SELECT i."id", i."timestamp", i."description", i."location", s."id", s."name", s."commonNameNL", s."commonNameEN", u."id", u."name"
 		FROM interaction i
 		INNER JOIN "species" s ON s."id" = i."speciesID"
 		INNER JOIN "user" u ON u."id" = i."userID"
@@ -30,7 +30,7 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 		var interaction models.Interaction
 		var species models.Species
 		var user models.User
-		if err := rows.Scan(&interaction.ID, &interaction.CreatedAt, &interaction.Description, &interaction.Latitude, &interaction.Longitude, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN, &user.ID, &user.Name); err != nil {
+		if err := rows.Scan(&interaction.ID, &interaction.Timestamp, &interaction.Description, &interaction.Location, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN, &user.ID, &user.Name); err != nil {
 			return nil, err
 		}
 		interaction.Species = species
@@ -71,11 +71,11 @@ func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error
 
 func (s *InteractionStore) Add(userID string, interaction *models.InteractionRecord) (*models.Interaction, error) {
 	query := `
-		INSERT INTO interaction("description", "latitude", "longitude", "speciesID", "userID") VALUES($1, $2, $3, $4, $5)
+		INSERT INTO interaction("description", "location","speciesID", "userID") VALUES($1, $2, $3, $4)
 		RETURNING "id"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Latitude, interaction.Longitude, interaction.SpeciesID, userID)
+	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.SpeciesID, userID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
