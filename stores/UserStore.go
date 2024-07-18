@@ -12,7 +12,7 @@ func NewUserStore(db *sql.DB) *UserStore {
 	s := UserStore{
 		relationalDB: db,
 		query: `
-		SELECT u."id", u."name", r."id", r."name"
+		SELECT u."id", u."name", COALESCE(r."id", 0), COALESCE(r."name", '')
 		FROM "user" u
 		LEFT JOIN user_role x ON x."userID" = u."id"
 		LEFT JOIN role r ON r."id" = x."roleID"
