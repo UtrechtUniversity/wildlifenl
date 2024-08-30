@@ -85,5 +85,22 @@ func main() {
 		config.CacheAuthRequestDurationMinutes = cacheAuthrequestMins
 	}
 
+	config.EmailFrom = os.Getenv("EMAIL_FROM")
+	if config.EmailFrom == "" {
+		log.Fatal("environment variable EMAIL_FROM cannot be empty")
+	}
+	config.EmailHost = os.Getenv("EMAIL_HOST")
+	if config.EmailHost == "" {
+		log.Fatal("environment variable EMAIL_HOST cannot be empty")
+	}
+	config.EmailUser = os.Getenv("EMAIL_USER")
+	if config.EmailUser == "" {
+		log.Fatal("environment variable EMAIL_USER cannot be empty")
+	}
+	config.EmailPassword = os.Getenv("EMAIL_PASS")
+	if config.EmailPassword == "" {
+		log.Fatal("environment variable EMAIL_PASS cannot be empty")
+	}
+
 	log.Fatal(wildlifenl.Start(config))
 }

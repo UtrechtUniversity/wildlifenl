@@ -16,28 +16,33 @@ import (
 	"github.com/UtrechtUniversity/wildlifenl/stores"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
+	"github.com/go-mail/mail"
 	"github.com/patrickmn/go-cache"
 )
 
 const appName = "WildlifeNL"
 const appVersion = "0.1"
+const emailSubject = "Aanmelden bij WildlifeNL"
+const emailBody = "Beste {displayName},<br/>De applicatie {appName} wil graag aanmelden bij WildlifeNL met jouw emailadres. Om dit toe te staan, voer onderstaande code in bij deze applicatie.<br/>Code: {code}<br/>"
 
 var (
-	relationalDB *sql.DB
-	timeseriesDB *stores.Timeseries
-	sessions     *cache.Cache
-	authRequests *cache.Cache
+	configuration *Configuration
+	relationalDB  *sql.DB
+	timeseriesDB  *stores.Timeseries
+	sessions      *cache.Cache
+	authRequests  *cache.Cache
 )
 
 func Start(config *Configuration) error {
-	if err := loadRelationalDB(config); err != nil {
+	configuration = config
+	if err := loadRelationalDB(configuration); err != nil {
 		return fmt.Errorf("could not connect to relational database: %w", err)
 	}
-	if err := loadTimeseriesDB(config); err != nil {
+	if err := loadTimeseriesDB(configuration); err != nil {
 		return fmt.Errorf("could not connect to timeseries database: %w", err)
 	}
-	sessions = cache.New(time.Duration(config.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
-	authRequests = cache.New(time.Duration(config.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
+	sessions = cache.New(time.Duration(configuration.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
+	authRequests = cache.New(time.Duration(configuration.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
 	apiConfig := huma.DefaultConfig(appName, appVersion)
 	apiConfig.Security = []map[string][]string{{"auth": {}}}
 	apiConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{"auth": {Type: "http", Scheme: "bearer"}}
@@ -59,7 +64,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newSpeciesOperations(relationalDB))
 	huma.AutoRegister(api, newTrackingEventOperations(relationalDB))
 	huma.AutoRegister(api, newUserOperations(relationalDB))
-	return http.ListenAndServe(config.Host+":"+strconv.Itoa(config.Port), router)
+	return http.ListenAndServe(configuration.Host+":"+strconv.Itoa(configuration.Port), router)
 }
 
 func loadRelationalDB(config *Configuration) error {
@@ -126,10 +131,9 @@ func authenticate(displayNameApp, displayNameUser, email string) error {
 	for i := 0; i < 6; i++ {
 		code += strconv.Itoa(rand.IntN(10))
 	}
-
-	// TODO send email message here
-	// sendEmail(request)
-
+	if err := sendCodeByEmail(displayNameApp, displayNameUser, email, code); err != nil {
+		return err
+	}
 	authenticationRequest := AuthenticationRequest{
 		appName:  displayNameApp,
 		userName: displayNameUser,
@@ -170,4 +174,18 @@ func getCredential(token string) *models.Credential {
 	}
 	sessions.SetDefault(token, credential)
 	return credential
+}
+
+func sendCodeByEmail(appName, displayName, email, code string) error {
+	body := emailBody
+	body = strings.ReplaceAll(body, "{appName}", appName)
+	body = strings.ReplaceAll(body, "{displayName}", displayName)
+	body = strings.ReplaceAll(body, "{code}", code)
+	m := mail.NewMessage()
+	m.SetHeader("From", configuration.EmailFrom)
+	m.SetHeader("To", email)
+	m.SetHeader("Subject", emailSubject)
+	m.SetBody("text/html", body)
+	d := mail.NewDialer(configuration.EmailHost, 587, configuration.EmailUser, configuration.EmailPassword)
+	return d.DialAndSend(m)
 }

@@ -14,4 +14,8 @@ type Configuration struct {
 	TimeseriesDatabaseToken         string
 	CacheSessionDurationMinutes     int
 	CacheAuthRequestDurationMinutes int
+	EmailFrom                       string
+	EmailHost                       string
+	EmailUser                       string
+	EmailPassword                   string
 }
