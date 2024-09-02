@@ -10,7 +10,7 @@ COPY *.go ./
 COPY cmd/*.go cmd/
 COPY models/*.go models/
 COPY stores/*.go stores/
-COPY database/*.sql database/
+COPY database/*.sql /app/database/
 
 RUN go build -o /app/wildlifenl cmd/*.go
 
