@@ -38,6 +38,9 @@ func (s *CredentialStore) Get(token string) (*models.Credential, error) {
 		rows.Scan(&credential.UserID, &credential.Token, &credential.Email, &credential.LastLogon, &role)
 		credential.Scopes = append(credential.Scopes, role)
 	}
+	if credential.UserID == "" {
+		return nil, nil
+	}
 	return &credential, nil
 }
 
@@ -70,7 +73,10 @@ func (s *CredentialStore) Create(appName, userName, email string) (*models.Crede
 		scopes = append(scopes, role)
 	}
 	query = `
-		INSERT INTO credential("email", "appName") VALUES($1, $2)
+		INSERT INTO credential("email", "appName", "lastLogon")
+		VALUES ($1, $2, NOW())
+		ON CONFLICT ("email", "appName") 
+		DO UPDATE SET "lastLogon" = NOW()
 		RETURNING "token", "email", "lastLogon";
 	`
 	row = s.relationalDB.QueryRow(query, email, appName)
