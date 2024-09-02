@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS "role" (
+	"id" SERIAL NOT NULL,
+	"name" VARCHAR NOT NULL,
+	PRIMARY KEY ("id")
+);

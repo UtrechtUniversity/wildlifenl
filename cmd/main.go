@@ -6,6 +6,9 @@ import (
 	"strconv"
 
 	"github.com/UtrechtUniversity/wildlifenl"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func main() {
@@ -102,5 +105,25 @@ func main() {
 		log.Fatal("environment variable EMAIL_PASS cannot be empty")
 	}
 
+	if err := migrateDatabase(config); err != nil {
+		log.Fatal("Database migration error:", err)
+	}
+
 	log.Fatal(wildlifenl.Start(config))
+}
+
+func migrateDatabase(config *wildlifenl.Configuration) error {
+	connStr := "postgres://" + config.RelationalDatabaseUser + ":" + config.RelationalDatabasePass + "@" + config.RelationalDatabaseHost
+	if config.RelationalDatabasePort > 0 {
+		connStr += ":" + strconv.Itoa(config.RelationalDatabasePort)
+	}
+	connStr += "/" + config.RelationalDatabaseName + "?sslmode=" + config.RelationalDatabaseSSLmode
+	m, err := migrate.New("file://../database", connStr)
+	if err != nil {
+		return err
+	}
+	if err := m.Up(); err != migrate.ErrNoChange {
+		return err
+	}
+	return nil
 }

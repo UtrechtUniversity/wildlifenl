@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 	"math/rand/v2"
@@ -21,9 +20,10 @@ import (
 )
 
 const appName = "WildlifeNL"
-const appVersion = "0.1"
+const appVersion = "3"
+
 const emailSubject = "Aanmelden bij WildlifeNL"
-const emailBody = "Beste {displayName},<br/>De applicatie {appName} wil graag aanmelden bij WildlifeNL met jouw emailadres. Om dit toe te staan, voer onderstaande code in bij deze applicatie.<br/>Code: {code}<br/>"
+const emailBody = "Beste {displayName}<br/>De applicatie {appName} wil graag aanmelden bij WildlifeNL met jouw emailadres. Om dit toe te staan, voer onderstaande code in bij deze applicatie.<br/>Code: {code}<br/><br/>Met vriendelijke groet<br/>WildlifeNL<br/><br/>"
 
 var (
 	configuration *Configuration
@@ -51,18 +51,14 @@ func Start(config *Configuration) error {
 	api := humago.New(router, apiConfig)
 	api.UseMiddleware(NewAuthMiddleware(api))
 	huma.AutoRegister(api, newAnimalOperations(relationalDB))
-	huma.AutoRegister(api, newAreaOperations(relationalDB))
 	huma.AutoRegister(api, newAuthOperations(relationalDB))
 	huma.AutoRegister(api, newBorneSensorDeploymentOperations())
 	huma.AutoRegister(api, newBorneSensorReadingOperations())
 	huma.AutoRegister(api, newInteractionOperations(relationalDB))
 	huma.AutoRegister(api, newMeOperations(relationalDB))
-	huma.AutoRegister(api, newNoticeOperations(relationalDB))
-	huma.AutoRegister(api, newNoticeTypeOperations(relationalDB))
 	huma.AutoRegister(api, newLivingLabOperations(relationalDB))
 	huma.AutoRegister(api, newRoleOperations(relationalDB))
 	huma.AutoRegister(api, newSpeciesOperations(relationalDB))
-	huma.AutoRegister(api, newTrackingEventOperations(relationalDB))
 	huma.AutoRegister(api, newUserOperations(relationalDB))
 	return http.ListenAndServe(configuration.Host+":"+strconv.Itoa(configuration.Port), router)
 }
@@ -147,11 +143,11 @@ func authenticate(displayNameApp, displayNameUser, email string) error {
 func authorize(email, code string) (*models.Credential, error) {
 	c, ok := authRequests.Get(email)
 	if !ok {
-		return nil, errors.New("email address not found, possibly the code has expired")
+		return nil, nil
 	}
 	authenticationRequest := c.(AuthenticationRequest)
 	if authenticationRequest.code != code {
-		return nil, errors.New("provided code does not match the sent code")
+		return nil, nil
 	}
 	account, err := stores.NewCredentialStore(relationalDB).Create(authenticationRequest.appName, authenticationRequest.userName, authenticationRequest.email)
 	if err != nil {
@@ -177,6 +173,9 @@ func getCredential(token string) *models.Credential {
 }
 
 func sendCodeByEmail(appName, displayName, email, code string) error {
+	if configuration.EmailHost == "local" {
+		return nil
+	}
 	body := emailBody
 	body = strings.ReplaceAll(body, "{appName}", appName)
 	body = strings.ReplaceAll(body, "{displayName}", displayName)

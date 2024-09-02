@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS "borneSensorDeployment" (
+	"animalID" UUID NOT NULL,
+	"sensorID" VARCHAR NOT NULL,
+	"start" TIMESTAMPTZ NOT NULL,
+	"end" TIMESTAMPTZ NULL DEFAULT NULL,
+	CONSTRAINT "FK_borneSensorDeployment_animal" FOREIGN KEY ("animalID") REFERENCES "animal" ("id") ON UPDATE RESTRICT ON DELETE RESTRICT
+);

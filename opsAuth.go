@@ -75,7 +75,7 @@ func (o *authOperations) RegisterAuthorisation(api huma.API) {
 			return nil, handleError(err)
 		}
 		if credential == nil {
-			return nil, huma.Error403Forbidden("The combination of email and code does not match a previous authentication")
+			return nil, huma.Error403Forbidden("The combination of email and code does not match a previous authentication. If you are sure that the email is correct, perhaps the code expired. You can authenticate again to get a new code.")
 		}
 		return &AuthorizationResult{Body: credential}, nil
 	})
