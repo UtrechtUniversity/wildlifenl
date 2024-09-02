@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.22
+FROM quay.io/projectquay/golang:1.22
 
 WORKDIR /app
 
