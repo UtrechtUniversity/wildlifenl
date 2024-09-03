@@ -54,7 +54,7 @@ func (o *userOperations) RegisterGetAll(api huma.API) {
 	name := "Get all Users"
 	description := "Retrieve all users."
 	path := "/" + o.Endpoint + "/"
-	scopes := []string{"researcher"}
+	scopes := []string{"administrator", "researcher"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
