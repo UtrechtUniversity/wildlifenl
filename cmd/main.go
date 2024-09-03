@@ -118,7 +118,7 @@ func migrateDatabase(config *wildlifenl.Configuration) error {
 		connStr += ":" + strconv.Itoa(config.RelationalDatabasePort)
 	}
 	connStr += "/" + config.RelationalDatabaseName + "?sslmode=" + config.RelationalDatabaseSSLmode
-	m, err := migrate.New("file://database", connStr)
+	m, err := migrate.New("file://../database", connStr)
 	if err != nil {
 		return err
 	}
