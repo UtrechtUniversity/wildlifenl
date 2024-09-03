@@ -173,7 +173,7 @@ func getCredential(token string) *models.Credential {
 }
 
 func sendCodeByEmail(appName, displayName, email, code string) error {
-	if configuration.EmailHost == "local" {
+	if configuration.EmailHost == "no-email" {
 		return nil
 	}
 	body := emailBody
