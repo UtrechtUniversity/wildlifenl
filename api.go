@@ -48,10 +48,6 @@ func Start(config *Configuration) error {
 	apiConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{"auth": {Type: "http", Scheme: "bearer"}}
 	apiConfig.DocsPath = "/"
 
-	if err := stores.NewRoleStore(relationalDB).AddRoleToUser("8a22b5ce-79e7-4f7b-9698-b0a83b07f45a", 1); err != nil {
-		log.Fatal(err)
-	}
-
 	router := http.NewServeMux()
 	api := humago.New(router, apiConfig)
 	api.UseMiddleware(NewAuthMiddleware(api))
