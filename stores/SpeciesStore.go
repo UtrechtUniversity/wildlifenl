@@ -12,7 +12,7 @@ func NewSpeciesStore(db *sql.DB) *SpeciesStore {
 	s := SpeciesStore{
 		relationalDB: db,
 		query: `
-		SELECT s."id", s."name", s."commonNameNL", s."commonNameEN"
+		SELECT s."ID", s."name", s."commonNameNL", s."commonNameEN"
 		FROM "species" s
 		`,
 	}
@@ -36,7 +36,7 @@ func (s *SpeciesStore) process(rows *sql.Rows, err error) ([]models.Species, err
 
 func (s *SpeciesStore) Get(speciesID string) (*models.Species, error) {
 	query := s.query + `
-		WHERE s."id" = $1
+		WHERE s."ID" = $1
 		`
 	rows, err := s.relationalDB.Query(query, speciesID)
 	result, err := s.process(rows, err)

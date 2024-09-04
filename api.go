@@ -20,7 +20,7 @@ import (
 )
 
 const appName = "WildlifeNL"
-const appVersion = "3.1"
+const appVersion = "1.3.1"
 
 const emailSubject = "Aanmelden bij WildlifeNL"
 const emailBody = "Beste {displayName}<br/>De applicatie {appName} wil graag aanmelden bij WildlifeNL met jouw emailadres. Om dit toe te staan, voer onderstaande code in bij deze applicatie.<br/>Code: {code}<br/><br/>Met vriendelijke groet<br/>WildlifeNL<br/><br/>"

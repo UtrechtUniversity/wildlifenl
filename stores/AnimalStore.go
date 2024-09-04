@@ -13,9 +13,9 @@ func NewAnimals(relationalDB *sql.DB, timeseriesDB *Timeseries) *AnimalStore {
 		relationalDB: relationalDB,
 		timeseriesDB: timeseriesDB,
 		query: `
-		SELECT a."id", a."name", a."location", s."id", s."name", s."commonNameNL", s."commonNameEN"
-		FROM animal a
-		LEFT JOIN species s ON s.id = a."speciesID"
+		SELECT a."ID", a."name", a."location", s."ID", s."name", s."commonNameNL", s."commonNameEN"
+		FROM "animal" a
+		LEFT JOIN "species" s ON s."ID" = a."speciesID"
 		`,
 	}
 	return &s
@@ -23,7 +23,7 @@ func NewAnimals(relationalDB *sql.DB, timeseriesDB *Timeseries) *AnimalStore {
 
 func (s *AnimalStore) Get(id string) (*models.Animal, error) {
 	query := s.query + `
-		WHERE a."id" = $1
+		WHERE a."ID" = $1
 	`
 	var animal models.Animal
 	var species models.Species

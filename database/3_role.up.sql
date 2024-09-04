@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "role" (
-	"id" SERIAL NOT NULL,
+	"ID" SERIAL NOT NULL,
 	"name" VARCHAR NOT NULL,
-	PRIMARY KEY ("id")
+	PRIMARY KEY ("ID")
 );
 
 INSERT INTO "role"("name") VALUES ('administrator');

@@ -12,10 +12,10 @@ func NewBorneSensorDeploymentStore(relationalDB *sql.DB) *BorneSensorDeploymentS
 	s := BorneSensorDeploymentStore{
 		relationalDB: relationalDB,
 		query: `
-			SELECT d."sensorID", d."start", d."end", a."id", a."name", a."location", s."id", s."name", s."commonNameNL", s."commonNameEN"
+			SELECT d."sensorID", d."start", d."end", a."ID", a."name", a."location", s."ID", s."name", s."commonNameNL", s."commonNameEN"
 			FROM "borneSensorDeployment" d
-			INNER JOIN animal a ON a."id" = d."animalID"
-			INNER JOIN species s ON s."id" = a."speciesID"
+			INNER JOIN "animal" a ON a."ID" = d."animalID"
+			INNER JOIN "species" s ON s."ID" = a."speciesID"
 			WHERE d."end" IS NULL
 		`,
 	}

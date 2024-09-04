@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS "user" (
+	"ID" UUID NOT NULL DEFAULT gen_random_uuid(),
+	"name" VARCHAR NOT NULL DEFAULT '',
+	"email" VARCHAR NOT NULL,
+	"livingLabID" UUID NULL,
+	PRIMARY KEY ("ID"),
+	UNIQUE ("email"),
+	CONSTRAINT "user_livingLabID_fkey" FOREIGN KEY ("livingLabID") REFERENCES "livingLab" ("ID") ON UPDATE RESTRICT ON DELETE RESTRICT
+);

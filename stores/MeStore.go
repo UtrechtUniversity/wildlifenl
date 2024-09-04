@@ -12,9 +12,9 @@ func NewMeStore(db *sql.DB) *MeStore {
 	s := MeStore{
 		relationalDB: db,
 		query: `
-		SELECT u."id", u."email"
+		SELECT u."ID", u."email"
 		FROM "user" u
-		INNER JOIN credential c	ON c."email" = u."email"
+		INNER JOIN "credential" c ON c."email" = u."email"
 		`,
 	}
 	return &s

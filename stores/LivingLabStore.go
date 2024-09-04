@@ -12,7 +12,7 @@ func NewLivingLabStore(db *sql.DB) *LivingLabStore {
 	s := LivingLabStore{
 		relationalDB: db,
 		query: `
-		SELECT l."id", l."name", l."definition"
+		SELECT l."ID", l."name", l."definition"
 		FROM "livingLab" l
 		`,
 	}
@@ -36,7 +36,7 @@ func (s *LivingLabStore) process(rows *sql.Rows, err error) ([]models.LivingLab,
 
 func (s *LivingLabStore) Get(livinglabID string) (*models.LivingLab, error) {
 	query := s.query + `
-		WHERE l."id" = $1
+		WHERE l."ID" = $1
 		`
 	rows, err := s.relationalDB.Query(query, livinglabID)
 	result, err := s.process(rows, err)
@@ -56,8 +56,8 @@ func (s *LivingLabStore) GetAll() ([]models.LivingLab, error) {
 
 func (s *LivingLabStore) Add(livinglab *models.LivingLab) (*models.LivingLab, error) {
 	query := `
-		INSERT INTO livingLab("name", "definition") VALUES($1, $2)
-		RETURNING "id"
+		INSERT INTO "livingLab"("name", "definition") VALUES($1, $2)
+		RETURNING "ID"
 	`
 	var id string
 	row := s.relationalDB.QueryRow(query, livinglab.Name, livinglab.Definition)

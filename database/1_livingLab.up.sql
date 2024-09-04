@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS "livingLab" (
+	"ID" UUID NOT NULL DEFAULT gen_random_uuid(),
+	"name" VARCHAR NOT NULL DEFAULT '',
+	"definition" POLYGON NULL DEFAULT NULL,
+	PRIMARY KEY ("ID")
+);

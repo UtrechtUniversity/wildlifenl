@@ -12,10 +12,11 @@ func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
 		relationalDB: db,
 		query: `
-		SELECT i."id", i."timestamp", i."description", i."location", s."id", s."name", s."commonNameNL", s."commonNameEN", u."id", u."name"
-		FROM interaction i
-		INNER JOIN "species" s ON s."id" = i."speciesID"
-		INNER JOIN "user" u ON u."id" = i."userID"
+		SELECT i."ID", i."timestamp", i."description", i."location", s."ID", s."name", s."commonNameNL", s."commonNameEN", u."ID", u."name", t."ID", t."nameNL", t."nameEN", t."descriptionNL", t."descriptionEN"
+		FROM "interaction" i
+		INNER JOIN "species" s ON s."ID" = i."speciesID"
+		INNER JOIN "user" u ON u."ID" = i."userID"
+		LEFT JOIN "interactionType" t ON t."ID" = i."typeID"
 		`,
 	}
 	return &s
@@ -30,11 +31,13 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 		var interaction models.Interaction
 		var species models.Species
 		var user models.User
-		if err := rows.Scan(&interaction.ID, &interaction.Timestamp, &interaction.Description, &interaction.Location, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN, &user.ID, &user.Name); err != nil {
+		var interactionType models.InteractionType
+		if err := rows.Scan(&interaction.ID, &interaction.Timestamp, &interaction.Description, &interaction.Location, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN, &user.ID, &user.Name, &interactionType.ID, &interactionType.NameNL, &interactionType.NameEN, &interactionType.DescriptionNL, &interactionType.DescriptionEN); err != nil {
 			return nil, err
 		}
 		interaction.Species = species
 		interaction.User = user
+		interaction.Type = interactionType
 		interactions = append(interactions, interaction)
 	}
 	return interactions, nil
@@ -42,7 +45,7 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 
 func (s *InteractionStore) Get(interactionID string) (*models.Interaction, error) {
 	query := s.query + `
-		WHERE i."id" = $1
+		WHERE i."ID" = $1
 		`
 	rows, err := s.relationalDB.Query(query, interactionID)
 	result, err := s.process(rows, err)
@@ -62,7 +65,7 @@ func (s *InteractionStore) GetAll() ([]models.Interaction, error) {
 
 func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error) {
 	query := s.query + `
-		WHERE u."id" = $1
+		WHERE u."ID" = $1
 		ORDER BY i."createdAt" DESC
 		`
 	rows, err := s.relationalDB.Query(query, userID)
@@ -71,11 +74,11 @@ func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error
 
 func (s *InteractionStore) Add(userID string, interaction *models.InteractionRecord) (*models.Interaction, error) {
 	query := `
-		INSERT INTO interaction("description", "location","speciesID", "userID") VALUES($1, $2, $3, $4)
-		RETURNING "id"
+		INSERT INTO "interaction"("description", "location","speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5)
+		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.SpeciesID, userID)
+	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.SpeciesID, userID, interaction.TypeID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

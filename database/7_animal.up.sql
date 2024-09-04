@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS "animal" (
+	"ID" UUID NOT NULL DEFAULT gen_random_uuid(),
+	"speciesID" UUID NOT NULL,
+	"name" VARCHAR NOT NULL DEFAULT '',
+	"location" POINT NULL DEFAULT NULL,
+	"locationTimestamp" TIMESTAMPTZ NULL DEFAULT NULL,
+	PRIMARY KEY ("ID"),
+	CONSTRAINT "animal_speciesID_fkey" FOREIGN KEY ("speciesID") REFERENCES "species" ("ID") ON UPDATE RESTRICT ON DELETE RESTRICT
+);

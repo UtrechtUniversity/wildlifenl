@@ -1,0 +1,8 @@
+CREATE TABLE "interactionType" (
+	"ID" SERIAL NOT NULL,
+	"nameNL" VARCHAR NOT NULL,
+	"nameEN" VARCHAR NOT NULL,
+	"descriptionNL" TEXT NOT NULL DEFAULT '',
+	"descriptionEN" TEXT NOT NULL DEFAULT '',
+	PRIMARY KEY ("ID")
+);
