@@ -48,6 +48,7 @@ func (o *meOperations) RegisterGet(api huma.API) {
 	})
 }
 
+/*
 func (o *meOperations) RegisterPut(api huma.API) {
 	name := "Update My Profile"
 	description := "Update the current user."
@@ -60,3 +61,4 @@ func (o *meOperations) RegisterPut(api huma.API) {
 		return nil, huma.Error501NotImplemented("")
 	})
 }
+*/
