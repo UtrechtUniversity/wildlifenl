@@ -20,7 +20,8 @@ import (
 )
 
 const appName = "WildlifeNL"
-const appVersion = "1.3.1"
+const appVersion = "1.3.2"
+const appDescription = "This is the WildlifeNL API. Before you can start making calls to the provided end-points you should acquire a bearer token. To do so, make a POST request at /auth/ providing the required fields including a valid email address. A validation code will be send to that email address. Then, make a PUT request at /auth/ providing the same email address and the validation code. The response will include a field named \"token\" containing your bearer token. Use this bearer token in the header of any future calls you make."
 
 const emailSubject = "Aanmelden bij WildlifeNL"
 const emailBody = "Beste {displayName}<br/>De applicatie {appName} wil graag aanmelden bij WildlifeNL met jouw emailadres. Om dit toe te staan, voer onderstaande code in bij deze applicatie.<br/>Code: {code}<br/><br/>Met vriendelijke groet<br/>WildlifeNL<br/><br/>"
@@ -44,10 +45,10 @@ func Start(config *Configuration) error {
 	sessions = cache.New(time.Duration(configuration.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
 	authRequests = cache.New(time.Duration(configuration.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
 	apiConfig := huma.DefaultConfig(appName, appVersion)
+	apiConfig.Info.Description = appDescription
 	apiConfig.Security = []map[string][]string{{"auth": {}}}
 	apiConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{"auth": {Type: "http", Scheme: "bearer"}}
 	apiConfig.DocsPath = "/"
-	apiConfig.Info.Description = "This is the WildlifeNL API. Before you can start making calls to the provided end-points you should acquire a bearer token. To do so, make a POST request at /auth/ providing the required fields including a valid email address. A validation code will be send to that email address. Then, make a PUT request at /auth/ providing the same email address and the validation code. The response will include a field named \"token\" containing your bearer token. Use this bearer token in the header of any future calls you make."
 
 	router := http.NewServeMux()
 	api := humago.New(router, apiConfig)
@@ -57,6 +58,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newBorneSensorDeploymentOperations())
 	huma.AutoRegister(api, newBorneSensorReadingOperations())
 	huma.AutoRegister(api, newInteractionOperations(relationalDB))
+	huma.AutoRegister(api, newInteractionTypeOperations(relationalDB))
 	huma.AutoRegister(api, newMeOperations(relationalDB))
 	huma.AutoRegister(api, newLivingLabOperations(relationalDB))
 	huma.AutoRegister(api, newRoleOperations(relationalDB))
