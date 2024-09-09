@@ -14,7 +14,7 @@ type SpeciesHolder struct {
 	Body *models.Species `json:"species"`
 }
 
-type SpeciesXHolder struct {
+type SpecieSHolder struct {
 	Body []models.Species `json:"species"`
 }
 
@@ -58,11 +58,28 @@ func (o *speciesOperations) RegisterGetAll(api huma.API) {
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*SpeciesXHolder, error) {
+	}, func(ctx context.Context, input *struct{}) (*SpecieSHolder, error) {
 		speciesX, err := stores.NewSpeciesStore(o.Database).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}
-		return &SpeciesXHolder{Body: speciesX}, nil
+		return &SpecieSHolder{Body: speciesX}, nil
+	})
+}
+
+func (o *speciesOperations) RegisterAdd(api huma.API) {
+	name := "Add Species"
+	description := "Add a new species."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"administrator"}
+	method := http.MethodPost
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *SpeciesHolder) (*SpeciesHolder, error) {
+		species, err := stores.NewSpeciesStore(relationalDB).Add(input.Body)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &SpeciesHolder{Body: species}, nil
 	})
 }

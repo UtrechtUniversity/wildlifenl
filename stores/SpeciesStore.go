@@ -56,3 +56,16 @@ func (s *SpeciesStore) GetAll() ([]models.Species, error) {
 	rows, err := s.relationalDB.Query(query)
 	return s.process(rows, err)
 }
+
+func (s *SpeciesStore) Add(species *models.Species) (*models.Species, error) {
+	query := `
+		INSERT INTO "species"("name", "commonNameNL", "commonNameEN") VALUES($1, $2, $3)
+		RETURNING "ID"
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, species.Name, species.CommonNameNL, species.CommonNameEN)
+	if err := row.Scan(&id); err != nil {
+		return nil, err
+	}
+	return s.Get(id)
+}
