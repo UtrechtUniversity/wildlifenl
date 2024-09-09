@@ -11,8 +11,12 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
+var version string
+
 func main() {
 	config := new(wildlifenl.Configuration)
+
+	config.Version = version
 
 	config.Host = os.Getenv("HOST")
 

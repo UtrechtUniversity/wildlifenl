@@ -1,6 +1,7 @@
 package wildlifenl
 
 type Configuration struct {
+	Version                         string
 	Host                            string
 	Port                            int
 	RelationalDatabaseHost          string
