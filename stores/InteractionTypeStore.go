@@ -34,7 +34,35 @@ func (s *InteractionTypeStore) process(rows *sql.Rows, err error) ([]models.Inte
 	return interactionTypes, nil
 }
 
+func (s *InteractionTypeStore) Get(interactionTypeID int) (*models.InteractionType, error) {
+	query := s.query + `
+		WHERE t."ID" = $1
+		`
+	rows, err := s.relationalDB.Query(query, interactionTypeID)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	if len(result) != 1 {
+		return nil, nil
+	}
+	return &result[0], nil
+}
+
 func (s *InteractionTypeStore) GetAll() ([]models.InteractionType, error) {
 	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
+}
+
+func (s *InteractionTypeStore) Add(interactionType *models.InteractionType) (*models.InteractionType, error) {
+	query := `
+		INSERT INTO "interactionType"("nameNL", "nameEN", "descriptionNL", "descriptionEN") VALUES($1, $2, $3, $4)
+		RETURNING "ID"
+	`
+	var id int
+	row := s.relationalDB.QueryRow(query, interactionType.NameNL, interactionType.NameEN, interactionType.DescriptionNL, interactionType.DescriptionEN)
+	if err := row.Scan(&id); err != nil {
+		return nil, err
+	}
+	return s.Get(id)
 }

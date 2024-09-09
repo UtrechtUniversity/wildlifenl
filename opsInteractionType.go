@@ -10,8 +10,12 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
+type InteractionTypeHolder struct {
+	Body *models.InteractionType `json:"interactionType"`
+}
+
 type InteractionTypesHolder struct {
-	Body []models.InteractionType `json:"interactionType"`
+	Body []models.InteractionType `json:"interactionTypes"`
 }
 
 type interactionTypeOperations Operations
@@ -38,5 +42,22 @@ func (o *interactionTypeOperations) RegisterGetAll(api huma.API) {
 			return nil, handleError(err)
 		}
 		return &InteractionTypesHolder{Body: interactionTypes}, nil
+	})
+}
+
+func (o *interactionTypeOperations) RegisterAdd(api huma.API) {
+	name := "Add Interaction Type"
+	description := "Add a new interaction type."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"administrator"}
+	method := http.MethodPost
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *InteractionTypeHolder) (*InteractionTypeHolder, error) {
+		interactionType, err := stores.NewInteractionTypeStore(relationalDB).Add(input.Body)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &InteractionTypeHolder{Body: interactionType}, nil
 	})
 }
