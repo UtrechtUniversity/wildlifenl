@@ -15,15 +15,11 @@ import (
 	"github.com/UtrechtUniversity/wildlifenl/stores"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
-	"github.com/go-mail/mail"
 	"github.com/patrickmn/go-cache"
 )
 
 const appName = "WildlifeNL"
 const appDescription = "This is the WildlifeNL API. Before you can start making calls to the provided end-points you should acquire a bearer token. To do so, make a POST request at /auth/ providing the required fields including a valid email address. A validation code will be send to that email address. Then, make a PUT request at /auth/ providing the same email address and the validation code. The response will include a field named \"token\" containing your bearer token. Use this bearer token in the header of any future calls you make."
-
-const emailSubject = "Aanmelden bij WildlifeNL"
-const emailBody = "Beste {displayName}<br/>De applicatie {appName} wil graag aanmelden bij WildlifeNL met jouw emailadres. Om dit toe te staan, voer onderstaande code in bij deze applicatie.<br/>Code: {code}<br/><br/>Met vriendelijke groet<br/>WildlifeNL<br/><br/>"
 
 var (
 	configuration *Configuration
@@ -173,21 +169,4 @@ func getCredential(token string) *models.Credential {
 	}
 	sessions.SetDefault(token, credential)
 	return credential
-}
-
-func sendCodeByEmail(appName, displayName, email, code string) error {
-	if configuration.EmailHost == "no-email" {
-		return nil
-	}
-	body := emailBody
-	body = strings.ReplaceAll(body, "{appName}", appName)
-	body = strings.ReplaceAll(body, "{displayName}", displayName)
-	body = strings.ReplaceAll(body, "{code}", code)
-	m := mail.NewMessage()
-	m.SetHeader("From", configuration.EmailFrom)
-	m.SetHeader("To", email)
-	m.SetHeader("Subject", emailSubject)
-	m.SetBody("text/html", body)
-	d := mail.NewDialer(configuration.EmailHost, 587, configuration.EmailUser, configuration.EmailPassword)
-	return d.DialAndSend(m)
 }
