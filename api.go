@@ -59,6 +59,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newRoleOperations(relationalDB))
 	huma.AutoRegister(api, newSpeciesOperations(relationalDB))
 	huma.AutoRegister(api, newUserOperations(relationalDB))
+	huma.AutoRegister(api, newZoneOperations(relationalDB))
 	return http.ListenAndServe(configuration.Host+":"+strconv.Itoa(configuration.Port), router)
 }
 
