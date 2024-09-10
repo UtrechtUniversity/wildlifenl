@@ -66,7 +66,7 @@ func (s *InteractionStore) GetAll() ([]models.Interaction, error) {
 func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error) {
 	query := s.query + `
 		WHERE u."ID" = $1
-		ORDER BY i."createdAt" DESC
+		ORDER BY i."timestamp" DESC
 		`
 	rows, err := s.relationalDB.Query(query, userID)
 	return s.process(rows, err)

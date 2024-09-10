@@ -88,3 +88,20 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 		return &InteractionHolder{Body: interaction}, nil
 	})
 }
+
+func (o *interactionOperations) RegisterGetMine(api huma.API) {
+	name := "Get My Interactions"
+	description := "Retrieve my interactions."
+	path := "/" + o.Endpoint + "/me/"
+	scopes := []string{}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *Input) (*InteractionsHolder, error) {
+		interactions, err := stores.NewInteractionStore(relationalDB).GetByUser(input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &InteractionsHolder{Body: interactions}, nil
+	})
+}
