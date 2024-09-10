@@ -63,15 +63,6 @@ func (s *InteractionStore) GetAll() ([]models.Interaction, error) {
 	return s.process(rows, err)
 }
 
-func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error) {
-	query := s.query + `
-		WHERE u."ID" = $1
-		ORDER BY i."timestamp" DESC
-		`
-	rows, err := s.relationalDB.Query(query, userID)
-	return s.process(rows, err)
-}
-
 func (s *InteractionStore) Add(userID string, interaction *models.InteractionRecord) (*models.Interaction, error) {
 	query := `
 		INSERT INTO "interaction"("description", "location","speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5)
@@ -83,4 +74,13 @@ func (s *InteractionStore) Add(userID string, interaction *models.InteractionRec
 		return nil, err
 	}
 	return s.Get(id)
+}
+
+func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error) {
+	query := s.query + `
+		WHERE u."ID" = $1
+		ORDER BY i."timestamp" DESC
+		`
+	rows, err := s.relationalDB.Query(query, userID)
+	return s.process(rows, err)
 }
