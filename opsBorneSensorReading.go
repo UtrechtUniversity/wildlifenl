@@ -30,7 +30,7 @@ func (o *borneSensorReadingOperations) RegisterGetAll(api huma.API) {
 	name := "Get All BorneSensorReadings"
 	description := "Retrieve all borne sensor reading of the last hour."
 	path := "/" + o.Endpoint + "/"
-	scopes := []string{}
+	scopes := []string{"herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
@@ -47,7 +47,7 @@ func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 	name := "Add BorneSensorReading"
 	description := "Submit a new reading for a borne sensor."
 	path := "/" + o.Endpoint + "/"
-	scopes := []string{}
+	scopes := []string{"data-system"}
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
