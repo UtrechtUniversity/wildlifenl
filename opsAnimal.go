@@ -47,6 +47,9 @@ func (o *animalOperations) RegisterGet(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
+		if animal == nil {
+			return nil, generateNotFoundByIDError(o.Endpoint, input.ID)
+		}
 		return &AnimalHolder{Body: animal}, nil
 	})
 }
