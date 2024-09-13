@@ -42,3 +42,7 @@ func handleError(err error) error {
 func generateNotFoundByIDError(objectType string, id string) error {
 	return huma.Error404NotFound("No " + objectType + " with ID " + id + " was found")
 }
+
+func generateNotFoundForThisUserError(objectType string, id string) error {
+	return huma.Error404NotFound("No " + objectType + " with ID " + id + " was found for the current user")
+}

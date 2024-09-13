@@ -9,5 +9,6 @@ type ZoneRecord struct {
 
 type Zone struct {
 	ZoneRecord
-	User User `json:"user" doc:"The user that added this Zone."`
+	User    User      `json:"user" doc:"The user that added this Zone."`
+	Species []Species `json:"species,omitempty" doc:"The species for which this zone creates alarms."`
 }

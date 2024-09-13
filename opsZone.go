@@ -10,17 +10,27 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewZoneInput struct {
-	Input
-	Body *models.ZoneRecord `json:"zone"`
-}
-
 type ZoneHolder struct {
 	Body *models.Zone `json:"zone"`
 }
 
 type ZonesHolder struct {
 	Body []models.Zone `json:"zones"`
+}
+
+type NewZoneInput struct {
+	Input
+	Body *models.ZoneRecord `json:"zone"`
+}
+
+type SetZoneSpeciesInput struct {
+	Input
+	Body *struct {
+		ZondeID string `json:"zoneID" format:"uuid" doc:"The ID of the zone."`
+		Species []struct {
+			SpeciesID string `json:"speciesID" format:"uuid" doc:"The ID of the species to set for this zone."`
+		}
+	}
 }
 
 type zoneOperations Operations
@@ -100,5 +110,34 @@ func (o *zoneOperations) RegisterGetMine(api huma.API) {
 			return nil, handleError(err)
 		}
 		return &ZonesHolder{Body: zones}, nil
+	})
+}
+
+func (o *zoneOperations) RegisterSetSpecies(api huma.API) {
+	name := "Set Zone Species"
+	description := "Set the species for which this zone should create alarms."
+	path := "/" + o.Endpoint + "/species/"
+	scopes := []string{}
+	method := http.MethodPost
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *SetZoneSpeciesInput) (*ZoneHolder, error) {
+		store := stores.NewZoneStore(relationalDB)
+		zone, err := store.Get(input.Body.ZondeID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		if zone == nil || zone.User.ID != input.credential.UserID {
+			return nil, generateNotFoundForThisUserError(o.Endpoint, input.Body.ZondeID)
+		}
+		speciesIDs := make([]string, 0)
+		for _, species := range input.Body.Species {
+			speciesIDs = append(speciesIDs, species.SpeciesID)
+		}
+		zone, err = store.SetZoneSpecies(input.Body.ZondeID, speciesIDs)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &ZoneHolder{Body: zone}, nil
 	})
 }
