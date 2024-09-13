@@ -22,6 +22,9 @@ The record of a message being sent to a user. A `Conveyance` is the result of an
 ### Detection
 A timestamped record of the location of a member of a specified animal species.
 
+### Experiment
+A collection of `Questionnaire`s and `Message`s with a start date and end date, that together make up a research experiment.
+
 ### Encounter
 An instance of the position of a `User` and the position of an `Animal` at a certain moment in time, where these positions are closer to each other than the *`EncounterDistance`* value of the `Species` of the animal in question, and that resulted in a message `Conveyance`.
 

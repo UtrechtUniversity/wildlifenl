@@ -1,9 +1,13 @@
 package stores
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/UtrechtUniversity/wildlifenl/timeseries"
+)
 
 type Store struct {
 	relationalDB *sql.DB
-	timeseriesDB *Timeseries
+	timeseriesDB *timeseries.Timeseries
 	query        string
 }

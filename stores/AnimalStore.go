@@ -4,11 +4,12 @@ import (
 	"database/sql"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
+	"github.com/UtrechtUniversity/wildlifenl/timeseries"
 )
 
 type AnimalStore Store
 
-func NewAnimalStore(relationalDB *sql.DB, timeseriesDB *Timeseries) *AnimalStore {
+func NewAnimalStore(relationalDB *sql.DB, timeseriesDB *timeseries.Timeseries) *AnimalStore {
 	s := AnimalStore{
 		relationalDB: relationalDB,
 		timeseriesDB: timeseriesDB,

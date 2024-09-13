@@ -13,6 +13,7 @@ import (
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
+	"github.com/UtrechtUniversity/wildlifenl/timeseries"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/patrickmn/go-cache"
@@ -24,7 +25,7 @@ const appDescription = "This is the WildlifeNL API. Before you can start making 
 var (
 	configuration *Configuration
 	relationalDB  *sql.DB
-	timeseriesDB  *stores.Timeseries
+	timeseriesDB  *timeseries.Timeseries
 	sessions      *cache.Cache
 	authRequests  *cache.Cache
 )
@@ -79,7 +80,7 @@ func loadRelationalDB(config *Configuration) error {
 }
 
 func loadTimeseriesDB(config *Configuration) error {
-	timeseriesDB = stores.NewTimeseries(config.TimeseriesDatabaseURL, config.TimeseriesDatabaseOrganization, config.TimeseriesDatabaseToken)
+	timeseriesDB = timeseries.NewTimeseries(config.TimeseriesDatabaseURL, config.TimeseriesDatabaseOrganization, config.TimeseriesDatabaseToken)
 	return timeseriesDB.Ping()
 }
 

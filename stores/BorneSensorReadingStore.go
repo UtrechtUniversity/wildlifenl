@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
+	"github.com/UtrechtUniversity/wildlifenl/timeseries"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 )
 
 type BorneSensorReadingStore Store
 
-func NewBorneSensorReadingStore(relationalDB *sql.DB, timeseriesDB *Timeseries) *BorneSensorReadingStore {
+func NewBorneSensorReadingStore(relationalDB *sql.DB, timeseriesDB *timeseries.Timeseries) *BorneSensorReadingStore {
 	s := BorneSensorReadingStore{
 		relationalDB: relationalDB,
 		timeseriesDB: timeseriesDB,
