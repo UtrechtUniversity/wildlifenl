@@ -10,7 +10,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewExperimentHolder struct {
+type NewExperimentInput struct {
+	Input
 	Body *models.ExperimentRecord `json:"experiment"`
 }
 
@@ -79,8 +80,8 @@ func (o *experimentOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewExperimentHolder) (*ExperimentHolder, error) {
-		species, err := stores.NewExperimentStore(relationalDB).Add(input.Body)
+	}, func(ctx context.Context, input *NewExperimentInput) (*ExperimentHolder, error) {
+		species, err := stores.NewExperimentStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
