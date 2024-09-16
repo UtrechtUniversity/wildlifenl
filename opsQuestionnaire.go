@@ -64,11 +64,11 @@ func (o *questionnaireOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct{}) (*QuestionnairesHolder, error) {
-		interactions, err := stores.NewQuestionnaireStore(relationalDB).GetAll()
+		questionnaires, err := stores.NewQuestionnaireStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}
-		return &QuestionnairesHolder{Body: interactions}, nil
+		return &QuestionnairesHolder{Body: questionnaires}, nil
 	})
 }
 
@@ -81,11 +81,11 @@ func (o *questionnaireOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewQuestionnaireInput) (*QuestionnaireHolder, error) {
-		species, err := stores.NewQuestionnaireStore(relationalDB).Add(input.credential.UserID, input.Body)
+		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
-		return &QuestionnaireHolder{Body: species}, nil
+		return &QuestionnaireHolder{Body: questionnaire}, nil
 	})
 }
 
