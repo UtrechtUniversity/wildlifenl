@@ -7,7 +7,7 @@ type QuestionRecord struct {
 	Index                 int    `json:"index" doc:"The index of this question within the questionnaire."`
 	AllowMultipleResponse bool   `json:"allowMultipleResponse" doc:"Whether or not this questions allows for multiple reponses."`
 	AllowOpenResponse     bool   `json:"allowOpenResponse" doc:"Whether or not this question allows for a response to contain a free format text."`
-	QuestionnaireID       string `json:"experimentID,omitempty" format:"uuid" writeOnly:"true"`
+	QuestionnaireID       string `json:"questionnaireID,omitempty" format:"uuid" writeOnly:"true"`
 }
 
 type Question struct {
