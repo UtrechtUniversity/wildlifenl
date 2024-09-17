@@ -102,6 +102,6 @@ Upon a new `Borne-Sensor-Reading` being posted, including lat/long, it should be
 
 [^1]: To calculate distances in meters between two points as given in latitude and longitude the conversion 1 meter = 0.00001 degree (either latitude or longitude) is used. This produces a small difference with reality as 1 degree latitude in reality is about 110 km and 1 degree longitude in reality is about 111 km on the equator and reaches zero at the poles, but this simplified conversion greatly increases calculation speeds as the problem can then be expressed in euclidean distance.
 
-[^2]: A record is marked *Deactivated* using a nullable DateTime field. When NULL it means the record is active, and when filled with a timestamp it means the record is deactivated.
+[^2]: A record is marked *Deactivated* using a nullable DateTime field. When NULL it means the record is active, and when filled with a timestamp it means the record was deactivated at that moment. A deactivated record does, for all intents and purposes, no longer exist, has no effect in logic rules and does no longer show up in lists, with the noteworthy exception those lists that explicitly state that they contain ALL records. Also, it is still possible to retrieve a deactivated record by ID.
 
 [^3]: A spatiotemporal overlap means that both the distance as well as the timestamps of the location measurements of two different entities are below a predefined threshold. In other words: They were close to eachother at the same moment in time.

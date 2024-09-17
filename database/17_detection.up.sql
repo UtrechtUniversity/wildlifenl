@@ -1,0 +1,9 @@
+CREATE TABLE "detection" (
+	"ID" SERIAL NOT NULL,
+	"location" POINT NOT NULL,
+	"timestamp" TIMESTAMPTZ NOT NULL DEFAULT now(),
+	"sensorID" VARCHAR NOT NULL,
+	"speciesID" UUID NOT NULL,
+	PRIMARY KEY ("ID"),
+	CONSTRAINT "FK__species" FOREIGN KEY ("speciesID") REFERENCES "species" ("ID") ON UPDATE RESTRICT ON DELETE RESTRICT
+);

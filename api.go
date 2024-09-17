@@ -54,6 +54,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newAuthOperations(relationalDB))
 	huma.AutoRegister(api, newBorneSensorDeploymentOperations())
 	huma.AutoRegister(api, newBorneSensorReadingOperations())
+	huma.AutoRegister(api, newDetectionOperations(relationalDB))
 	huma.AutoRegister(api, newExperimentOperations(relationalDB))
 	huma.AutoRegister(api, newInteractionOperations(relationalDB))
 	huma.AutoRegister(api, newInteractionTypeOperations(relationalDB))
