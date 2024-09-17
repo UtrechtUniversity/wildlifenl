@@ -33,6 +33,11 @@ type SetZoneSpeciesInput struct {
 	}
 }
 
+type DeactivateZoneInput struct {
+	Input
+	ID string `path:"id" doc:"The ID of this zone." format:"uuid"`
+}
+
 type zoneOperations Operations
 
 func newZoneOperations(database *sql.DB) *zoneOperations {
@@ -139,5 +144,37 @@ func (o *zoneOperations) RegisterSetSpecies(api huma.API) {
 			return nil, handleError(err)
 		}
 		return &ZoneHolder{Body: zone}, nil
+	})
+}
+
+func (o *zoneOperations) RegisterDeactivate(api huma.API) {
+	name := "Deactivate Zone"
+	description := "Deactivate a zone."
+	path := "/" + o.Endpoint + "/{id}"
+	scopes := []string{}
+	method := http.MethodDelete
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *DeactivateZoneInput) (*ZoneHolder, error) {
+		store := stores.NewZoneStore(relationalDB)
+		var zone models.Zone
+		zones, err := store.GetByUser(input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		for _, z := range zones {
+			if z.ID == input.ID {
+				zone = z
+				break
+			}
+		}
+		if zone.ID == "" {
+			return nil, generateNotFoundForThisUserError(o.Endpoint, input.ID)
+		}
+		result, err := stores.NewZoneStore(relationalDB).Deactivate(zone.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &ZoneHolder{Body: result}, nil
 	})
 }

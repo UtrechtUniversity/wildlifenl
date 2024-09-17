@@ -1,0 +1,2 @@
+ALTER TABLE "zone"
+	ADD "deactivated" TIMESTAMPTZ NULL;

@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type ZoneRecord struct {
 	ID          string `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this Zone."`
 	Name        string `json:"name" doc:"The name of this Zone."`
@@ -9,6 +11,7 @@ type ZoneRecord struct {
 
 type Zone struct {
 	ZoneRecord
-	User    User      `json:"user" doc:"The user that added this Zone."`
-	Species []Species `json:"species,omitempty" doc:"The species for which this zone creates alarms."`
+	Deactivated *time.Time `json:"deactivated,omitempty" doc:"The moment this zone record was deactivated."`
+	User        User       `json:"user" doc:"The user that added this Zone."`
+	Species     []Species  `json:"species,omitempty" doc:"The species for which this zone creates alarms."`
 }
