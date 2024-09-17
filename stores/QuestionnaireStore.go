@@ -58,13 +58,7 @@ func (s *QuestionnaireStore) Get(questionnaireID string) (*models.Questionnaire,
 	if len(result) != 1 {
 		return nil, nil
 	}
-	questionnaire := result[0]
-	questions, err := NewQuestionStore(s.relationalDB).GetByQuestionnaire(questionnaire.ID)
-	if err != nil {
-		return nil, err
-	}
-	questionnaire.Questions = questions
-	return &questionnaire, nil
+	return s.addQuestions(result[0])
 }
 
 func (s *QuestionnaireStore) GetAll() ([]models.Questionnaire, error) {
@@ -90,21 +84,47 @@ func (s *QuestionnaireStore) GetByUser(userID string) ([]models.Questionnaire, e
 		WHERE u."ID" = $1
 		`
 	rows, err := s.relationalDB.Query(query, userID)
-	result := make([]models.Questionnaire, 0)
 	questionnaires, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
 	}
 	// This is a potential performance issue because it calls the DB in a loop, but let's cross that bridge when we get there.
-	questionStore := NewQuestionStore(s.relationalDB)
+	result := make([]models.Questionnaire, 0)
 	for _, q := range questionnaires {
-		questions, err := questionStore.GetByQuestionnaire(q.ID)
+		questionnaire, err := s.addQuestions(q)
 		if err != nil {
 			return nil, err
 		}
-		q.Questions = questions
-		result = append(result, q)
+		result = append(result, *questionnaire)
 	}
 	// ---
 	return result, nil
+}
+
+func (s *QuestionnaireStore) GetRandomActiveByInteractionType(interactionType models.InteractionType) (*models.Questionnaire, error) {
+	query := s.query + `
+		WHERE q."interactionTypeID" = $1
+		AND NOW() > "start"
+		AND ("end" IS NULL OR "end" > NOW())
+		ORDER BY random()
+		LIMIT 1
+		`
+	rows, err := s.relationalDB.Query(query, interactionType.ID)
+	questionnaires, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	if len(questionnaires) == 0 {
+		return nil, nil
+	}
+	return s.addQuestions(questionnaires[0])
+}
+
+func (s *QuestionnaireStore) addQuestions(questionnaire models.Questionnaire) (*models.Questionnaire, error) {
+	questions, err := NewQuestionStore(s.relationalDB).GetByQuestionnaire(questionnaire.ID)
+	if err != nil {
+		return nil, err
+	}
+	questionnaire.Questions = questions
+	return &questionnaire, nil
 }

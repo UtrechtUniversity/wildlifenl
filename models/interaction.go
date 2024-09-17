@@ -13,7 +13,8 @@ type InteractionRecord struct {
 
 type Interaction struct {
 	InteractionRecord
-	Species Species         `json:"species" doc:"The species of the animal that this interaction was with."`
-	User    User            `json:"user" doc:"The User that reported this interaction."`
-	Type    InteractionType `json:"type" doc:"The type of the interaction."`
+	Species       Species         `json:"species" doc:"The species of the animal that this interaction was with."`
+	User          User            `json:"user" doc:"The User that reported this interaction."`
+	Type          InteractionType `json:"type" doc:"The type of the interaction."`
+	Questionnaire *Questionnaire  `json:"questionnaire,omitempty" doc:"The questionnaire the user should fill-out after having added the interaction."`
 }

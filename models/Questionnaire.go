@@ -3,8 +3,8 @@ package models
 type QuestionnaireRecord struct {
 	ID                string `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this questionnaire."`
 	Name              string `json:"name" doc:"The name of this questionnaire."`
-	ExperimentID      string `json:"experimentID" format:"uuid" writeOnly:"true"`
-	InteractionTypeID int    `json:"interactionTypeID" writeOnly:"true"`
+	ExperimentID      string `json:"experimentID,omitempty" format:"uuid" writeOnly:"true" required:"true"`
+	InteractionTypeID int    `json:"interactionTypeID,omitempty" writeOnly:"true" required:"true"`
 }
 
 type Questionnaire struct {

@@ -85,6 +85,11 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
+		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).GetRandomActiveByInteractionType(interaction.Type)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		interaction.Questionnaire = questionnaire
 		return &InteractionHolder{Body: interaction}, nil
 	})
 }
