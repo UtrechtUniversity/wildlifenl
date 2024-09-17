@@ -11,4 +11,5 @@ type Questionnaire struct {
 	QuestionnaireRecord
 	Experiment      Experiment      `json:"experiment" doc:"The experiment that this questionnaire belongs to."`
 	InteractionType InteractionType `json:"interactionType" doc:"The type of interactions that this questionnaire is created for."`
+	Questions       []Question      `json:"questions,omitempty" doc:"The questions of this questionnaire"`
 }

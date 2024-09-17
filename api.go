@@ -50,6 +50,7 @@ func Start(config *Configuration) error {
 	api := humago.New(router, apiConfig)
 	api.UseMiddleware(NewAuthMiddleware(api))
 	huma.AutoRegister(api, newAnimalOperations(relationalDB))
+	huma.AutoRegister(api, newAnswerOperations(relationalDB))
 	huma.AutoRegister(api, newAuthOperations(relationalDB))
 	huma.AutoRegister(api, newBorneSensorDeploymentOperations())
 	huma.AutoRegister(api, newBorneSensorReadingOperations())

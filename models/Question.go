@@ -12,4 +12,5 @@ type QuestionRecord struct {
 
 type Question struct {
 	QuestionRecord
+	Answers []Answer `json:"answers,omitempty" doc:"The selectable answers for this questions."`
 }

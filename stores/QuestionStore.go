@@ -12,8 +12,9 @@ func NewQuestionStore(db *sql.DB) *QuestionStore {
 	s := QuestionStore{
 		relationalDB: db,
 		query: `
-		SELECT q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse"
+		SELECT q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", COALESCE(a."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(a."text", ''), COALESCE(a."index", 0)
 		FROM "question" q
+		LEFT JOIN "answer" a ON a."questionID" = q."ID"
 		`,
 	}
 	return &s
@@ -24,11 +25,24 @@ func (s *QuestionStore) process(rows *sql.Rows, err error) ([]models.Question, e
 		return nil, err
 	}
 	questions := make([]models.Question, 0)
+	var question models.Question
 	for rows.Next() {
-		var question models.Question
-		if err := rows.Scan(&question.ID, &question.Text, &question.Description, &question.Index, &question.AllowMultipleResponse, &question.AllowOpenResponse); err != nil {
+		var q models.Question
+		var a models.Answer
+		if err := rows.Scan(&q.ID, &q.Text, &q.Description, &q.Index, &q.AllowMultipleResponse, &q.AllowOpenResponse, &a.ID, &a.Text, &a.Index); err != nil {
 			return nil, err
 		}
+		if question.ID == "" {
+			question = q
+		} else if question.ID != q.ID {
+			questions = append(questions, question)
+			question = q
+		}
+		if a.ID != "00000000-0000-0000-0000-000000000000" {
+			question.Answers = append(question.Answers, a)
+		}
+	}
+	if question.ID != "" {
 		questions = append(questions, question)
 	}
 	return questions, nil
@@ -51,7 +65,7 @@ func (s *QuestionStore) Get(questionID string) (*models.Question, error) {
 
 func (s *QuestionStore) Add(question *models.QuestionRecord) (*models.Question, error) {
 	query := `
-		INSERT INTO "question"("text", "description", "index", "allowMultipleResponse", "allowOpenResponse", "questionnaireID") VALUES($1, $2, $3, $4, $5)
+		INSERT INTO "question"("text", "description", "index", "allowMultipleResponse", "allowOpenResponse", "questionnaireID") VALUES($1, $2, $3, $4, $5, $6)
 		RETURNING "ID"
 	`
 	var id string
@@ -60,4 +74,17 @@ func (s *QuestionStore) Add(question *models.QuestionRecord) (*models.Question, 
 		return nil, err
 	}
 	return s.Get(id)
+}
+
+func (s *QuestionStore) GetByQuestionnaire(questionnaireID string) ([]models.Question, error) {
+	query := s.query + `
+		WHERE q."questionnaireID" = $1
+		ORDER BY q."index" ASC
+	`
+	rows, err := s.relationalDB.Query(query, questionnaireID)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

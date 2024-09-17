@@ -58,7 +58,13 @@ func (s *QuestionnaireStore) Get(questionnaireID string) (*models.Questionnaire,
 	if len(result) != 1 {
 		return nil, nil
 	}
-	return &result[0], nil
+	questionnaire := result[0]
+	questions, err := NewQuestionStore(s.relationalDB).GetByQuestionnaire(questionnaire.ID)
+	if err != nil {
+		return nil, err
+	}
+	questionnaire.Questions = questions
+	return &questionnaire, nil
 }
 
 func (s *QuestionnaireStore) GetAll() ([]models.Questionnaire, error) {
@@ -84,5 +90,21 @@ func (s *QuestionnaireStore) GetByUser(userID string) ([]models.Questionnaire, e
 		WHERE u."ID" = $1
 		`
 	rows, err := s.relationalDB.Query(query, userID)
-	return s.process(rows, err)
+	result := make([]models.Questionnaire, 0)
+	questionnaires, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	// This is a potential performance issue because it calls the DB in a loop, but let's cross that bridge when we get there.
+	questionStore := NewQuestionStore(s.relationalDB)
+	for _, q := range questionnaires {
+		questions, err := questionStore.GetByQuestionnaire(q.ID)
+		if err != nil {
+			return nil, err
+		}
+		q.Questions = questions
+		result = append(result, q)
+	}
+	// ---
+	return result, nil
 }

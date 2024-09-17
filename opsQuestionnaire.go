@@ -37,7 +37,7 @@ func (o *questionnaireOperations) RegisterGet(api huma.API) {
 	name := "Get Questionnaire By ID"
 	description := "Retrieve a specific questionnaire by ID."
 	path := "/" + o.Endpoint + "/{id}"
-	scopes := []string{"administrator"}
+	scopes := []string{}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
