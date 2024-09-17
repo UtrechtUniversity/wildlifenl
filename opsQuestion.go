@@ -73,6 +73,7 @@ func (o *questionOperations) RegisterAdd(api huma.API) {
 		for _, q := range questionnaires {
 			if q.ID == input.Body.QuestionnaireID {
 				questionnaire = q
+				break
 			}
 		}
 		if questionnaire.ID == "" {
