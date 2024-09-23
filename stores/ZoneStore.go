@@ -140,13 +140,13 @@ func (s *ZoneStore) Deactivate(zoneID string) (*models.Zone, error) {
 	return s.Get(id)
 }
 
-func (s *ZoneStore) GetForDetection(detectionID int) ([]models.Zone, error) {
+func (s *ZoneStore) GetForDetection(detection *models.Detection) ([]models.Zone, error) {
 	query := s.query + `
 		LEFT JOIN "detection" d ON z."area" @> d."location" AND d."speciesID" = s."ID"
 		WHERE d."ID" = $1
 		AND z."deactivated" IS NULL
 		AND z."created" > d."timestamp"
 	`
-	rows, err := s.relationalDB.Query(query, detectionID)
+	rows, err := s.relationalDB.Query(query, detection.ID)
 	return s.process(rows, err)
 }
