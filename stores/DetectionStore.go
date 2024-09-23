@@ -12,7 +12,7 @@ func NewDetectionStore(db *sql.DB) *DetectionStore {
 	s := DetectionStore{
 		relationalDB: db,
 		query: `
-		SELECT d."location", d."timestamp", d."sensorID", s."ID", s."name", s."commonNameNL", s."commonNameEN"
+		SELECT d."ID", d."location", d."timestamp", d."sensorID", s."ID", s."name", s."commonNameNL", s."commonNameEN"
 		FROM "detection" d
 		INNER JOIN "species" s ON s."ID" = d."speciesID"
 		`,
@@ -27,7 +27,7 @@ func (s *DetectionStore) process(rows *sql.Rows, err error) ([]models.Detection,
 	detections := make([]models.Detection, 0)
 	for rows.Next() {
 		var d models.Detection
-		if err := rows.Scan(&d.Location, &d.Timestamp, &d.SensorID, &d.Species.ID, &d.Species.Name, &d.Species.CommonNameNL, &d.Species.CommonNameEN); err != nil {
+		if err := rows.Scan(&d.ID, &d.Location, &d.Timestamp, &d.SensorID, &d.Species.ID, &d.Species.Name, &d.Species.CommonNameNL, &d.Species.CommonNameEN); err != nil {
 			return nil, err
 		}
 		detections = append(detections, d)
@@ -35,7 +35,7 @@ func (s *DetectionStore) process(rows *sql.Rows, err error) ([]models.Detection,
 	return detections, nil
 }
 
-func (s *DetectionStore) get(detectionID int) (*models.Detection, error) {
+func (s *DetectionStore) Get(detectionID int) (*models.Detection, error) {
 	query := s.query + `
 		WHERE d."ID" = $1
 	`
@@ -68,5 +68,5 @@ func (s *DetectionStore) Add(detection models.DetectionRecord) (*models.Detectio
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
-	return s.get(id)
+	return s.Get(id)
 }

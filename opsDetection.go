@@ -58,10 +58,20 @@ func (o *detectionOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewDetectionInput) (*DetectionHolder, error) {
-		species, err := stores.NewDetectionStore(relationalDB).Add(input.Body)
+		detection, err := stores.NewDetectionStore(relationalDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
-		return &DetectionHolder{Body: species}, nil
+		zones, err := stores.NewZoneStore(relationalDB).GetForDetection(detection.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		alarmStore := stores.NewAlarmStore(relationalDB)
+		for _, zone := range zones {
+			if err := alarmStore.AddFromDetection(zone.ID, detection.ID); err != nil {
+				return nil, handleError(err)
+			}
+		}
+		return &DetectionHolder{Body: detection}, nil
 	})
 }

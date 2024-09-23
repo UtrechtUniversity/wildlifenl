@@ -1,0 +1,2 @@
+ALTER TABLE "zone"
+	ADD "created" TIMESTAMPTZ NOT NULL DEFAULT now();
