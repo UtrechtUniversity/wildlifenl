@@ -62,15 +62,8 @@ func (o *detectionOperations) RegisterAdd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
-		zones, err := stores.NewZoneStore(relationalDB).GetForDetection(detection)
-		if err != nil {
+		if err := stores.NewAlarmStore(relationalDB).AddAllFromDetection(detection); err != nil {
 			return nil, handleError(err)
-		}
-		alarmStore := stores.NewAlarmStore(relationalDB)
-		for _, zone := range zones {
-			if err := alarmStore.AddFromDetection(zone.ID, detection.ID); err != nil {
-				return nil, handleError(err)
-			}
 		}
 		return &DetectionHolder{Body: detection}, nil
 	})

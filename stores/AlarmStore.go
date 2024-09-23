@@ -88,12 +88,18 @@ func (s *AlarmStore) GetByUser(userID string) ([]models.Alarm, error) {
 	return s.process(rows, err)
 }
 
-func (s *AlarmStore) AddFromDetection(zoneID string, detectionID int) error {
+func (s *AlarmStore) AddAllFromDetection(detection *models.Detection) error {
+	zones, err := NewZoneStore(s.relationalDB).GetForDetection(detection)
+	if err != nil {
+		return err
+	}
 	query := `
 		INSERT INTO "alarm"("zoneID", "detectionID") VALUES($1, $2)
 	`
-	if _, err := s.relationalDB.Exec(query, zoneID, detectionID); err != nil {
-		return err
+	for _, zone := range zones {
+		if _, err := s.relationalDB.Exec(query, zone.ID, detection.ID); err != nil {
+			return err
+		}
 	}
 	return nil
 }

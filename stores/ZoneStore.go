@@ -145,7 +145,7 @@ func (s *ZoneStore) GetForDetection(detection *models.Detection) ([]models.Zone,
 		LEFT JOIN "detection" d ON z."area" @> d."location" AND d."speciesID" = s."ID"
 		WHERE d."ID" = $1
 		AND z."deactivated" IS NULL
-		AND z."created" > d."timestamp"
+		AND z."created" < d."timestamp"
 	`
 	rows, err := s.relationalDB.Query(query, detection.ID)
 	return s.process(rows, err)
