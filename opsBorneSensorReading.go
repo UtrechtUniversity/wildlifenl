@@ -29,7 +29,7 @@ func newBorneSensorReadingOperations() *borneSensorReadingOperations {
 func (o *borneSensorReadingOperations) RegisterGetAll(api huma.API) {
 	name := "Get All BorneSensorReadings"
 	description := "Retrieve all borne sensor reading of the last hour."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

@@ -31,7 +31,7 @@ func newInteractionTypeOperations(database *sql.DB) *interactionTypeOperations {
 func (o *interactionTypeOperations) RegisterGetAll(api huma.API) {
 	name := "Get All InteractionTypes"
 	description := "Retrieve all interaction types."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

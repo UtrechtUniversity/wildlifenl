@@ -53,7 +53,7 @@ func (o *profileOperations) RegisterGet(api huma.API) {
 func (o *profileOperations) RegisterGetAll(api huma.API) {
 	name := "Get all Profiles"
 	description := "Retrieve all profiles."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"administrator"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

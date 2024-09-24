@@ -58,7 +58,7 @@ func (o *interactionOperations) RegisterGet(api huma.API) {
 func (o *interactionOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Interactions"
 	description := "Retrieve all interactions."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"researcher"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
@@ -102,7 +102,7 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 func (o *interactionOperations) RegisterGetMine(api huma.API) {
 	name := "Get My Interactions"
 	description := "Retrieve my interactions."
-	path := "/" + o.Endpoint + "/me/"
+	path := "/" + o.Endpoint + "s/me/"
 	scopes := []string{}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

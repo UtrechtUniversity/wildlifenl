@@ -35,7 +35,7 @@ func newDetectionOperations(database *sql.DB) *detectionOperations {
 func (o *detectionOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Detections"
 	description := "Retrieve all detections."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"administrator", "researcher"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

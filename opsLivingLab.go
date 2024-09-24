@@ -58,7 +58,7 @@ func (o *livinglabOperations) RegisterGet(api huma.API) {
 func (o *livinglabOperations) RegisterGetAll(api huma.API) {
 	name := "Get all LivingLabs"
 	description := "Retrieve all living labs."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

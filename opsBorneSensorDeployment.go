@@ -33,7 +33,7 @@ func newBorneSensorDeploymentOperations() *borneSensorDeploymentOperations {
 func (o *borneSensorDeploymentOperations) RegisterGetAll(api huma.API) {
 	name := "Get All BorneSensorDeployments"
 	description := "Retrieve all active borne sensor deployments, i.e. having no end timestamp."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

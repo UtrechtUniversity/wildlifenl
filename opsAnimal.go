@@ -57,7 +57,7 @@ func (o *animalOperations) RegisterGet(api huma.API) {
 func (o *animalOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Animals"
 	description := "Retrieve all animals."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"herd-manager", "researcher"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

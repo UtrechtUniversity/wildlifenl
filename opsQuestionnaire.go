@@ -58,7 +58,7 @@ func (o *questionnaireOperations) RegisterGet(api huma.API) {
 func (o *questionnaireOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Questionnaires"
 	description := "Retrieve all questionnaires."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"administrator"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
@@ -106,7 +106,7 @@ func (o *questionnaireOperations) RegisterAdd(api huma.API) {
 func (o *questionnaireOperations) RegisterGetMine(api huma.API) {
 	name := "Get My Questionnaires"
 	description := "Retrieve my questionnaires."
-	path := "/" + o.Endpoint + "/me/"
+	path := "/" + o.Endpoint + "s/me/"
 	scopes := []string{"researcher"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

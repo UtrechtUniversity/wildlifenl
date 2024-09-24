@@ -34,7 +34,7 @@ func newRoleOperations(database *sql.DB) *roleOperations {
 func (o *roleOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Roles"
 	description := "Retrieve all roles."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

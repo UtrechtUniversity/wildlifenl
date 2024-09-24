@@ -70,7 +70,7 @@ func (o *zoneOperations) RegisterGet(api huma.API) {
 func (o *zoneOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Zones"
 	description := "Retrieve all zones."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"administrator", "researcher"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
@@ -104,7 +104,7 @@ func (o *zoneOperations) RegisterAdd(api huma.API) {
 func (o *zoneOperations) RegisterGetMine(api huma.API) {
 	name := "Get My Zones"
 	description := "Retrieve my zones."
-	path := "/" + o.Endpoint + "/me/"
+	path := "/" + o.Endpoint + "s/me/"
 	scopes := []string{}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{

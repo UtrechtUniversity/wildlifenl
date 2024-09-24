@@ -58,7 +58,7 @@ func (o *messageOperations) RegisterGet(api huma.API) {
 func (o *messageOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Messages"
 	description := "Retrieve all messages."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"administrator"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
@@ -106,7 +106,7 @@ func (o *messageOperations) RegisterAdd(api huma.API) {
 func (o *messageOperations) RegisterGetMine(api huma.API) {
 	name := "Get My Messages"
 	description := "Retrieve my messages."
-	path := "/" + o.Endpoint + "/me/"
+	path := "/" + o.Endpoint + "s/me/"
 	scopes := []string{"researcher"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
