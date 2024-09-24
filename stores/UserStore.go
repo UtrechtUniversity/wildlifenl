@@ -2,6 +2,7 @@ package stores
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 )
@@ -55,4 +56,22 @@ func (s *UserStore) Get(userID string) (*models.User, error) {
 func (s *UserStore) GetAll() ([]models.User, error) {
 	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
+}
+
+func (s *UserStore) UpdateLocation(userID string, location models.Point, timestamp time.Time) (*models.User, error) {
+	query := `
+		UPDATE "user"
+		SET "location" = $1, "locationTimestamp" = $2
+		WHERE "ID" = $3
+		RETURNING "ID"
+	`
+	var id *string
+	row := s.relationalDB.QueryRow(query, location, timestamp, userID)
+	if err := row.Scan(&id); err != nil {
+		return nil, err
+	}
+	if id == nil {
+		return nil, nil
+	}
+	return s.Get(*id)
 }
