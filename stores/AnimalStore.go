@@ -15,7 +15,7 @@ func NewAnimalStore(relationalDB *sql.DB, timeseriesDB *timeseries.Timeseries) *
 		relationalDB: relationalDB,
 		timeseriesDB: timeseriesDB,
 		query: `
-		SELECT a."ID", a."name", a."location", s."ID", s."name", s."commonNameNL", s."commonNameEN"
+		SELECT a."ID", a."name", a."location", a."locationTimestamp", s."ID", s."name", s."commonNameNL", s."commonNameEN"
 		FROM "animal" a
 		LEFT JOIN "species" s ON s."ID" = a."speciesID"
 		`,
@@ -31,7 +31,7 @@ func (s *AnimalStore) process(rows *sql.Rows, err error) ([]models.Animal, error
 	for rows.Next() {
 		var animal models.Animal
 		var species models.Species
-		if err := rows.Scan(&animal.ID, &animal.Name, &animal.Location, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN); err != nil {
+		if err := rows.Scan(&animal.ID, &animal.Name, &animal.Location, &animal.LocationTimestamp, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
