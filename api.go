@@ -38,6 +38,14 @@ func Start(config *Configuration) error {
 	if err := loadTimeseriesDB(configuration); err != nil {
 		return fmt.Errorf("could not connect to timeseries database: %w", err)
 	}
+	/*
+		if err := timeseriesDB.CreateBucketIfNotExists("animals"); err != nil {
+			return fmt.Errorf("could not create timeseries bucket: %w", err)
+		}
+		if err := timeseriesDB.CreateBucketIfNotExists("humans"); err != nil {
+			return fmt.Errorf("could not create timeseries bucket: %w", err)
+		}
+	*/
 	sessions = cache.New(time.Duration(configuration.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
 	authRequests = cache.New(time.Duration(configuration.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
 	apiConfig := huma.DefaultConfig(appName, config.Version)
