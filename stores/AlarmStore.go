@@ -12,11 +12,13 @@ func NewAlarmStore(db *sql.DB) *AlarmStore {
 	s := AlarmStore{
 		relationalDB: db,
 		query: `
-		SELECT a."ID", a."timestamp", z."ID", z."deactivated", z."name", z."description", z."area", s."ID", s."name", s."commonNameNL", s."commonNameEN", u."ID", u."name", COALESCE(i."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(i."timestamp", '2000-01-01'), COALESCE(i."description",''), COALESCE(i."location", '(0,0)'), COALESCE(d."ID",0), COALESCE(d."location", '(0,0)'), COALESCE(d."timestamp",'2000-01-01'), COALESCE(d."sensorID",''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(n."location",'(0,0)')
+		SELECT a."ID", a."timestamp", z."ID", z."deactivated", z."name", z."description", z."area", s."ID", s."name", s."commonNameNL", s."commonNameEN", u."ID", u."name", COALESCE(i."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(i."timestamp", '2000-01-01'), COALESCE(i."description",''), COALESCE(i."location",'(0,0)'), COALESCE(t."ID",0), COALESCE(t."nameNL",''), COALESCE(t."nameEN",''), COALESCE(t."descriptionNL",''), COALESCE(t."descriptionEN",''), COALESCE(x."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(x."name",''), COALESCE(d."ID",0), COALESCE(d."location", '(0,0)'), COALESCE(d."timestamp",'2000-01-01'), COALESCE(d."sensorID",''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(n."location",'(0,0)')
 		FROM "alarm" a
 		INNER JOIN "zone" z ON a."zoneID" = z."ID"
 		INNER JOIN "user" u ON u."ID" = z."userID"
 		LEFT JOIN "interaction" i ON a."interactionID" = i."ID"
+		LEFT JOIN "interactionType" t ON t."ID" = i."typeID"
+		LEFT JOIN "user" x ON x."ID" = i."userID"
 		LEFT JOIN "detection" d ON a."detectionID" = d."ID"
 		LEFT JOIN "animal" n ON a."animalID" = n."ID"
 		INNER JOIN "species" s ON s."ID" = COALESCE(i."speciesID", d."speciesID", n."speciesID")
@@ -36,7 +38,7 @@ func (s *AlarmStore) process(rows *sql.Rows, err error) ([]models.Alarm, error) 
 		var d models.Detection
 		var n models.Animal
 		var s models.Species
-		if err := rows.Scan(&a.ID, &a.Timestamp, &a.Zone.ID, &a.Zone.Deactivated, &a.Zone.Name, &a.Zone.Description, &a.Zone.Area, &s.ID, &s.Name, &s.CommonNameNL, &s.CommonNameEN, &a.Zone.User.ID, &a.Zone.User.Name, &i.ID, &i.Timestamp, &i.Description, &i.Location, &d.ID, &d.Location, &d.Timestamp, &d.SensorID, &n.ID, &n.Name, &n.Location); err != nil {
+		if err := rows.Scan(&a.ID, &a.Timestamp, &a.Zone.ID, &a.Zone.Deactivated, &a.Zone.Name, &a.Zone.Description, &a.Zone.Area, &s.ID, &s.Name, &s.CommonNameNL, &s.CommonNameEN, &a.Zone.User.ID, &a.Zone.User.Name, &i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Type.ID, &i.Type.NameNL, &i.Type.NameEN, &i.Type.DescriptionNL, &i.Type.DescriptionEN, &i.User.ID, &i.User.Name, &d.ID, &d.Location, &d.Timestamp, &d.SensorID, &n.ID, &n.Name, &n.Location); err != nil {
 			return nil, err
 		}
 		if i.ID != "00000000-0000-0000-0000-000000000000" {
@@ -98,6 +100,22 @@ func (s *AlarmStore) AddAllFromDetection(detection *models.Detection) error {
 	`
 	for _, zone := range zones {
 		if _, err := s.relationalDB.Exec(query, zone.ID, detection.ID); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *AlarmStore) AddAllFromInteraction(interaction *models.Interaction) error {
+	zones, err := NewZoneStore(s.relationalDB).GetForInteraction(interaction)
+	if err != nil {
+		return err
+	}
+	query := `
+		INSERT INTO "alarm"("zoneID", "interactionID") VALUES($1, $2)
+	`
+	for _, zone := range zones {
+		if _, err := s.relationalDB.Exec(query, zone.ID, interaction.ID); err != nil {
 			return err
 		}
 	}
