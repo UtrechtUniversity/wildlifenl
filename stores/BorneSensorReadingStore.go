@@ -97,7 +97,7 @@ func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) 
 	return results, nil
 }
 
-func (s *BorneSensorReadingStore) Add(borneSensorReading *models.BorneSensorReading) error {
+func (s *BorneSensorReadingStore) Add(borneSensorReading *models.BorneSensorReading) (*models.Animal, error) {
 	fields := make(map[string]any)
 	if borneSensorReading.Location != nil {
 		fields["latitude"] = borneSensorReading.Location.Latitude
@@ -121,20 +121,15 @@ func (s *BorneSensorReadingStore) Add(borneSensorReading *models.BorneSensorRead
 		}
 		point := write.NewPoint("borne-sensor", tags, fields, borneSensorReading.Timestamp.Local())
 		if err := writer.WritePoint(context.Background(), point); err != nil {
-			return err
+			return nil, err
 		}
 	}
 	if borneSensorReading.Location != nil {
-		query := `
-			UPDATE animal SET "location" = $1, "locationTimestamp" = $2
-			FROM animal a
-			JOIN "borneSensorDeployment" d on a."id" = d."animalID"
-			WHERE d."sensorID" = $3
-		`
-		_, err := s.relationalDB.Exec(query, borneSensorReading.Location, borneSensorReading.Timestamp, borneSensorReading.SensorID)
+		animal, err := NewAnimalStore(s.relationalDB, s.timeseriesDB).UpdateLocation(borneSensorReading.SensorID, *borneSensorReading.Location, borneSensorReading.Timestamp)
 		if err != nil {
-			return err
+			return nil, err
 		}
+		return animal, nil
 	}
-	return nil
+	return nil, nil
 }

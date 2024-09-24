@@ -52,9 +52,14 @@ func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewBorneSensorReadingInput) (*struct{}, error) {
-		err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).Add(input.Body)
+		animal, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)
+		}
+		if animal != nil {
+			if err := stores.NewAlarmStore(relationalDB).AddAllFromAnimal(animal); err != nil {
+				return nil, handleError(err)
+			}
 		}
 		return nil, nil
 	})

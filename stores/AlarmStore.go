@@ -121,3 +121,19 @@ func (s *AlarmStore) AddAllFromInteraction(interaction *models.Interaction) erro
 	}
 	return nil
 }
+
+func (s *AlarmStore) AddAllFromAnimal(animal *models.Animal) error {
+	zones, err := NewZoneStore(s.relationalDB).GetForAnimal(animal)
+	if err != nil {
+		return err
+	}
+	query := `
+		INSERT INTO "alarm"("zoneID", "animalID") VALUES($1, $2)
+	`
+	for _, zone := range zones {
+		if _, err := s.relationalDB.Exec(query, zone.ID, animal.ID); err != nil {
+			return err
+		}
+	}
+	return nil
+}

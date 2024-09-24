@@ -161,3 +161,14 @@ func (s *ZoneStore) GetForInteraction(interaction *models.Interaction) ([]models
 	rows, err := s.relationalDB.Query(query, interaction.ID)
 	return s.process(rows, err)
 }
+
+func (s *ZoneStore) GetForAnimal(animal *models.Animal) ([]models.Zone, error) {
+	query := s.query + `
+		LEFT JOIN "animal" a ON z."area" @> a."location" AND a."speciesID" = s."ID"
+		WHERE a."ID" = $1
+		AND z."deactivated" IS NULL
+		AND z."created" < a."locationTimestamp"
+	`
+	rows, err := s.relationalDB.Query(query, animal.ID)
+	return s.process(rows, err)
+}

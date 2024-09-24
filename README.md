@@ -95,7 +95,7 @@ Upon a new `Detection` being posted, including lat/long, it should be checked wh
 ### Alarm from Interaction
 Upon a new `Interaction` being posted, including lat/long, it should be checked whether its type is 'Sighting'. If so, it should be checked whether a `Zone` exits that is associated with the `Species` of this interaction, and that has a spatiotemperal overlap[^3] with this `Interaction`. If so, a new `Alarm` must be created being associated with the `Zone` in question and linked to this `Interaction`.
 
-### Alarm from Borne-Sensor-Reading
+### Alarm from Animal
 Upon a new `Borne-Sensor-Reading` being posted, including lat/long, it should be checked whether a `Borne-Sensor-Deployment` exists for this reading, if so the location of the associated `Animal` should be updated. Then, it should be checked whether a `Zone` exits that is associated with the `Species` of this animal, and that has a spatiotemperal overlap[^3] with this `Animal`. If so, a new `Alarm` must be created being associated with the `Zone` in question and linked to the `Animal` that the `Borne-Sensor-Deployment` refers to.
 
 ---

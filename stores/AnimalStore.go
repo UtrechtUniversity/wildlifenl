@@ -2,6 +2,7 @@ package stores
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/timeseries"
@@ -73,4 +74,29 @@ func (s *AnimalStore) Add(animal *models.AnimalRecord) (*models.Animal, error) {
 		return nil, err
 	}
 	return s.Get(id)
+}
+
+func (s *AnimalStore) UpdateLocation(sensorID string, location models.Point, timestamp time.Time) (*models.Animal, error) {
+	query := `
+		UPDATE animal
+		SET "location" = $1, "locationTimestamp" = $2
+		WHERE "ID" = (
+			SELECT a."ID"
+			FROM "borneSensorDeployment" d
+			INNER JOIN "animal" a ON a."ID" = d."animalID" 
+			WHERE d."sensorID" = $3
+			AND (d."end" IS NULL OR d."end" > $2)
+			AND d."start" < $2
+		)
+		RETURNING "ID"
+	`
+	var id *string
+	row := s.relationalDB.QueryRow(query, location, timestamp, sensorID)
+	if err := row.Scan(&id); err != nil {
+		return nil, err
+	}
+	if id == nil {
+		return nil, nil
+	}
+	return s.Get(*id)
 }
