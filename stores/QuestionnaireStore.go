@@ -66,7 +66,7 @@ func (s *QuestionnaireStore) GetAll() ([]models.Questionnaire, error) {
 	return s.process(rows, err)
 }
 
-func (s *QuestionnaireStore) Add(userID string, questionnaire *models.QuestionnaireRecord) (*models.Questionnaire, error) {
+func (s *QuestionnaireStore) Add(questionnaire *models.QuestionnaireRecord) (*models.Questionnaire, error) {
 	query := `
 		INSERT INTO "questionnaire"("name", "experimentID", "interactionTypeID") VALUES($1, $2, $3)
 		RETURNING "ID"

@@ -81,7 +81,21 @@ func (o *questionnaireOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewQuestionnaireInput) (*QuestionnaireHolder, error) {
-		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).Add(input.credential.UserID, input.Body)
+		experiments, err := stores.NewExperimentStore(relationalDB).GetByUser(input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		var experiment models.Experiment
+		for _, e := range experiments {
+			if e.ID == input.Body.ExperimentID {
+				experiment = e
+				break
+			}
+		}
+		if experiment.ID == "" {
+			return nil, generateNotFoundForThisUserError("experiment", input.Body.ExperimentID)
+		}
+		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
