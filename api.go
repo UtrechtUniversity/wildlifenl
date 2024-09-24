@@ -64,6 +64,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newMessageOperations(relationalDB))
 	huma.AutoRegister(api, newQuestionOperations(relationalDB))
 	huma.AutoRegister(api, newQuestionnaireOperations(relationalDB))
+	huma.AutoRegister(api, newResponseOperations(relationalDB))
 	huma.AutoRegister(api, newRoleOperations(relationalDB))
 	huma.AutoRegister(api, newSpeciesOperations(relationalDB))
 	huma.AutoRegister(api, newUserOperations(relationalDB))
