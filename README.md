@@ -46,9 +46,6 @@ A place in the world designated as a nature area.
 ### Message
 A piece of information to send to the user upon certain conditions. As soon as a message has an associated `Conveyance` record, it can no longer be changed. A `Message` can be deactivated when it is no longer needed to send it, and a new `Message` can be created for the new situation.
 
-### Message-Type
-The type of a message to indicate severity, for example a piece of information or an urgent warning.
-
 ### Response
 The answer the user gave to the question. If the `Question` has associated possible `Answer` records, the response must refer to one of the `Answer` records of the question.
 
