@@ -28,7 +28,7 @@ func newUserOperations(database *sql.DB) *userOperations {
 	return &o
 }
 
-func (o *userOperations) RegisterGetByID(api huma.API) {
+func (o *userOperations) RegisterGet(api huma.API) {
 	name := "Get User By ID"
 	description := "Retrieve a specific user by ID."
 	path := "/" + o.Endpoint + "/{id}"
@@ -54,7 +54,7 @@ func (o *userOperations) RegisterGetAll(api huma.API) {
 	name := "Get all Users"
 	description := "Retrieve all users."
 	path := "/" + o.Endpoint + "/"
-	scopes := []string{"administrator", "researcher"}
+	scopes := []string{}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
