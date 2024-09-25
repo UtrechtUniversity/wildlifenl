@@ -8,8 +8,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -ldflags "-X main.version=$(git log -1 --format=%cd --date=format:'%Y%m%d')" -o /app/wildlifenl cmd/main.go
+RUN go build -ldflags "-X main.version=$(git log -1 --format=%cd --date=format:'%Y%m%d')" -o /app/cmd/wildlifenl cmd/main.go
 
 EXPOSE 8080
 
-CMD ["/app/wildlifenl"]
+CMD ["/app/cmd/wildlifenl"]
