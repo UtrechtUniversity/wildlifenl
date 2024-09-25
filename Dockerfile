@@ -6,10 +6,12 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY . .
+COPY **/*.go ./
 
-RUN go build -ldflags "-X main.version=$(git log -1 --format=%cd --date=format:'%Y%m%d')" -o /app/cmd/wildlifenl cmd/main.go
+COPY database /database
+
+RUN go build -ldflags "-X main.version=$(git log -1 --format=%cd --date=format:'%Y%m%d')" -o /app/wildlifenl cmd/main.go
 
 EXPOSE 8080
 
-CMD ["/app/cmd/wildlifenl"]
+CMD ["/app/wildlifenl"]
