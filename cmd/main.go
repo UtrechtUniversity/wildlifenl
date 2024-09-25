@@ -117,6 +117,8 @@ func main() {
 }
 
 func migrateDatabase(config *wildlifenl.Configuration) error {
+	exe, _ := os.Executable()
+	log.Println("EXE", exe)
 	connStr := "postgres://" + config.RelationalDatabaseUser + ":" + config.RelationalDatabasePass + "@" + config.RelationalDatabaseHost
 	if config.RelationalDatabasePort > 0 {
 		connStr += ":" + strconv.Itoa(config.RelationalDatabasePort)
