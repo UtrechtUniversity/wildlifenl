@@ -76,24 +76,27 @@ A circular area in the world with a central postion (latitude/longitude) and rad
 
 The blue entities are stored in a relational database, whereas the green entities are stored in a timeseries database. As a result the relationships between blue and green entities are "by convention" of having the same IDs rather than them being enforced by any rules. For `Sensor-Reading` and `Borne-Sensor-Reading` this brings an advantage in the cases where data is ingested from external automated systems as it is therefore possible to accept and store these data, regardless of there being a way to use and retreive them in a meaningful context (even if there are no `Sensor-Installation` or `Borne-Sensor-Deployment` with the referenced ID), subsequently allowing that the installation or deployment that adds meaning be added later, rather than rejecting these data for the reason of there being no meaningful context, and perhaps make external automated systems fail. Note that this advantage is not needed for `Tracking-Reading` as it is highly unlikely for a new reading to refer to a userID that is unknown.
 
-Blue entities with a red border are created internally as a result of logic rules (see below) and are therefore *de facto* read-only.
+Blue entities with a red border are created internally as a result of logical triggers (see below) and are therefore *de facto* read-only.
 
-## Logic rules
+## Logical triggers
 
-### Conveyance from Response
-Upon a new `Response` being posted, it should be checked whether this response refers to an `Answer`. If so, it should be checked whether a non-deactivated[^2] `Message` exists that is associated with the same `Answer`, and is associated with a non-ended `Experiment`. If the `Experiment` has an association with a `LivingLab`, the `Interaction` that is associated with the `Response` must have a spatiotemperal overlap[^3] with this `LivingLab`. If so, a new `Conveyance` must be created referring to that `Message` and associated with the `Response` and NOT with an `Encounter`. The `Conveyance` and its `Message` should be in the response body of the post request.
+### Deployment of Questionnaire from Interaction
+Upon a new `Interaction` being posted, it should be checked whether a `Questionnaire` exists that is accociated with the `InteractionType` of the newly posted `Interaction`, that is associated with a non-ended `Experiment`, and if that `Experiment` is bound to a specific `LivingLab` the newly posted `Interaction` should be within that `LivingLab`. If so, this `Questionnaire` should be in the response body of the post request. If multiple `Questionnaire`s qualify, a random single one is chosen as to not overload the end-user. 
 
-### Encounter and Conveyance from Tracking-Reading
-Upon a new `Tracking-Reading` being posted, including lat/long, it should be checked whether a non-deactivated[^2] `Message` exists that is associated with a non-ended `Experiment` and with a `Species` for which there is an `Animal` that has spatiotemperal overlap[^3] with this `Tracking-Reading`. Per animal for which this is true an `Encounter` must be created having the user location fields set to the lat/long of the `Tracking-Reading` and the animal location fields set to that of the animal in question. If the `Experiment` has an association with a `LivingLab`, the `Tracking-Reading` must have a spatiotemperal overlap[^3] with this `LivingLab`. Then, a new `Conveyance` must be created and associated with the previously mentioned `Message` and `Encounter` and NOT with a `Response`. The `Conveyance` and its `Message` should be in the response body of the post request.
-
-### Alarm from Detection
+### Creation of Alarm from Detection
 Upon a new `Detection` being posted, including lat/long, it should be checked whether a `Zone` exits that is associated with the `Species` of this detection and that has a spatiotemperal overlap[^3] with this `Detection`. If so, a new `Alarm` must be created being associated with the `Zone` in question and linked to this `Detection`.
 
-### Alarm from Interaction
+### Creation of Alarm from Interaction
 Upon a new `Interaction` being posted, including lat/long, it should be checked whether its type is 'Sighting'. If so, it should be checked whether a `Zone` exits that is associated with the `Species` of this interaction, and that has a spatiotemperal overlap[^3] with this `Interaction`. If so, a new `Alarm` must be created being associated with the `Zone` in question and linked to this `Interaction`.
 
-### Alarm from Animal
+### Creation of Alarm from Animal with Borne-Sensor-Reading
 Upon a new `Borne-Sensor-Reading` being posted, including lat/long, it should be checked whether a `Borne-Sensor-Deployment` exists for this reading, if so the location of the associated `Animal` should be updated. Then, it should be checked whether a `Zone` exits that is associated with the `Species` of this animal, and that has a spatiotemperal overlap[^3] with this `Animal`. If so, a new `Alarm` must be created being associated with the `Zone` in question and linked to the `Animal` that the `Borne-Sensor-Deployment` refers to.
+
+### Creation of Conveyance from Response
+Upon a new `Response` being posted, it should be checked whether this response refers to an `Answer`. If so, it should be checked whether a `Message` exists that is associated with the same `Answer`, and is associated with a non-ended `Experiment`. If the `Experiment` has an association with a `LivingLab`, the `Interaction` that is associated with the `Response` must have a spatiotemperal overlap[^3] with this `LivingLab`. If so, a new `Conveyance` must be created referring to that `Message` and associated with the `Response` and NOT with an `Encounter`. The `Conveyance` and its `Message` should be in the response body of the post request. If multiple `Message`s qualify, a random single one is chosen as to not overload the end-user.
+
+### Creation of Encounter and Conveyance from Tracking-Reading
+Upon a new `Tracking-Reading` being posted, including lat/long, it should be checked whether there is an `Animal` that has spatiotemperal overlap[^3] within the margins as specified by its `Species` with this `Tracking-Reading`. Per animal for which this is true an `Encounter` must be created having the user location field set to the lat/long of the `Tracking-Reading` and the animal location field set to that of the animal in question. Then, it should be checked whether a `Message` exists that is associated with a non-ended `Experiment` and with the same `Species` as the `Animal` for which the `Encounter` is created. If the `Experiment` has an association with a `LivingLab`, the `Tracking-Reading` must have a spatiotemperal overlap[^3] with this `LivingLab`. Then, a new `Conveyance` must be created and associated with the previously mentioned `Message` and `Encounter` and NOT with a `Response`. The `Conveyance` and its `Message` should be in the response body of the post request. If multiple `Message`s qualify, a random single one is chosen as to not overload the end-user.
 
 ---
 
@@ -101,4 +104,4 @@ Upon a new `Borne-Sensor-Reading` being posted, including lat/long, it should be
 
 [^2]: A record is marked *Deactivated* using a nullable DateTime field. When NULL it means the record is active, and when filled with a timestamp it means the record was deactivated at that moment. A deactivated record does, for all intents and purposes, no longer exist, has no effect in logic rules and does no longer show up in lists, with the noteworthy exception those lists that explicitly state that they contain ALL records. Also, it is still possible to retrieve a deactivated record by ID.
 
-[^3]: A spatiotemporal overlap means that both the distance as well as the timestamps of the location measurements of two different entities are below a predefined threshold. In other words: They were close to eachother at the same moment in time.
+[^3]: A spatiotemporal overlap means that both the distance as well as the timestamps of the location measurements of two different entities are below a predefined threshold. In other words: They were close to eachother at roughly the same moment in time.

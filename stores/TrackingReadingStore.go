@@ -23,7 +23,7 @@ func NewTrackingReadingStore(relationalDB *sql.DB, timeseriesDB *timeseries.Time
 	return &s
 }
 
-func (s *TrackingReadingStore) Add(userID string, trackingReading *models.TrackingReading) (*models.User, error) {
+func (s *TrackingReadingStore) Add(userID string, trackingReading *models.TrackingReadingRecord) (*models.TrackingReading, error) {
 	fields := make(map[string]any)
 	fields["latitude"] = trackingReading.Location.Latitude
 	fields["longitude"] = trackingReading.Location.Longitude
@@ -35,9 +35,9 @@ func (s *TrackingReadingStore) Add(userID string, trackingReading *models.Tracki
 	if err := writer.WritePoint(context.Background(), point); err != nil {
 		return nil, err
 	}
-	user, err := NewUserStore(s.relationalDB).UpdateLocation(userID, trackingReading.Location, trackingReading.Timestamp)
+	_, err := NewUserStore(s.relationalDB).UpdateLocation(userID, trackingReading.Location, trackingReading.Timestamp)
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
+	return &models.TrackingReading{TrackingReadingRecord: *trackingReading}, nil
 }

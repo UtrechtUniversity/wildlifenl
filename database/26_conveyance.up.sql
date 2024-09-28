@@ -1,0 +1,11 @@
+CREATE TABLE "conveyance" (
+    "ID" UUID NOT NULL DEFAULT gen_random_uuid(),
+	"timestamp" TIMESTAMPTZ NOT NULL DEFAULT now(),
+	"messageID" UUID NOT NULL,
+	"encounterID" UUID NULL,
+    "responseID" UUID NULL,
+	PRIMARY KEY ("ID"),
+	CONSTRAINT "FK__message" FOREIGN KEY ("messageID") REFERENCES "message" ("ID") ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT "FK__encounter" FOREIGN KEY ("encounterID") REFERENCES "encounter" ("ID") ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT "FK__response" FOREIGN KEY ("responseID") REFERENCES "response" ("ID") ON UPDATE RESTRICT ON DELETE RESTRICT
+);

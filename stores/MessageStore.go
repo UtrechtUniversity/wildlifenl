@@ -93,3 +93,13 @@ func (s *MessageStore) GetByUser(userID string) ([]models.Message, error) {
 	}
 	return result, nil
 }
+
+func (s *MessageStore) GetAllForEncounter(encounter *models.Encounter) ([]models.Message, error) {
+	query := s.query + `
+		WHERE m."speciesID" = $1
+		AND e."start" < $2
+		AND (e."end" IS NULL OR e."end" > $2)
+	`
+	rows, err := s.relationalDB.Query(query, encounter.Animal.SpeciesID, encounter.Timestamp)
+	return s.process(rows, err)
+}

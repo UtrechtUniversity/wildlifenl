@@ -11,6 +11,10 @@ import (
 
 type NewTrackingReadingInput struct {
 	Input
+	Body *models.TrackingReadingRecord `json:"trackingReading"`
+}
+
+type TrackingReadingHolder struct {
 	Body *models.TrackingReading `json:"trackingReading"`
 }
 
@@ -35,14 +39,20 @@ func (o *trackingReadingOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewTrackingReadingInput) (*struct{}, error) {
-		user, err := stores.NewTrackingReadingStore(relationalDB, timeseriesDB).Add(input.credential.UserID, input.Body)
+	}, func(ctx context.Context, input *NewTrackingReadingInput) (*TrackingReadingHolder, error) {
+		trackingReading, err := stores.NewTrackingReadingStore(relationalDB, timeseriesDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
-		if user != nil {
-			// something happens here
+		encounters, err := stores.NewEncounterStore(relationalDB).AddAllForTrackingReading(trackingReading)
+		if err != nil {
+			return nil, handleError(err)
 		}
-		return nil, nil
+		conveyance, err := stores.NewConveyanceStore(relationalDB).AddForEncounters(encounters)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		trackingReading.Conveyance = conveyance
+		return &TrackingReadingHolder{Body: trackingReading}, nil
 	})
 }
