@@ -14,7 +14,7 @@ func NewResponseStore(db *sql.DB) *ResponseStore {
 		query: `
 		SELECT r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", i."ID", i."timestamp", i."description", i."location", u."ID", u."name", t."ID", t."nameNL", t."nameEN", t."descriptionNL", t."descriptionEN", COALESCE(a."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(a."text", ''), COALESCE(a."index", 0)
 		FROM "response" r
-		INNER JOIN "questions" q ON q."ID" = r."questionID"
+		INNER JOIN "question" q ON q."ID" = r."questionID"
 		INNER JOIN "interaction" i ON i."ID" = r."interactionID"
 		INNER JOIN "user" u ON u."ID" = i."userID"
 		INNER JOIN "interactionType" t ON t."ID" = i."typeID"
