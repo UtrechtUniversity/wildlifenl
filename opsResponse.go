@@ -73,6 +73,10 @@ func (o *responseOperations) RegisterAdd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
+
+		// TODO issue 21:
+		// Add Response -> Create Conveyance.
+
 		return &ResponseHolder{Body: response}, nil
 	})
 }

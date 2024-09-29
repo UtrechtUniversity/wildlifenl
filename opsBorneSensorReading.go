@@ -56,11 +56,14 @@ func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
+
+		// Add Borne-Sensor-Reading -> Create Alarms.
 		if animal != nil {
 			if err := stores.NewAlarmStore(relationalDB).AddAllFromAnimal(animal); err != nil {
 				return nil, handleError(err)
 			}
 		}
+
 		return nil, nil
 	})
 }
