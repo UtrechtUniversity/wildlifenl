@@ -2,7 +2,7 @@ package stores
 
 import (
 	"database/sql"
-	"math/rand"
+	"strings"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 )
@@ -92,33 +92,34 @@ func (s *ConveyanceStore) GetByUser(userID string) ([]models.Conveyance, error) 
 	return s.process(rows, err)
 }
 
-func (s ConveyanceStore) AddForEncounters(encounters []models.Encounter) (*models.Conveyance, error) {
-	messages := make(map[*models.Encounter][]models.Message)
-	messageStore := NewMessageStore(s.relationalDB)
-	for _, encounter := range encounters {
-		m, err := messageStore.GetAllForEncounter(&encounter)
-		if err != nil {
-			return nil, err
-		}
-		messages[&encounter] = m
-	}
-	if len(messages) == 0 {
-		return nil, nil
-	}
-	keys := make([]*models.Encounter, 0, len(messages))
-	for k := range messages {
-		keys = append(keys, k)
-	}
-	encounter := keys[rand.Intn(len(keys))]
-	message := messages[encounter][rand.Intn(len(messages[encounter]))]
+func (s *ConveyanceStore) AddForTrackingReading(trackingReading *models.TrackingReading) (*models.Conveyance, error) {
 	query := `
-		INSERT INTO "conveyance"("messageID", "encounterID") VALUES($1, $2, $3)
-		RETURNING "ID"
-	`
-	var id string
-	row := s.relationalDB.QueryRow(query, message.ID, encounter.ID)
-	if err := row.Scan(&id); err != nil {
+		WITH inserted AS (
+			INSERT INTO "conveyance"("messageID", "encounterID")
+			SELECT M."ID", e."ID"
+			FROM "encounter" e
+			INNER JOIN "animal" a ON a."ID" = e."animalID"
+			INNER JOIN "species" s ON s."ID" = a."speciesID"
+			LEFT JOIN "message" m ON m."speciesID" = s."ID"
+			LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
+			WHERE e."timestamp" = $1
+			AND e."userID" = $2
+			AND (l."ID" IS NULL OR l."definition" @> $3)
+			ORDER BY RANDOM()
+			LIMIT 1
+			RETURNING "ID", "timestamp", "messageID", "encounterID", "responseID"
+		)
+	` + strings.Replace(s.query, "FROM \"conveyance\"", "FROM inserted", 1)
+	rows, err := s.relationalDB.Query(query, trackingReading.Timestamp, trackingReading.UserID, trackingReading.Location)
+	if err != nil {
 		return nil, err
 	}
-	return s.Get(id)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	if len(result) != 1 {
+		return nil, nil
+	}
+	return &result[0], nil
 }

@@ -52,11 +52,13 @@ func (o *trackingReadingOperations) RegisterAdd(api huma.API) {
 		}
 
 		// Add Tracking-Reading -> Create Conveyance.
-		conveyance, err := stores.NewConveyanceStore(relationalDB).AddForEncounters(encounters)
-		if err != nil {
-			return nil, handleError(err)
+		if len(encounters) > 0 {
+			conveyance, err := stores.NewConveyanceStore(relationalDB).AddForTrackingReading(trackingReading)
+			if err != nil {
+				return nil, handleError(err)
+			}
+			trackingReading.Conveyance = conveyance
 		}
-		trackingReading.Conveyance = conveyance
 
 		return &TrackingReadingHolder{Body: trackingReading}, nil
 	})
