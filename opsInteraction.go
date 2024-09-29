@@ -85,16 +85,21 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
-		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).GetRandomActiveByInteractionType(interaction.Type)
+
+		// Add Interaction -> Get Questionnaire.
+		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).GetRandomActiveByInteraction(interaction)
 		if err != nil {
 			return nil, handleError(err)
 		}
 		interaction.Questionnaire = questionnaire
+
+		// Add Interaction -> Create Alarms.
 		if interaction.Type.ID == 1 { // TODO issue #15: Uses magic number.
 			if err := stores.NewAlarmStore(relationalDB).AddAllFromInteraction(interaction); err != nil {
 				return nil, handleError(err)
 			}
 		}
+
 		return &InteractionHolder{Body: interaction}, nil
 	})
 }

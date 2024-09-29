@@ -101,15 +101,17 @@ func (s *QuestionnaireStore) GetByUser(userID string) ([]models.Questionnaire, e
 	return result, nil
 }
 
-func (s *QuestionnaireStore) GetRandomActiveByInteractionType(interactionType models.InteractionType) (*models.Questionnaire, error) {
+func (s *QuestionnaireStore) GetRandomActiveByInteraction(interaction *models.Interaction) (*models.Questionnaire, error) {
 	query := s.query + `
+		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
 		WHERE q."interactionTypeID" = $1
-		AND NOW() > "start"
-		AND ("end" IS NULL OR "end" > NOW())
+		AND e."start" < $2
+		AND (e."end" IS NULL OR e."end" > $2)
+		AND (l."ID" IS NULL OR l."definition" @> $3)
 		ORDER BY random()
 		LIMIT 1
 		`
-	rows, err := s.relationalDB.Query(query, interactionType.ID)
+	rows, err := s.relationalDB.Query(query, interaction.Type.ID, interaction.Timestamp, interaction.Location)
 	questionnaires, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
