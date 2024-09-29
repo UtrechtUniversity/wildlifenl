@@ -96,7 +96,7 @@ func (s *ConveyanceStore) AddForTrackingReading(trackingReading *models.Tracking
 	query := `
 		WITH inserted AS (
 			INSERT INTO "conveyance"("messageID", "encounterID")
-			SELECT M."ID", e."ID"
+			SELECT m."ID", e."ID"
 			FROM "encounter" e
 			INNER JOIN "animal" a ON a."ID" = e."animalID"
 			INNER JOIN "species" s ON s."ID" = a."speciesID"
@@ -111,6 +111,38 @@ func (s *ConveyanceStore) AddForTrackingReading(trackingReading *models.Tracking
 		)
 	` + strings.Replace(s.query, "FROM \"conveyance\"", "FROM inserted", 1)
 	rows, err := s.relationalDB.Query(query, trackingReading.Timestamp, trackingReading.UserID, trackingReading.Location)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	if len(result) != 1 {
+		return nil, nil
+	}
+	return &result[0], nil
+}
+
+func (s *ConveyanceStore) AddForResponse(response *models.Response) (*models.Conveyance, error) {
+	query := `
+		WITH inserted AS (
+			INSERT INTO "conveyance"("messageID", "encounterID")
+			SELECT m."ID", r."ID"
+			FROM "response" r
+			INNER JOIN "interaction" i ON r."interactionID" = i."ID"
+			LEFT JOIN "answer" a ON r."answerID" = a."ID"
+			LEFT JOIN "message" m ON m."answerID" = a."ID"
+			LEFT JOIN "experiment" e ON e."ID" = m."experimentID"
+			LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
+			WHERE r."ID" = $1
+			AND (l."ID" IS NULL OR l."definition" @> i."location")
+			ORDER BY RANDOM()
+			LIMIT 1
+			RETURNING "ID"
+		)
+	` + strings.Replace(s.query, "FROM \"conveyance\"", "FROM inserted", 1)
+	rows, err := s.relationalDB.Query(query, response.ID)
 	if err != nil {
 		return nil, err
 	}

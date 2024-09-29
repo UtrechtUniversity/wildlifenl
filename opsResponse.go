@@ -74,8 +74,12 @@ func (o *responseOperations) RegisterAdd(api huma.API) {
 			return nil, handleError(err)
 		}
 
-		// TODO issue 21:
 		// Add Response -> Create Conveyance.
+		conveyance, err := stores.NewConveyanceStore(relationalDB).AddForResponse(response)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		response.Conveyance = conveyance
 
 		return &ResponseHolder{Body: response}, nil
 	})
