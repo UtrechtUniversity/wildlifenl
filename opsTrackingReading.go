@@ -44,15 +44,20 @@ func (o *trackingReadingOperations) RegisterAdd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
+
+		// Add Tracking-Reading -> Create Encounters.
 		encounters, err := stores.NewEncounterStore(relationalDB).AddAllForTrackingReading(trackingReading)
 		if err != nil {
 			return nil, handleError(err)
 		}
+
+		// Add Tracking-Reading -> Create Conveyance.
 		conveyance, err := stores.NewConveyanceStore(relationalDB).AddForEncounters(encounters)
 		if err != nil {
 			return nil, handleError(err)
 		}
 		trackingReading.Conveyance = conveyance
+
 		return &TrackingReadingHolder{Body: trackingReading}, nil
 	})
 }

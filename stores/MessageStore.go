@@ -96,10 +96,12 @@ func (s *MessageStore) GetByUser(userID string) ([]models.Message, error) {
 
 func (s *MessageStore) GetAllForEncounter(encounter *models.Encounter) ([]models.Message, error) {
 	query := s.query + `
+		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
 		WHERE m."speciesID" = $1
 		AND e."start" < $2
 		AND (e."end" IS NULL OR e."end" > $2)
+		AND (l."ID" IS NULL OR l."definition" @> $3)
 	`
-	rows, err := s.relationalDB.Query(query, encounter.Animal.SpeciesID, encounter.Timestamp)
+	rows, err := s.relationalDB.Query(query, encounter.Animal.SpeciesID, encounter.Timestamp, encounter.UserLocation)
 	return s.process(rows, err)
 }
