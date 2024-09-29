@@ -87,7 +87,7 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 		}
 
 		// Add Interaction -> Get Questionnaire.
-		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).GetRandomActiveByInteraction(interaction)
+		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).GetRandomByInteraction(interaction)
 		if err != nil {
 			return nil, handleError(err)
 		}

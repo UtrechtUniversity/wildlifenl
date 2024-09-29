@@ -101,7 +101,7 @@ func (s *QuestionnaireStore) GetByUser(userID string) ([]models.Questionnaire, e
 	return result, nil
 }
 
-func (s *QuestionnaireStore) GetRandomActiveByInteraction(interaction *models.Interaction) (*models.Questionnaire, error) {
+func (s *QuestionnaireStore) GetRandomByInteraction(interaction *models.Interaction) (*models.Questionnaire, error) {
 	query := s.query + `
 		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
 		WHERE q."interactionTypeID" = $1
