@@ -3,8 +3,8 @@ package models
 type ResponseRecord struct {
 	ID            string  `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this response."`
 	Text          *string `json:"text" doc:"The free format text that the user added to this response."`
-	QuestionID    string  `json:"questionID,omitempty" format:"uuid" writeOnly:"true" doc:"The ID of the question this response is for."`
-	InteractionID string  `json:"interactionID,omitempty" format:"uuid" writeOnly:"true" doc:"The ID of the interaction this response belongs to."`
+	QuestionID    string  `json:"questionID" format:"uuid" writeOnly:"true" doc:"The ID of the question this response is for."`
+	InteractionID string  `json:"interactionID" format:"uuid" writeOnly:"true" doc:"The ID of the interaction this response belongs to."`
 	AnswerID      *string `json:"answerID,omitempty" format:"uuid" writeOnly:"true" doc:"The ID of the answer that was selected for this response."`
 }
 

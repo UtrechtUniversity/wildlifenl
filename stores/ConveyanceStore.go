@@ -132,14 +132,14 @@ func (s *ConveyanceStore) AddForResponse(response *models.Response) (*models.Con
 			FROM "response" r
 			INNER JOIN "interaction" i ON r."interactionID" = i."ID"
 			LEFT JOIN "answer" a ON r."answerID" = a."ID"
-			LEFT JOIN "message" m ON m."answerID" = a."ID"
+			INNER JOIN "message" m ON m."answerID" = a."ID"
 			LEFT JOIN "experiment" e ON e."ID" = m."experimentID"
 			LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
 			WHERE r."ID" = $1
 			AND (l."ID" IS NULL OR l."definition" @> i."location")
 			ORDER BY RANDOM()
 			LIMIT 1
-			RETURNING "ID"
+			RETURNING "ID", "timestamp", "messageID", "encounterID", "responseID"
 		)
 	` + strings.Replace(s.query, "FROM \"conveyance\"", "FROM inserted", 1)
 	rows, err := s.relationalDB.Query(query, response.ID)

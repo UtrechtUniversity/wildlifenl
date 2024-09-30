@@ -32,7 +32,7 @@ func (s *ResponseStore) process(rows *sql.Rows, err error) ([]models.Response, e
 	for rows.Next() {
 		var r models.Response
 		var a models.Answer
-		if err := rows.Scan(&r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.User.ID, &r.Interaction.User.Name, &r.Interaction.Type.NameNL, &r.Interaction.Type.NameEN, &r.Interaction.Type.DescriptionNL, &r.Interaction.Type.DescriptionEN, &a.ID, &a.Text, &a.Index); err != nil {
+		if err := rows.Scan(&r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.User.ID, &r.Interaction.User.Name, &r.Interaction.Type.ID, &r.Interaction.Type.NameNL, &r.Interaction.Type.NameEN, &r.Interaction.Type.DescriptionNL, &r.Interaction.Type.DescriptionEN, &a.ID, &a.Text, &a.Index); err != nil {
 			return nil, err
 		}
 		if a.ID != "00000000-0000-0000-0000-000000000000" {
@@ -58,14 +58,32 @@ func (s *ResponseStore) Get(responseID string) (*models.Response, error) {
 	return &result[0], nil
 }
 
-func (s *ResponseStore) Add(response *models.ResponseRecord) (*models.Response, error) {
+func (s *ResponseStore) Add(userID string, response *models.ResponseRecord) (*models.Response, error) {
 	query := `
-		INSERT INTO "response"("text", "questionID", "interactionID", "answerID") VALUES($1, $2, $3, $4)
-		RETURNING "ID"
+		WITH sanity_check AS (
+			SELECT i."ID" 
+			FROM "interaction" i
+			INNER JOIN "user" u ON u."ID" = i."userID"
+			INNER JOIN "interactionType" t ON t."ID" = i."typeID"
+			INNER JOIN "questionnaire" n ON n."interactionTypeID" = t."ID"
+			INNER JOIN "question" q ON q."questionnaireID" = n."ID"
+			LEFT JOIN "answer" a ON a."questionID" = q."ID"
+			WHERE u."ID" = $1
+			AND q."ID" = $3
+			AND i."ID" = $4
+			AND a."ID" = $5
+		)
+		INSERT INTO "response"("text", "questionID", "interactionID", "answerID")
+		SELECT $2, $3, $4, $5
+		WHERE (SELECT COUNT(*) FROM sanity_check) = 1
+		RETURNING "ID";
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, response.Text, response.QuestionID, response.InteractionID, response.AnswerID)
+	row := s.relationalDB.QueryRow(query, userID, response.Text, response.QuestionID, response.InteractionID, response.AnswerID)
 	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return s.Get(id)

@@ -65,13 +65,14 @@ func (o *responseOperations) RegisterAdd(api huma.API) {
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewResponseInput) (*ResponseHolder, error) {
 
-		// TODO issue 19: do sanity check here.
-
 		// TODO issue 20: check question settings here.
 
-		response, err := stores.NewResponseStore(relationalDB).Add(input.Body)
+		response, err := stores.NewResponseStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
+		}
+		if response == nil {
+			return nil, huma.Error400BadRequest("a response could not be added for the combination of interactionID, questionID and answerID that was provided")
 		}
 
 		// Add Response -> Create Conveyance.
