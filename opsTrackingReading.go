@@ -45,20 +45,12 @@ func (o *trackingReadingOperations) RegisterAdd(api huma.API) {
 			return nil, handleError(err)
 		}
 
-		// Add Tracking-Reading -> Create Encounters.
-		encounters, err := stores.NewEncounterStore(relationalDB).AddAllForTrackingReading(trackingReading)
+		// Add Tracking-Reading -> Create Conveyance.
+		conveyance, err := stores.NewConveyanceStore(relationalDB).AddForTrackingReading(trackingReading)
 		if err != nil {
 			return nil, handleError(err)
 		}
-
-		// Add Tracking-Reading -> Create Conveyance.
-		if len(encounters) > 0 {
-			conveyance, err := stores.NewConveyanceStore(relationalDB).AddForTrackingReading(trackingReading)
-			if err != nil {
-				return nil, handleError(err)
-			}
-			trackingReading.Conveyance = conveyance
-		}
+		trackingReading.Conveyance = conveyance
 
 		return &TrackingReadingHolder{Body: trackingReading}, nil
 	})

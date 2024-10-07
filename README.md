@@ -25,9 +25,6 @@ A timestamped record of the location of a member of a specified animal species.
 ### Experiment
 A collection of `Questionnaire`s and `Message`s with a start date and end date, that together make up a research experiment.
 
-### Encounter
-An instance of the position of a `User` and the position of an `Animal` at a certain moment in time, where these positions are closer to each other than the *`EncounterDistance`* value of the `Species` of the animal in question, and that resulted in a message `Conveyance`.
-
 ### Interaction
 The report from a user about having had a human-wildlife interaction.
 
@@ -95,10 +92,14 @@ Upon a new `Detection` being posted, including lat/long, it should be checked wh
 Upon a new `Borne-Sensor-Reading` being posted, including lat/long, it should be checked whether a `Borne-Sensor-Deployment` exists for this reading, if so the location of the associated `Animal` should be updated. Then, it should be checked whether a `Zone` exits that is associated with the `Species` of this animal, and that has a spatiotemperal overlap[^3] with this `Animal`. If so, a new `Alarm` must be created being associated with the `Zone` in question and linked to the `Animal` that the `Borne-Sensor-Deployment` refers to.
 
 ### Add Response -> Create Conveyance
-Upon a new `Response` being posted, it should be checked whether this response refers to an `Answer`. If so, it should be checked whether a `Message` exists that is associated with the same `Answer`, and is associated with a non-ended `Experiment`. If the `Experiment` has an association with a `LivingLab`, the `Interaction` that is associated with the `Response` must have a spatiotemperal overlap[^3] with this `LivingLab`. If so, a new `Conveyance` must be created referring to that `Message` and associated with the `Response` and NOT with an `Encounter`. The `Conveyance` and its `Message` should be in the response body of the post request. If multiple `Message`s qualify, a random single one is chosen as to not overload the end-user.
+Upon a new `Response` being posted, it should be checked whether this response refers to an `Answer`. If so, it should be checked whether a `Message` exists, in non-ended `Experiment`, that is associated with the same `Answer`. If the `Experiment` has an association with a `LivingLab`, the `Interaction` that is associated with the `Response` must have a spatiotemperal overlap[^3] with this `LivingLab`. If so, a new `Conveyance` must be created referring to that `Message` and associated with the `Response` and NOT with an `Animal` and NOT with an `Alarms`. The `Conveyance` and its `Message` should be in the response body of the post request. If multiple `Message`s qualify, a random single one is chosen as to not overload the end-user.
 
-### Add Tracking-Reading -> Create Encounter and create Conveyance 
-Upon a new `Tracking-Reading` being posted, including lat/long, it should be checked whether there is an `Animal` that has spatiotemperal overlap[^3] within the margins as specified by its `Species` with this `Tracking-Reading`. Per animal for which this is true an `Encounter` must be created having the user location field set to the lat/long of the `Tracking-Reading` and the animal location field set to that of the animal in question. Then, it should be checked whether a `Message` exists that is associated with a non-ended `Experiment` and with the same `Species` as the `Animal` for which the `Encounter` is created. If the `Experiment` has an association with a `LivingLab`, the `Tracking-Reading` must have a spatiotemperal overlap[^3] with this `LivingLab`. Then, a new `Conveyance` must be created and associated with the previously mentioned `Message` and `Encounter` and NOT with a `Response`. The `Conveyance` and its `Message` should be in the response body of the post request. If multiple `Message`s qualify, a random single one is chosen as to not overload the end-user.
+### Add Tracking-Reading -> Create Conveyance 
+Upon a new `Tracking-Reading` being posted, including lat/long, it should be checked whether there is an `Animal`, having a `Species` for which there a `Message` exists, in a non-ended `Experiment`, that has spatiotemperal overlap[^3], within the margins as specified by this `Message`, with this `Tracking-Reading`. If the `Experiment` has an association with a `LivingLab`, the `Tracking-Reading` must have a spatiotemperal overlap[^3] with this `LivingLab`. Then, a new `Conveyance` must be created referring to that `Message` and associated with `Animal` and NOT with a `Response` and NOT with `Alarm`. The `Conveyance` and its `Message` should be in the response body of the post request. If multiple `Message`s qualify, a random single one is chosen as to not overload the end-user.
+
+
+### From created Alarms -> Create Conveyances
+Whenever a new `Alarm` is created it should be checked whether a `Message` exists //TODO
 
 ---
 

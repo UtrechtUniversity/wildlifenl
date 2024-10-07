@@ -17,4 +17,5 @@ type Alarm struct {
 	Interaction *Interaction `json:"interaction,omitempty" doc:"The optional interaction that initiated the creation of this alarm."`
 	Detection   *Detection   `json:"detection,omitempty" doc:"The optional detection that initiated the creation of this alarm."`
 	Animal      *Animal      `json:"animal,omitempty" doc:"The optional animal that initiated the creation of this alarm."`
+	Conveyances []Conveyance `json:"conveyances" doc:"The conveyances that were created for this alarm."`
 }

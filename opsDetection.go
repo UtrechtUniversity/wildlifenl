@@ -64,7 +64,13 @@ func (o *detectionOperations) RegisterAdd(api huma.API) {
 		}
 
 		// Add Detection -> Create Alarms.
-		if err := stores.NewAlarmStore(relationalDB).AddAllFromDetection(detection); err != nil {
+		ids, err := stores.NewAlarmStore(relationalDB).AddAllFromDetection(detection)
+		if err != nil {
+			return nil, handleError(err)
+		}
+
+		// From created Alarms -> Create Conveyances
+		if err := stores.NewConveyanceStore(relationalDB).AddForAlarmIDs(ids); err != nil {
 			return nil, handleError(err)
 		}
 

@@ -90,50 +90,89 @@ func (s *AlarmStore) GetByUser(userID string) ([]models.Alarm, error) {
 	return s.process(rows, err)
 }
 
-func (s *AlarmStore) AddAllFromDetection(detection *models.Detection) error {
-	zones, err := NewZoneStore(s.relationalDB).GetForDetection(detection)
-	if err != nil {
-		return err
-	}
+func (s *AlarmStore) AddAllFromDetection(detection *models.Detection) ([]string, error) {
 	query := `
-		INSERT INTO "alarm"("zoneID", "detectionID") VALUES($1, $2)
+		INSERT INTO "alarm"("zoneID", "detectionID")
+		SELECT z."ID", d."ID"
+		FROM "zone" z
+		INNER JOIN "user" u ON u."ID" = z."userID"
+		LEFT JOIN "zone_species" x ON x."zoneID" = z."ID"
+		LEFT JOIN "species" s ON s."ID" = x."speciesID"
+		LEFT JOIN "detection" d ON z."area" @> d."location" AND d."speciesID" = s."ID"
+		WHERE d."ID" = $1
+		AND z."deactivated" IS NULL
+		AND z."created" < d."timestamp"
+		RETURNING "ID"
 	`
-	for _, zone := range zones {
-		if _, err := s.relationalDB.Exec(query, zone.ID, detection.ID); err != nil {
-			return err
-		}
+	ids := make([]string, 0)
+	rows, err := s.relationalDB.Query(query, detection.ID)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	var id string
+	for rows.Next() {
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
 }
 
-func (s *AlarmStore) AddAllFromInteraction(interaction *models.Interaction) error {
-	zones, err := NewZoneStore(s.relationalDB).GetForInteraction(interaction)
-	if err != nil {
-		return err
-	}
+func (s *AlarmStore) AddAllFromInteraction(interaction *models.Interaction) ([]string, error) {
 	query := `
-		INSERT INTO "alarm"("zoneID", "interactionID") VALUES($1, $2)
+		INSERT INTO "alarm"("zoneID", "interactionID")
+		SELECT z."ID", i."ID"
+		FROM "zone" z
+		INNER JOIN "user" u ON u."ID" = z."userID"
+		LEFT JOIN "zone_species" x ON x."zoneID" = z."ID"
+		LEFT JOIN "species" s ON s."ID" = x."speciesID"
+		LEFT JOIN "interaction" i ON z."area" @> i."location" AND i."speciesID" = s."ID"
+		WHERE i."ID" = $1
+		AND z."deactivated" IS NULL
+		AND z."created" < i."timestamp"
+		RETURNING "ID"
 	`
-	for _, zone := range zones {
-		if _, err := s.relationalDB.Exec(query, zone.ID, interaction.ID); err != nil {
-			return err
-		}
+	ids := make([]string, 0)
+	rows, err := s.relationalDB.Query(query, interaction.ID)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	var id string
+	for rows.Next() {
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
 }
 
-func (s *AlarmStore) AddAllFromAnimal(animal *models.Animal) error {
-	zones, err := NewZoneStore(s.relationalDB).GetForAnimal(animal)
-	if err != nil {
-		return err
-	}
+func (s *AlarmStore) AddAllFromAnimal(animal *models.Animal) ([]string, error) {
 	query := `
-		INSERT INTO "alarm"("zoneID", "animalID") VALUES($1, $2)
+		INSERT INTO "alarm"("zoneID", "animalID")
+		SELECT z."ID", n."ID"
+		FROM "zone" z
+		INNER JOIN "user" u ON u."ID" = z."userID"
+		LEFT JOIN "zone_species" x ON x."zoneID" = z."ID"
+		LEFT JOIN "species" s ON s."ID" = x."speciesID"
+		LEFT JOIN "animal" n ON z."area" @> n."location" AND n."speciesID" = s."ID"
+		WHERE n."ID" = $1
+		AND z."deactivated" IS NULL
+		AND z."created" < n."locationTimestamp"
+		RETURNING "ID"
 	`
-	for _, zone := range zones {
-		if _, err := s.relationalDB.Exec(query, zone.ID, animal.ID); err != nil {
-			return err
-		}
+	ids := make([]string, 0)
+	rows, err := s.relationalDB.Query(query, animal.ID)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	var id string
+	for rows.Next() {
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
 }

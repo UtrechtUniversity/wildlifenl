@@ -59,7 +59,13 @@ func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 
 		// Add Borne-Sensor-Reading -> Create Alarms.
 		if animal != nil {
-			if err := stores.NewAlarmStore(relationalDB).AddAllFromAnimal(animal); err != nil {
+			ids, err := stores.NewAlarmStore(relationalDB).AddAllFromAnimal(animal)
+			if err != nil {
+				return nil, handleError(err)
+			}
+
+			// From created Alarms -> Create Conveyances
+			if err := stores.NewConveyanceStore(relationalDB).AddForAlarmIDs(ids); err != nil {
 				return nil, handleError(err)
 			}
 		}

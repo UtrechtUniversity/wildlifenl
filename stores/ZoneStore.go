@@ -139,36 +139,3 @@ func (s *ZoneStore) Deactivate(zoneID string) (*models.Zone, error) {
 	}
 	return s.Get(id)
 }
-
-func (s *ZoneStore) GetForDetection(detection *models.Detection) ([]models.Zone, error) {
-	query := s.query + `
-		LEFT JOIN "detection" d ON z."area" @> d."location" AND d."speciesID" = s."ID"
-		WHERE d."ID" = $1
-		AND z."deactivated" IS NULL
-		AND z."created" < d."timestamp"
-	`
-	rows, err := s.relationalDB.Query(query, detection.ID)
-	return s.process(rows, err)
-}
-
-func (s *ZoneStore) GetForInteraction(interaction *models.Interaction) ([]models.Zone, error) {
-	query := s.query + `
-		LEFT JOIN "interaction" i ON z."area" @> i."location" AND i."speciesID" = s."ID"
-		WHERE i."ID" = $1
-		AND z."deactivated" IS NULL
-		AND z."created" < i."timestamp"
-	`
-	rows, err := s.relationalDB.Query(query, interaction.ID)
-	return s.process(rows, err)
-}
-
-func (s *ZoneStore) GetForAnimal(animal *models.Animal) ([]models.Zone, error) {
-	query := s.query + `
-		LEFT JOIN "animal" a ON z."area" @> a."location" AND a."speciesID" = s."ID"
-		WHERE a."ID" = $1
-		AND z."deactivated" IS NULL
-		AND z."created" < a."locationTimestamp"
-	`
-	rows, err := s.relationalDB.Query(query, animal.ID)
-	return s.process(rows, err)
-}

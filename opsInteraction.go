@@ -95,7 +95,13 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 
 		// Add Interaction -> Create Alarms.
 		if interaction.Type.ID == 1 { // TODO issue #15: Uses magic number.
-			if err := stores.NewAlarmStore(relationalDB).AddAllFromInteraction(interaction); err != nil {
+			ids, err := stores.NewAlarmStore(relationalDB).AddAllFromInteraction(interaction)
+			if err != nil {
+				return nil, handleError(err)
+			}
+
+			// From created Alarms -> Create Conveyances
+			if err := stores.NewConveyanceStore(relationalDB).AddForAlarmIDs(ids); err != nil {
 				return nil, handleError(err)
 			}
 		}

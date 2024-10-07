@@ -12,7 +12,7 @@ func NewMessageStore(db *sql.DB) *MessageStore {
 	s := MessageStore{
 		relationalDB: db,
 		query: `
-		SELECT m."ID", m."name", m."severity", m."text", e."ID", e."name", e."start", e."end", u."ID", u."name", COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonNameNL",''), COALESCE(s."commonNameEN",''), COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0)
+		SELECT m."ID", m."name", m."severity", m."text", m."trigger", m."encounterMeters", m."encounterMinutes", e."ID", e."name", e."start", e."end", u."ID", u."name", COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonNameNL",''), COALESCE(s."commonNameEN",''), COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0)
 		FROM "message" m
 		INNER JOIN "experiment" e ON e."ID" = m."experimentID"
 		INNER JOIN "user" u ON u."ID" = e."userID"
@@ -32,7 +32,7 @@ func (s *MessageStore) process(rows *sql.Rows, err error) ([]models.Message, err
 		var m models.Message
 		var s models.Species
 		var a models.Answer
-		if err := rows.Scan(&m.ID, &m.Name, &m.Severity, &m.Text, m.Experiment.ID, &m.Experiment.Start, &m.Experiment.End, &m.Experiment.User.ID, &m.Experiment.User.Name, &s.ID, &s.Name, &s.CommonNameNL, &s.CommonNameEN, &a.ID, &a.Text, &a.Index); err != nil {
+		if err := rows.Scan(&m.ID, &m.Name, &m.Severity, &m.Text, &m.Trigger, &m.EncounterMeters, &m.EncounterMinutes, m.Experiment.ID, &m.Experiment.Start, &m.Experiment.End, &m.Experiment.User.ID, &m.Experiment.User.Name, &s.ID, &s.Name, &s.CommonNameNL, &s.CommonNameEN, &a.ID, &a.Text, &a.Index); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
@@ -94,6 +94,7 @@ func (s *MessageStore) GetByUser(userID string) ([]models.Message, error) {
 	return result, nil
 }
 
+/*
 func (s *MessageStore) GetAllForEncounter(encounter *models.Encounter) ([]models.Message, error) {
 	query := s.query + `
 		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
@@ -105,3 +106,4 @@ func (s *MessageStore) GetAllForEncounter(encounter *models.Encounter) ([]models
 	rows, err := s.relationalDB.Query(query, encounter.Animal.SpeciesID, encounter.Timestamp, encounter.UserLocation)
 	return s.process(rows, err)
 }
+*/
