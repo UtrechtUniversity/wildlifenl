@@ -2,10 +2,10 @@ package stores
 
 import (
 	"database/sql"
-	"errors"
 	"strings"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
+	"github.com/lib/pq"
 )
 
 type ConveyanceStore Store
@@ -167,5 +167,29 @@ func (s *ConveyanceStore) AddForTrackingReading(trackingReading *models.Tracking
 }
 
 func (s *ConveyanceStore) AddForAlarmIDs(alarmIDs []string) error {
-	return errors.New("not implemented")
+	if len(alarmIDs) < 1 {
+		return nil
+	}
+	query := `
+		INSERT INTO "conveyance"("userID", "messageID", "alarmID")
+		SELECT u."ID", m."ID", a."ID"
+		FROM "alarm" a
+		INNER JOIN "zone" z ON a."zoneID" = z."ID"
+		INNER JOIN "user" u ON u."ID" = z."userID"
+		LEFT JOIN "interaction" i ON i."ID" = a."interactionID"
+		LEFT JOIN "detection" d ON d."ID" = a."detectionID"
+		LEFT JOIN "animal" n ON n."ID" = a."animalID"
+		INNER JOIN "species" s ON s."ID" = COALESCE(i."speciesID", d."speciesID", n."speciesID")
+		INNER JOIN "message" m ON m."speciesID" = s."ID" AND m."trigger" = 'alarm'
+		INNER JOIN "experiment" e ON e."ID" = m."experimentID"
+		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
+		WHERE a."ID" = ANY($1)
+		AND e."start" < a."timestamp"
+		AND (e."end" IS NULL OR e."end" > a."timestamp")
+		AND (l."ID" IS NULL OR l."definition" @> @@z."area")
+	`
+	if _, err := s.relationalDB.Exec(query, pq.Array(alarmIDs)); err != nil {
+		return err
+	}
+	return nil
 }
