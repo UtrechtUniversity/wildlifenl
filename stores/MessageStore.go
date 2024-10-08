@@ -12,7 +12,7 @@ func NewMessageStore(db *sql.DB) *MessageStore {
 	s := MessageStore{
 		relationalDB: db,
 		query: `
-		SELECT m."ID", m."name", m."severity", m."text", m."trigger", m."encounterMeters", m."encounterMinutes", e."ID", e."name", e."start", e."end", u."ID", u."name", COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonNameNL",''), COALESCE(s."commonNameEN",''), COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0)
+		SELECT m."ID", m."name", m."severity", m."text", m."trigger", m."encounterMeters", m."encounterMinutes", e."ID", e."name", e."description", e."start", e."end", u."ID", u."name", COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonNameNL",''), COALESCE(s."commonNameEN",''), COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0)
 		FROM "message" m
 		INNER JOIN "experiment" e ON e."ID" = m."experimentID"
 		INNER JOIN "user" u ON u."ID" = e."userID"
@@ -32,7 +32,7 @@ func (s *MessageStore) process(rows *sql.Rows, err error) ([]models.Message, err
 		var m models.Message
 		var s models.Species
 		var a models.Answer
-		if err := rows.Scan(&m.ID, &m.Name, &m.Severity, &m.Text, &m.Trigger, &m.EncounterMeters, &m.EncounterMinutes, m.Experiment.ID, &m.Experiment.Start, &m.Experiment.End, &m.Experiment.User.ID, &m.Experiment.User.Name, &s.ID, &s.Name, &s.CommonNameNL, &s.CommonNameEN, &a.ID, &a.Text, &a.Index); err != nil {
+		if err := rows.Scan(&m.ID, &m.Name, &m.Severity, &m.Text, &m.Trigger, &m.EncounterMeters, &m.EncounterMinutes, &m.Experiment.ID, &m.Experiment.Name, &m.Experiment.Description, &m.Experiment.Start, &m.Experiment.End, &m.Experiment.User.ID, &m.Experiment.User.Name, &s.ID, &s.Name, &s.CommonNameNL, &s.CommonNameEN, &a.ID, &a.Text, &a.Index); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
@@ -71,11 +71,11 @@ func (s *MessageStore) GetAll() ([]models.Message, error) {
 
 func (s *MessageStore) Add(message *models.MessageRecord) (*models.Message, error) {
 	query := `
-		INSERT INTO "message"("name", "severity", "text", "experimentID", "speciesID", "answerID") VALUES($1, $2, $3, $4, $5, $6)
+		INSERT INTO "message"("name", "severity", "text", "trigger", "encounterMeters", "encounterMinutes", "experimentID", "speciesID", "answerID") VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, message.Name, message.Severity, message.Text, message.ExperimentID, message.SpeciesID, message.AnswerID)
+	row := s.relationalDB.QueryRow(query, message.Name, message.Severity, message.Text, message.Trigger, message.EncounterMeters, message.EncounterMinutes, message.ExperimentID, message.SpeciesID, message.AnswerID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
@@ -93,17 +93,3 @@ func (s *MessageStore) GetByUser(userID string) ([]models.Message, error) {
 	}
 	return result, nil
 }
-
-/*
-func (s *MessageStore) GetAllForEncounter(encounter *models.Encounter) ([]models.Message, error) {
-	query := s.query + `
-		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
-		WHERE m."speciesID" = $1
-		AND e."start" < $2
-		AND (e."end" IS NULL OR e."end" > $2)
-		AND (l."ID" IS NULL OR l."definition" @> $3)
-	`
-	rows, err := s.relationalDB.Query(query, encounter.Animal.SpeciesID, encounter.Timestamp, encounter.UserLocation)
-	return s.process(rows, err)
-}
-*/

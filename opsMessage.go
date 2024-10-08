@@ -81,6 +81,22 @@ func (o *messageOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewMessageInput) (*MessageHolder, error) {
+
+		switch input.Body.Trigger {
+		case "encounter":
+			if input.Body.SpeciesID == nil || input.Body.EncounterMeters == nil || input.Body.EncounterMinutes == nil || input.Body.AnswerID != nil {
+				return nil, huma.Error400BadRequest("trigger 'encounter' requires fields speciesID, encounterMeters and encounterMinutes to be non-empty, and field answerID to be empty")
+			}
+		case "answer":
+			if input.Body.SpeciesID != nil || input.Body.EncounterMeters != nil || input.Body.EncounterMinutes != nil || input.Body.AnswerID == nil {
+				return nil, huma.Error400BadRequest("trigger 'answer' requires field answerID to be non-empty, and fields speciesID, encounterMeters and encounterMinutes to be empty")
+			}
+		case "alarm":
+			if input.Body.SpeciesID == nil || input.Body.EncounterMeters != nil || input.Body.EncounterMinutes != nil || input.Body.AnswerID != nil {
+				return nil, huma.Error400BadRequest("trigger 'alarm' requires field speciesID to be non-empty, and fields answerID, encounterMeters and encounterMinutes to be empty")
+			}
+		}
+
 		experiments, err := stores.NewExperimentStore(relationalDB).GetByUser(input.credential.UserID)
 		if err != nil {
 			return nil, handleError(err)
