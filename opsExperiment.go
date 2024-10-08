@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -25,12 +24,8 @@ type ExperimentsHolder struct {
 
 type experimentOperations Operations
 
-func newExperimentOperations(database *sql.DB) *experimentOperations {
-	o := experimentOperations{
-		Database: database,
-		Endpoint: "experiment",
-	}
-	return &o
+func newExperimentOperations() *experimentOperations {
+	return &experimentOperations{Endpoint: "experiment"}
 }
 
 func (o *experimentOperations) RegisterGet(api huma.API) {

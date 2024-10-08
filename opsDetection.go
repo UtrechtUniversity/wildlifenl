@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -24,12 +23,8 @@ type NewDetectionInput struct {
 
 type detectionOperations Operations
 
-func newDetectionOperations(database *sql.DB) *detectionOperations {
-	o := detectionOperations{
-		Database: database,
-		Endpoint: "detection",
-	}
-	return &o
+func newDetectionOperations() *detectionOperations {
+	return &detectionOperations{Endpoint: "detection"}
 }
 
 func (o *detectionOperations) RegisterGetAll(api huma.API) {

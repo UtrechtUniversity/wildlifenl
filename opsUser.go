@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -20,12 +19,8 @@ type UsersHolder struct {
 
 type userOperations Operations
 
-func newUserOperations(database *sql.DB) *userOperations {
-	o := userOperations{
-		Database: database,
-		Endpoint: "user",
-	}
-	return &o
+func newUserOperations() *userOperations {
+	return &userOperations{Endpoint: "user"}
 }
 
 func (o *userOperations) RegisterGet(api huma.API) {

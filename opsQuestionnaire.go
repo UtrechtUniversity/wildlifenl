@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -25,12 +24,8 @@ type QuestionnairesHolder struct {
 
 type questionnaireOperations Operations
 
-func newQuestionnaireOperations(database *sql.DB) *questionnaireOperations {
-	o := questionnaireOperations{
-		Database: database,
-		Endpoint: "questionnaire",
-	}
-	return &o
+func newQuestionnaireOperations() *questionnaireOperations {
+	return &questionnaireOperations{Endpoint: "questionnaire"}
 }
 
 func (o *questionnaireOperations) RegisterGet(api huma.API) {

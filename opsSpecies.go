@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -20,12 +19,8 @@ type SpecieSHolder struct {
 
 type speciesOperations Operations
 
-func newSpeciesOperations(database *sql.DB) *speciesOperations {
-	o := speciesOperations{
-		Database: database,
-		Endpoint: "species",
-	}
-	return &o
+func newSpeciesOperations() *speciesOperations {
+	return &speciesOperations{Endpoint: "species"}
 }
 
 func (o *speciesOperations) RegisterGet(api huma.API) {
@@ -39,7 +34,7 @@ func (o *speciesOperations) RegisterGet(api huma.API) {
 	}, func(ctx context.Context, input *struct {
 		ID string `path:"id" doc:"The ID of the species." format:"uuid"`
 	}) (*SpeciesHolder, error) {
-		species, err := stores.NewSpeciesStore(o.Database).Get(input.ID)
+		species, err := stores.NewSpeciesStore(relationalDB).Get(input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -59,7 +54,7 @@ func (o *speciesOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct{}) (*SpecieSHolder, error) {
-		speciesX, err := stores.NewSpeciesStore(o.Database).GetAll()
+		speciesX, err := stores.NewSpeciesStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}

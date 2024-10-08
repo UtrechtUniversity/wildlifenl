@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"log"
 	"net/http"
 
@@ -12,12 +11,8 @@ import (
 
 type authOperations Operations
 
-func newAuthOperations(database *sql.DB) *authOperations {
-	o := authOperations{
-		Database: database,
-		Endpoint: "auth",
-	}
-	return &o
+func newAuthOperations() *authOperations {
+	return &authOperations{Endpoint: "auth"}
 }
 
 type AuthenticationInput struct {

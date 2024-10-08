@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -20,12 +19,8 @@ type InteractionTypesHolder struct {
 
 type interactionTypeOperations Operations
 
-func newInteractionTypeOperations(database *sql.DB) *interactionTypeOperations {
-	o := interactionTypeOperations{
-		Database: database,
-		Endpoint: "interactionType",
-	}
-	return &o
+func newInteractionTypeOperations() *interactionTypeOperations {
+	return &interactionTypeOperations{Endpoint: "interactionType"}
 }
 
 func (o *interactionTypeOperations) RegisterGetAll(api huma.API) {

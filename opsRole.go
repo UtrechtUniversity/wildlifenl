@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -23,12 +22,8 @@ type RolesHolder struct {
 
 type roleOperations Operations
 
-func newRoleOperations(database *sql.DB) *roleOperations {
-	o := roleOperations{
-		Database: database,
-		Endpoint: "role",
-	}
-	return &o
+func newRoleOperations() *roleOperations {
+	return &roleOperations{Endpoint: "role"}
 }
 
 func (o *roleOperations) RegisterGetAll(api huma.API) {

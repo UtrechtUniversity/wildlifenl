@@ -32,10 +32,11 @@ var (
 
 func Start(config *Configuration) error {
 	configuration = config
-	if err := loadRelationalDB(configuration); err != nil {
+
+	if err := loadRelationalDB(config); err != nil {
 		return fmt.Errorf("could not connect to relational database: %w", err)
 	}
-	if err := loadTimeseriesDB(configuration); err != nil {
+	if err := loadTimeseriesDB(config); err != nil {
 		return fmt.Errorf("could not connect to timeseries database: %w", err)
 	}
 	/*
@@ -46,8 +47,8 @@ func Start(config *Configuration) error {
 			return fmt.Errorf("could not create timeseries bucket: %w", err)
 		}
 	*/
-	sessions = cache.New(time.Duration(configuration.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
-	authRequests = cache.New(time.Duration(configuration.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
+	sessions = cache.New(time.Duration(config.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
+	authRequests = cache.New(time.Duration(config.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
 	apiConfig := huma.DefaultConfig(appName, config.Version)
 	apiConfig.Info.Description = appDescription
 	apiConfig.Security = []map[string][]string{{"auth": {}}}
@@ -57,29 +58,29 @@ func Start(config *Configuration) error {
 	router := http.NewServeMux()
 	api := humago.New(router, apiConfig)
 	api.UseMiddleware(NewAuthMiddleware(api))
-	huma.AutoRegister(api, newAlarmOperations(relationalDB))
-	huma.AutoRegister(api, newAnimalOperations(relationalDB))
-	huma.AutoRegister(api, newAnswerOperations(relationalDB))
-	huma.AutoRegister(api, newAuthOperations(relationalDB))
+	huma.AutoRegister(api, newAlarmOperations())
+	huma.AutoRegister(api, newAnimalOperations())
+	huma.AutoRegister(api, newAnswerOperations())
+	huma.AutoRegister(api, newAuthOperations())
 	huma.AutoRegister(api, newBorneSensorDeploymentOperations())
 	huma.AutoRegister(api, newBorneSensorReadingOperations())
-	huma.AutoRegister(api, newConveyanceOperations(relationalDB))
-	huma.AutoRegister(api, newDetectionOperations(relationalDB))
-	huma.AutoRegister(api, newExperimentOperations(relationalDB))
-	huma.AutoRegister(api, newInteractionOperations(relationalDB))
-	huma.AutoRegister(api, newInteractionTypeOperations(relationalDB))
-	huma.AutoRegister(api, newLivingLabOperations(relationalDB))
-	huma.AutoRegister(api, newMessageOperations(relationalDB))
-	huma.AutoRegister(api, newProfileOperations(relationalDB))
-	huma.AutoRegister(api, newQuestionOperations(relationalDB))
-	huma.AutoRegister(api, newQuestionnaireOperations(relationalDB))
-	huma.AutoRegister(api, newResponseOperations(relationalDB))
-	huma.AutoRegister(api, newRoleOperations(relationalDB))
-	huma.AutoRegister(api, newSpeciesOperations(relationalDB))
+	huma.AutoRegister(api, newConveyanceOperations())
+	huma.AutoRegister(api, newDetectionOperations())
+	huma.AutoRegister(api, newExperimentOperations())
+	huma.AutoRegister(api, newInteractionOperations())
+	huma.AutoRegister(api, newInteractionTypeOperations())
+	huma.AutoRegister(api, newLivingLabOperations())
+	huma.AutoRegister(api, newMessageOperations())
+	huma.AutoRegister(api, newProfileOperations())
+	huma.AutoRegister(api, newQuestionOperations())
+	huma.AutoRegister(api, newQuestionnaireOperations())
+	huma.AutoRegister(api, newResponseOperations())
+	huma.AutoRegister(api, newRoleOperations())
+	huma.AutoRegister(api, newSpeciesOperations())
 	huma.AutoRegister(api, newTrackingReadingOperations())
-	huma.AutoRegister(api, newUserOperations(relationalDB))
-	huma.AutoRegister(api, newZoneOperations(relationalDB))
-	return http.ListenAndServe(configuration.Host+":"+strconv.Itoa(configuration.Port), router)
+	huma.AutoRegister(api, newUserOperations())
+	huma.AutoRegister(api, newZoneOperations())
+	return http.ListenAndServe(config.Host+":"+strconv.Itoa(config.Port), router)
 }
 
 func loadRelationalDB(config *Configuration) error {

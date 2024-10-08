@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -25,12 +24,8 @@ type MessagesHolder struct {
 
 type messageOperations Operations
 
-func newMessageOperations(database *sql.DB) *messageOperations {
-	o := messageOperations{
-		Database: database,
-		Endpoint: "message",
-	}
-	return &o
+func newMessageOperations() *messageOperations {
+	return &messageOperations{Endpoint: "message"}
 }
 
 func (o *messageOperations) RegisterGet(api huma.API) {

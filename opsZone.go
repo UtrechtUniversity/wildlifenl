@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -40,12 +39,8 @@ type DeactivateZoneInput struct {
 
 type zoneOperations Operations
 
-func newZoneOperations(database *sql.DB) *zoneOperations {
-	o := zoneOperations{
-		Database: database,
-		Endpoint: "zone",
-	}
-	return &o
+func newZoneOperations() *zoneOperations {
+	return &zoneOperations{Endpoint: "zone"}
 }
 
 func (o *zoneOperations) RegisterGet(api huma.API) {

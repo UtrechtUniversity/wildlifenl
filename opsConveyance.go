@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -20,12 +19,8 @@ type ConveyancesHolder struct {
 
 type conveyanceOperations Operations
 
-func newConveyanceOperations(database *sql.DB) *conveyanceOperations {
-	o := conveyanceOperations{
-		Database: database,
-		Endpoint: "conveyance",
-	}
-	return &o
+func newConveyanceOperations() *conveyanceOperations {
+	return &conveyanceOperations{Endpoint: "conveyance"}
 }
 
 func (o *conveyanceOperations) RegisterGetAll(api huma.API) {

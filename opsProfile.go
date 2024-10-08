@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -20,12 +19,8 @@ type ProfilesHolder struct {
 
 type profileOperations Operations
 
-func newProfileOperations(database *sql.DB) *profileOperations {
-	o := profileOperations{
-		Database: database,
-		Endpoint: "profile",
-	}
-	return &o
+func newProfileOperations() *profileOperations {
+	return &profileOperations{Endpoint: "profile"}
 }
 
 func (o *profileOperations) RegisterGet(api huma.API) {

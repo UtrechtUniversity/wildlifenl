@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -20,12 +19,8 @@ type AlarmsHolder struct {
 
 type alarmOperations Operations
 
-func newAlarmOperations(database *sql.DB) *alarmOperations {
-	o := alarmOperations{
-		Database: database,
-		Endpoint: "alarm",
-	}
-	return &o
+func newAlarmOperations() *alarmOperations {
+	return &alarmOperations{Endpoint: "alarm"}
 }
 
 func (o *alarmOperations) RegisterGetAll(api huma.API) {
