@@ -114,7 +114,7 @@ func (s *ConveyanceStore) AddForResponse(response *models.Response) (*models.Con
 			AND (l."ID" IS NULL OR l."definition" @> i."location")
 			ORDER BY RANDOM()
 			LIMIT 1
-			RETURNING "ID", "timestamp", "userID", "messageID", "encounterID", "responseID"
+			RETURNING "ID", "timestamp", "userID", "messageID", "animalID", "responseID", "alarmID"
 		)
 	` + strings.Replace(s.query, "FROM \"conveyance\"", "FROM inserted", 1)
 	rows, err := s.relationalDB.Query(query, response.ID)
@@ -149,7 +149,7 @@ func (s *ConveyanceStore) AddForTrackingReading(trackingReading *models.Tracking
 			AND (l."ID" IS NULL OR l."definition" @> $2)
 			ORDER BY RANDOM()
 			LIMIT 1
-			RETURNING "ID", "timestamp", "messageID", "encounterID", "responseID"
+			RETURNING "ID", "timestamp", "userID", "messageID", "animalID", "responseID", "alarmID"
 		)
 	` + strings.Replace(s.query, "FROM \"conveyance\"", "FROM inserted", 1)
 	rows, err := s.relationalDB.Query(query, trackingReading.UserID, trackingReading.Location)
