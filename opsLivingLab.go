@@ -76,6 +76,9 @@ func (o *livinglabOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewLivingLabInput) (*LivingLabHolder, error) {
+		if len(input.Body.Definition) < 3 {
+			return nil, huma.Error400BadRequest("definition should contain 3 or more points")
+		}
 		livinglab, err := stores.NewLivingLabStore(relationalDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)

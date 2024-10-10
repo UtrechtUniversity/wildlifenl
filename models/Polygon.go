@@ -37,6 +37,7 @@ func (p *Polygon) Scan(value interface{}) error {
 			polygon = append(polygon, *point)
 		}
 		*p = polygon
+		return nil
 	}
 	return fmt.Errorf("failed to scan into Polygon")
 }
