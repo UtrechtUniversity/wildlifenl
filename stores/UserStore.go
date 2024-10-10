@@ -75,3 +75,18 @@ func (s *UserStore) UpdateLocation(userID string, location models.Point, timesta
 	}
 	return s.Get(*id)
 }
+
+func (s *UserStore) GetNameFromEmail(email string) (string, error) {
+	query := s.query + `
+		WHERE "email" = $1
+	`
+	rows, err := s.relationalDB.Query(query, email)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return "", err
+	}
+	if len(result) != 1 {
+		return "", nil
+	}
+	return result[0].Name, nil
+}

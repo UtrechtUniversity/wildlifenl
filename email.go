@@ -1,6 +1,7 @@
 package wildlifenl
 
 import (
+	"log"
 	"strings"
 
 	"github.com/go-mail/mail"
@@ -11,6 +12,7 @@ const emailBody = "Beste {displayName}<br/>De applicatie {appName} wil graag aan
 
 func sendCodeByEmail(appName, displayName, email, code string) error {
 	if configuration.EmailHost == "no-email" {
+		log.Println("Code for", email, "is:", code)
 		return nil
 	}
 	body := emailBody

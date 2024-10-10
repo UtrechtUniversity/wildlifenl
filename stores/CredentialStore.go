@@ -47,10 +47,10 @@ func (s *CredentialStore) Get(token string) (*models.Credential, error) {
 func (s *CredentialStore) Create(appName, userName, email string) (*models.Credential, error) {
 	query := `
 		INSERT INTO "user"("name", "email") VALUES($1, $2) 
-		ON CONFLICT("email") DO UPDATE SET "name" = $3 
+		ON CONFLICT("email") DO UPDATE SET "email" = $2 
 		RETURNING "ID"
 	`
-	row := s.relationalDB.QueryRow(query, userName, email, userName)
+	row := s.relationalDB.QueryRow(query, userName, email)
 	var userID string
 	if err := row.Scan(&userID); err != nil {
 		return nil, err

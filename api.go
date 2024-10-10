@@ -142,17 +142,25 @@ func NewAuthMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Conte
 	}
 }
 
-func authenticate(displayNameApp, displayNameUser, email string) error {
+func authenticate(displayNameApp, email string) error {
 	code := ""
 	for i := 0; i < 6; i++ {
 		code += strconv.Itoa(rand.IntN(10))
 	}
-	if err := sendCodeByEmail(displayNameApp, displayNameUser, email, code); err != nil {
+	userName := email[:strings.Index(email, "@")]
+	name, err := stores.NewUserStore(relationalDB).GetNameFromEmail(email)
+	if err != nil {
+		return err
+	}
+	if name != "" {
+		userName = name
+	}
+	if err := sendCodeByEmail(displayNameApp, userName, email, code); err != nil {
 		return err
 	}
 	authenticationRequest := AuthenticationRequest{
 		appName:  displayNameApp,
-		userName: displayNameUser,
+		userName: userName,
 		email:    email,
 		code:     code,
 	}
