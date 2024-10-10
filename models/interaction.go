@@ -6,9 +6,9 @@ type InteractionRecord struct {
 	ID          string    `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this interaction."`
 	Timestamp   time.Time `json:"timestamp" format:"date-time" readOnly:"true" doc:"The moment this interaction was reported."`
 	Description string    `json:"description" doc:"The description of this interaction."`
-	SpeciesID   string    `json:"speciesID,omitempty" format:"uuid" writeOnly:"true"`
+	SpeciesID   string    `json:"speciesID" format:"uuid" writeOnly:"true"`
 	Location    Point     `json:"location" doc:"The place where the interaction was reported."`
-	TypeID      int       `json:"typeID,omitempty" minimum:"1" writeOnly:"true"`
+	TypeID      int       `json:"typeID" minimum:"1" writeOnly:"true"`
 }
 
 type Interaction struct {

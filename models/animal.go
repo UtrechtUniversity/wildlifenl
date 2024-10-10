@@ -5,7 +5,7 @@ import "time"
 type AnimalRecord struct {
 	ID        string `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this animal."`
 	Name      string `json:"name" doc:"The name of this animal."`
-	SpeciesID string `json:"speciesID,omitempty" format:"uuid" writeOnly:"true"`
+	SpeciesID string `json:"speciesID" format:"uuid" writeOnly:"true"`
 }
 
 type Animal struct {
