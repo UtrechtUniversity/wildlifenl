@@ -59,6 +59,8 @@ func (s *ResponseStore) Get(responseID string) (*models.Response, error) {
 }
 
 func (s *ResponseStore) Add(userID string, response *models.ResponseRecord) (*models.Response, error) {
+	var id string
+	var args []any
 	query := `
 		WITH sanity_check AS (
 			SELECT i."ID" 
@@ -71,15 +73,28 @@ func (s *ResponseStore) Add(userID string, response *models.ResponseRecord) (*mo
 			WHERE u."ID" = $1
 			AND q."ID" = $3
 			AND i."ID" = $4
-			AND a."ID" = $5
-		)
-		INSERT INTO "response"("text", "questionID", "interactionID", "answerID")
-		SELECT $2, $3, $4, $5
+	`
+	if response.AnswerID == nil {
+		query += `
+			)
+			INSERT INTO "response"("text", "questionID", "interactionID")
+			SELECT $2, $3, $4
+		`
+		args = []any{userID, response.Text, response.QuestionID, response.InteractionID}
+	} else {
+		query += `
+				AND a."ID" = $5
+			)
+			INSERT INTO "response"("text", "questionID", "interactionID", "answerID")
+			SELECT $2, $3, $4, $5
+		`
+		args = []any{userID, response.Text, response.QuestionID, response.InteractionID, response.AnswerID}
+	}
+	query += `
 		WHERE (SELECT COUNT(*) FROM sanity_check) = 1
 		RETURNING "ID";
 	`
-	var id string
-	row := s.relationalDB.QueryRow(query, userID, response.Text, response.QuestionID, response.InteractionID, response.AnswerID)
+	row := s.relationalDB.QueryRow(query, args...)
 	if err := row.Scan(&id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
