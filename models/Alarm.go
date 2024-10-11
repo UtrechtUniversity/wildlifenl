@@ -4,7 +4,7 @@ import "time"
 
 type AlarmRecord struct {
 	ID            string    `json:"ID" format:"uuid" doc:"The ID of this alarm."`
-	Timestamp     time.Time `json:"timestamp" doc:"The moment this alarm was created."`
+	Timestamp     time.Time `json:"timestamp" format:"date-time" doc:"The moment this alarm was created."`
 	ZoneID        string    `json:"-"`
 	InteractionID *string   `json:"-"`
 	DetectionID   *string   `json:"-"`
