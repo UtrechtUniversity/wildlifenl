@@ -10,6 +10,14 @@ import (
 	"github.com/lib/pq"
 )
 
+// BM: In an ideal world these text constants would not be hard coded but would be read from somewhere else. Unfortunately, the world is not always perfect.
+const (
+	appName        = "WildlifeNL"
+	appDescription = "This is the WildlifeNL API. Before you can start making calls to the provided end-points you should acquire a bearer token. To do so, make a POST request at /auth/ providing the required fields including a valid email address. A validation code will be send to that email address. Then, make a PUT request at /auth/ providing the same email address and the validation code. The response will include a field named \"token\" containing your bearer token. Use this bearer token in the header of any future calls you make."
+	emailSubject   = "Aanmelden bij WildlifeNL"
+	emailBody      = "Beste {displayName}<br/>De applicatie {appName} wil graag aanmelden bij WildlifeNL met jouw emailadres. Om dit toe te staan, voer onderstaande code in bij deze applicatie.<br/>Code: {code}<br/><br/>Met vriendelijke groet<br/>WildlifeNL<br/><br/>"
+)
+
 func generateDescription(text string, scopes []string) string {
 	if len(scopes) == 0 {
 		return text

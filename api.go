@@ -19,25 +19,23 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-const appName = "WildlifeNL"
-const appDescription = "This is the WildlifeNL API. Before you can start making calls to the provided end-points you should acquire a bearer token. To do so, make a POST request at /auth/ providing the required fields including a valid email address. A validation code will be send to that email address. Then, make a PUT request at /auth/ providing the same email address and the validation code. The response will include a field named \"token\" containing your bearer token. Use this bearer token in the header of any future calls you make."
-
 var (
-	configuration *Configuration
-	relationalDB  *sql.DB
-	timeseriesDB  *timeseries.Timeseries
-	sessions      *cache.Cache
-	authRequests  *cache.Cache
+	relationalDB *sql.DB
+	timeseriesDB *timeseries.Timeseries
+	mailer       *Mailer
+	sessions     *cache.Cache
+	authRequests *cache.Cache
 )
 
 func Start(config *Configuration) error {
-	configuration = config
-
-	if err := loadRelationalDB(config); err != nil {
-		return fmt.Errorf("could not connect to relational database: %w", err)
+	if err := initializeRelationalDB(config); err != nil {
+		return fmt.Errorf("could not initialize Relational database: %w", err)
 	}
-	if err := loadTimeseriesDB(config); err != nil {
-		return fmt.Errorf("could not connect to timeseries database: %w", err)
+	if err := initializeTimeseriesDB(config); err != nil {
+		return fmt.Errorf("could not initiliaze Timeseries database: %w", err)
+	}
+	if err := initializeMailer(config); err != nil {
+		return fmt.Errorf("could not initialize Mailer service: %w", err)
 	}
 	/*
 		if err := timeseriesDB.CreateBucketIfNotExists("animals"); err != nil {
@@ -83,7 +81,7 @@ func Start(config *Configuration) error {
 	return http.ListenAndServe(config.Host+":"+strconv.Itoa(config.Port), router)
 }
 
-func loadRelationalDB(config *Configuration) error {
+func initializeRelationalDB(config *Configuration) error {
 	connStr := "postgres://" + config.RelationalDatabaseUser + ":" + config.RelationalDatabasePass + "@" + config.RelationalDatabaseHost
 	if config.RelationalDatabasePort > 0 {
 		connStr += ":" + strconv.Itoa(config.RelationalDatabasePort)
@@ -98,9 +96,14 @@ func loadRelationalDB(config *Configuration) error {
 	return relationalDB.Ping()
 }
 
-func loadTimeseriesDB(config *Configuration) error {
+func initializeTimeseriesDB(config *Configuration) error {
 	timeseriesDB = timeseries.NewTimeseries(config.TimeseriesDatabaseURL, config.TimeseriesDatabaseOrganization, config.TimeseriesDatabaseToken)
 	return timeseriesDB.Ping()
+}
+
+func initializeMailer(config *Configuration) error {
+	mailer = newMailer(config)
+	return mailer.Ping()
 }
 
 func NewAuthMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context)) {
@@ -155,7 +158,7 @@ func authenticate(displayNameApp, email string) error {
 	if name != "" {
 		userName = name
 	}
-	if err := sendCodeByEmail(displayNameApp, userName, email, code); err != nil {
+	if err := mailer.SendCode(displayNameApp, userName, email, code); err != nil {
 		return err
 	}
 	authenticationRequest := AuthenticationRequest{
