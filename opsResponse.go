@@ -60,7 +60,20 @@ func (o *responseOperations) RegisterAdd(api huma.API) {
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewResponseInput) (*ResponseHolder, error) {
 
-		// TODO issue 20: check question settings here.
+		question, err := stores.NewQuestionStore(relationalDB).Get(input.Body.QuestionID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		if !question.AllowOpenResponse && input.Body.Text != nil {
+			return nil, huma.Error400BadRequest("question (" + question.ID + ") does not allow open responses, therefore field text must not be present")
+		}
+		earlierResponses, err := stores.NewResponseStore(relationalDB).GetForInteractionByQuestion(input.Body.InteractionID, input.Body.QuestionID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		if !question.AllowMultipleResponse && len(earlierResponses) > 0 {
+			return nil, huma.Error400BadRequest("question (" + question.ID + ") does not allow multiple responses, and a previous response already exists")
+		}
 
 		response, err := stores.NewResponseStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {

@@ -103,3 +103,12 @@ func (s *ResponseStore) Add(userID string, response *models.ResponseRecord) (*mo
 	}
 	return s.Get(id)
 }
+
+func (s *ResponseStore) GetForInteractionByQuestion(interactionID string, questionID string) ([]models.Response, error) {
+	query := s.query + `
+		WHERE i."ID" = $1
+		AND q."ID" = $2
+		`
+	rows, err := s.relationalDB.Query(query, interactionID, questionID)
+	return s.process(rows, err)
+}
