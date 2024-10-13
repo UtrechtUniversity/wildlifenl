@@ -55,7 +55,7 @@ func Start(config *Configuration) error {
 
 	router := http.NewServeMux()
 	api := humago.New(router, apiConfig)
-	api.UseMiddleware(NewAuthMiddleware(api))
+	api.UseMiddleware(NewMiddleware(api))
 	huma.AutoRegister(api, newAlarmOperations())
 	huma.AutoRegister(api, newAnimalOperations())
 	huma.AutoRegister(api, newAnswerOperations())
@@ -106,8 +106,14 @@ func initializeMailer(config *Configuration) error {
 	return mailer.Ping()
 }
 
-func NewAuthMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context)) {
+func NewMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
+		ctx.SetHeader("Access-Control-Allow-Origin", "*")
+		m := ctx.Method()
+		if m == http.MethodOptions {
+			return
+		}
+
 		var anyOfNeededScopes []string
 		isAuthorizationRequired := false
 		for _, opScheme := range ctx.Operation().Security {
