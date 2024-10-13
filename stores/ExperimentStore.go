@@ -67,11 +67,11 @@ func (s *ExperimentStore) GetAll() ([]models.Experiment, error) {
 
 func (s *ExperimentStore) Add(userID string, experiment *models.ExperimentRecord) (*models.Experiment, error) {
 	query := `
-		INSERT INTO "experiment"("name", "description", "start", "userID", "livingLabID") VALUES($1, $2, $3, $4, $5)
+		INSERT INTO "experiment"("name", "description", "start", "end", "userID", "livingLabID") VALUES($1, $2, $3, $4, $5, $6)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, experiment.Name, experiment.Description, experiment.Start, userID, experiment.LivingLabID)
+	row := s.relationalDB.QueryRow(query, experiment.Name, experiment.Description, experiment.Start, experiment.End, userID, experiment.LivingLabID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
