@@ -37,14 +37,12 @@ func Start(config *Configuration) error {
 	if err := initializeMailer(config); err != nil {
 		return fmt.Errorf("could not initialize Mailer service: %w", err)
 	}
-	/*
-		if err := timeseriesDB.CreateBucketIfNotExists("animals"); err != nil {
-			return fmt.Errorf("could not create timeseries bucket: %w", err)
-		}
-		if err := timeseriesDB.CreateBucketIfNotExists("humans"); err != nil {
-			return fmt.Errorf("could not create timeseries bucket: %w", err)
-		}
-	*/
+	if err := timeseriesDB.CreateBucketIfNotExists("animals"); err != nil {
+		return fmt.Errorf("could not create Timeseries bucket: %w", err)
+	}
+	if err := timeseriesDB.CreateBucketIfNotExists("humans"); err != nil {
+		return fmt.Errorf("could not create Timeseries bucket: %w", err)
+	}
 	sessions = cache.New(time.Duration(config.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
 	authRequests = cache.New(time.Duration(config.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
 	apiConfig := huma.DefaultConfig(appName, config.Version)
