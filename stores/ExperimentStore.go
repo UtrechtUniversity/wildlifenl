@@ -85,3 +85,22 @@ func (s *ExperimentStore) GetByUser(userID string) ([]models.Experiment, error) 
 	rows, err := s.relationalDB.Query(query, userID)
 	return s.process(rows, err)
 }
+
+func (s *ExperimentStore) Update(userID string, experimentID string, experiment *models.ExperimentRecord) (*models.Experiment, error) {
+	query := `
+		UPDATE "experiment" SET "name" = $1, "description" = $2, "start" = $3, "end" = $4, "livingLabID" = $5
+		WHERE "ID" = $6
+		AND "userID" = $7
+		AND "start" > NOW()
+		RETURNING "ID"
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, experiment.Name, experiment.Description, experiment.Start, experiment.End, experiment.LivingLabID, experimentID, userID)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return s.Get(id)
+}

@@ -34,9 +34,15 @@ func handleError(err error) error {
 	case *pq.Error:
 		message := typedError.Message
 		detail := typedError.Detail
-		if strings.Contains(message, "violates foreign key constraint") {
-			detail = detail[4:strings.LastIndex(detail, ")")+1] + " does not exist."
-			return huma.Error400BadRequest(detail)
+		switch typedError.Code {
+		case "23503": // violates foreign key constraint
+			text := detail[4:strings.LastIndex(detail, ")")+1] + " does not exist."
+			return huma.Error400BadRequest(text)
+		case "23514": // violates check constraint
+			text := strings.ReplaceAll(message, "new row for relation", "cannot add or update")
+			text = strings.ReplaceAll(text, "violates", "because it violates")
+			text = strings.ReplaceAll(text, "\"", "'")
+			return huma.Error400BadRequest(text)
 		}
 	}
 	pc := make([]uintptr, 15)
@@ -48,9 +54,9 @@ func handleError(err error) error {
 }
 
 func generateNotFoundByIDError(objectType string, id string) error {
-	return huma.Error404NotFound("No " + objectType + " with ID " + id + " was found")
+	return huma.Error404NotFound("No '" + objectType + "' with ID '" + id + "' was found")
 }
 
 func generateNotFoundForThisUserError(objectType string, id string) error {
-	return huma.Error404NotFound("No " + objectType + " with ID " + id + " was found for the current user")
+	return huma.Error404NotFound("No '" + objectType + "' with ID '" + id + "' was found for the current user")
 }
