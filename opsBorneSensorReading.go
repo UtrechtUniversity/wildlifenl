@@ -10,7 +10,8 @@ import (
 )
 
 type NewBorneSensorReadingInput struct {
-	Body *models.BorneSensorReading `json:"borneSensorReading"`
+	Input
+	Body *models.BorneSensorReadingRecord `json:"borneSensorReading"`
 }
 
 type BorneSensorReadingsHolder struct {
@@ -52,7 +53,7 @@ func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewBorneSensorReadingInput) (*struct{}, error) {
-		animal, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).Add(input.Body)
+		animal, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}

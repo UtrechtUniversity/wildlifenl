@@ -93,10 +93,10 @@ func (s *AnimalStore) UpdateLocation(sensorID string, location models.Point, tim
 	var id *string
 	row := s.relationalDB.QueryRow(query, location, timestamp, sensorID)
 	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
-	}
-	if id == nil {
-		return nil, nil
 	}
 	return s.Get(*id)
 }

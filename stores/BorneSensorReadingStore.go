@@ -48,6 +48,10 @@ func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) 
 			sensor[r.Time()] = reading
 		}
 		switch r.Field() {
+		case "userID":
+			if value, ok := r.Value().(string); ok {
+				reading.UserID = value
+			}
 		case "latitude":
 			if reading.Location == nil {
 				reading.Location = &models.Point{}
@@ -97,8 +101,9 @@ func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) 
 	return results, nil
 }
 
-func (s *BorneSensorReadingStore) Add(borneSensorReading *models.BorneSensorReading) (*models.Animal, error) {
+func (s *BorneSensorReadingStore) Add(userID string, borneSensorReading *models.BorneSensorReadingRecord) (*models.Animal, error) {
 	fields := make(map[string]any)
+	fields["userID"] = userID
 	if borneSensorReading.Location != nil {
 		fields["latitude"] = borneSensorReading.Location.Latitude
 		fields["longitude"] = borneSensorReading.Location.Longitude
@@ -129,7 +134,9 @@ func (s *BorneSensorReadingStore) Add(borneSensorReading *models.BorneSensorRead
 		if err != nil {
 			return nil, err
 		}
-		return animal, nil
+		if animal != nil {
+			return animal, nil
+		}
 	}
 	return nil, nil
 }
