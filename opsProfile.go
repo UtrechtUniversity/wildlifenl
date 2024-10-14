@@ -13,6 +13,11 @@ type ProfileHolder struct {
 	Body *models.Profile `json:"profile"`
 }
 
+type UpdateProfileHolder struct {
+	Input
+	Body *models.ProfileRecord `json:"profile"`
+}
+
 type ProfilesHolder struct {
 	Body []models.Profile `json:"profiles"`
 }
@@ -75,8 +80,22 @@ func (o *profileOperations) RegisterGetMine(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
-		if me == nil {
-			return nil, huma.Error404NotFound("The logged in user was not found.")
+		return &ProfileHolder{Body: me}, nil
+	})
+}
+
+func (o *profileOperations) RegisterUpdateMine(api huma.API) {
+	name := "Update My Profile"
+	description := "Update the profile for the current user."
+	path := "/" + o.Endpoint + "/me/"
+	scopes := []string{}
+	method := http.MethodPut
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *UpdateProfileHolder) (*ProfileHolder, error) {
+		me, err := stores.NewProfileStore(relationalDB).Update(input.credential.UserID, input.Body)
+		if err != nil {
+			return nil, handleError(err)
 		}
 		return &ProfileHolder{Body: me}, nil
 	})

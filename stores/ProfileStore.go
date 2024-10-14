@@ -13,11 +13,10 @@ func NewProfileStore(db *sql.DB) *ProfileStore {
 	s := ProfileStore{
 		relationalDB: db,
 		query: `
-		SELECT u."ID", u."name", u."email", u."location", u."locationTimestamp", COALESCE(r."ID", 0), COALESCE(r."name", ''), COALESCE(l."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(l."name", '')
+		SELECT u."ID", u."name", u."email", u."location", u."locationTimestamp", COALESCE(r."ID", 0), COALESCE(r."name", '')
 		FROM "user" u
 		LEFT JOIN "user_role" x ON x."userID" = u."ID"
 		LEFT JOIN "role" r ON r."ID" = x."roleID"
-		LEFT JOIN "livingLab" l ON l."ID" = u."livingLabID"
 		`,
 	}
 	return &s
@@ -36,8 +35,7 @@ func (s *ProfileStore) process(rows *sql.Rows, err error) ([]models.Profile, err
 		var userLocation *models.Point
 		var userLocationTimestamp *time.Time
 		var r models.Role
-		var l models.LivingLab
-		if err := rows.Scan(&userID, &userName, &userEmail, &userLocation, &userLocationTimestamp, &r.ID, &r.Name, &l.ID, &l.Name); err != nil {
+		if err := rows.Scan(&userID, &userName, &userEmail, &userLocation, &userLocationTimestamp, &r.ID, &r.Name); err != nil {
 			return nil, err
 		}
 		if user.ID != "" && user.ID != userID {
@@ -51,9 +49,6 @@ func (s *ProfileStore) process(rows *sql.Rows, err error) ([]models.Profile, err
 		user.LocationTimestamp = userLocationTimestamp
 		if r.ID > 0 {
 			user.Roles = append(user.Roles, r)
-		}
-		if l.ID != "00000000-0000-0000-0000-000000000000" {
-			user.LivingLab = &l
 		}
 	}
 	if user.ID != "" {
@@ -80,4 +75,21 @@ func (s *ProfileStore) Get(userID string) (*models.Profile, error) {
 func (s *ProfileStore) GetAll() ([]models.Profile, error) {
 	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
+}
+
+func (s *ProfileStore) Update(profileID string, profile *models.ProfileRecord) (*models.Profile, error) {
+	query := `
+		UPDATE "user" SET "name" = $2
+		WHERE "ID" = $1
+		RETURNING "ID"
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, profileID, profile.Name)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return s.Get(id)
 }
