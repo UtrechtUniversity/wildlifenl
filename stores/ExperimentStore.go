@@ -12,10 +12,14 @@ func NewExperimentStore(relationalDB *sql.DB) *ExperimentStore {
 	s := ExperimentStore{
 		relationalDB: relationalDB,
 		query: `
-		SELECT e."ID", e."name", e."description", e."start", e."end", u."ID", u."name", COALESCE(l."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(l."name", '')
+		SELECT e."ID", e."name", e."description", e."start", e."end", COALESCE(qc."x", 0), COALESCE(mc."x", 0), COALESCE(qa."x", 0), COALESCE(ca."x", 0), u."ID", u."name", COALESCE(l."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(l."name", '')
 		FROM "experiment" e
 		INNER JOIN "user" u ON u."ID" = e."userID"
 		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
+		LEFT JOIN (SELECT "experimentID", COUNT("ID") AS x FROM "questionnaire" GROUP BY "experimentID") qc ON qc."experimentID" = e."ID"
+		LEFT JOIN (SELECT "experimentID", COUNT("ID") AS x FROM "message" GROUP BY "experimentID") mc ON mc."experimentID" = e."ID"
+		LEFT JOIN (SELECT "experimentID", COUNT(*) AS x FROM (SELECT a."experimentID" AS "experimentID", a."ID" FROM "response" r INNER JOIN "question" q ON q."ID" = r."questionID" INNER JOIN "questionnaire" a ON a."ID" = q."questionnaireID" GROUP BY a."experimentID", a."ID") GROUP BY "experimentID") qa ON qa."experimentID" = e."ID"
+		LEFT JOIN (SELECT m."experimentID", COUNT(c."ID") AS x FROM "conveyance" c INNER JOIN "message" m ON m."ID" = c."messageID" GROUP BY m."experimentID") ca ON ca."experimentID" = e."ID"
 		`,
 	}
 	return &s
@@ -27,20 +31,20 @@ func (s *ExperimentStore) process(rows *sql.Rows, err error) ([]models.Experimen
 	}
 	experiments := make([]models.Experiment, 0)
 	for rows.Next() {
-		var experiment models.Experiment
-		var user models.User
-		var livingLab models.LivingLab
-		if err := rows.Scan(&experiment.ID, &experiment.Name, &experiment.Description, &experiment.Start, &experiment.End, &user.ID, &user.Name, &livingLab.ID, &livingLab.Name); err != nil {
+		var e models.Experiment
+		var u models.User
+		var l models.LivingLab
+		if err := rows.Scan(&e.ID, &e.Name, &e.Description, &e.Start, &e.End, &e.NumberOfQuestionnaires, &e.NumberOfMessages, &e.QuestionnaireActivity, &e.MessageActivity, &u.ID, &u.Name, &l.ID, &l.Name); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
 			return nil, err
 		}
-		experiment.User = user
-		if livingLab.ID != "00000000-0000-0000-0000-000000000000" {
-			experiment.LivingLab = &livingLab
+		e.User = u
+		if l.ID != "00000000-0000-0000-0000-000000000000" {
+			e.LivingLab = &l
 		}
-		experiments = append(experiments, experiment)
+		experiments = append(experiments, e)
 	}
 	return experiments, nil
 }
