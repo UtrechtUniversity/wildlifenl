@@ -52,3 +52,16 @@ func (s *RoleStore) AddRoleToUser(userID string, roleID int) error {
 	}
 	return nil
 }
+
+func (s *RoleStore) RemoveRoleFromUser(userID string, roleID int) error {
+	query := `
+		DELETE FROM "user_role"
+		WHERE "userID" = $1
+		AND "roleID" = $2
+	`
+	_, err := s.relationalDB.Exec(query, userID, roleID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

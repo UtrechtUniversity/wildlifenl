@@ -200,3 +200,16 @@ func getCredential(token string) *models.Credential {
 	sessions.SetDefault(token, credential)
 	return credential
 }
+
+func flushSession(userID string) {
+	selectedKey := ""
+	for key, item := range sessions.Items() {
+		if item.Object.(*models.Credential).UserID == userID {
+			selectedKey = key
+			break
+		}
+	}
+	if selectedKey != "" {
+		sessions.Delete(selectedKey)
+	}
+}

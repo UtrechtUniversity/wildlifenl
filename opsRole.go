@@ -9,7 +9,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type AddRoleToUserInput struct {
+type MutateRoleForUserInput struct {
 	Body *struct {
 		UserID string `json:"userID" format:"uuid" doc:"The ID of the user"`
 		RoleID int    `json:"roleID" minimum:"1" doc:"The ID of the role"`
@@ -51,11 +51,30 @@ func (o *roleOperations) RegisterAddRoleToUser(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *AddRoleToUserInput) (*struct{}, error) {
+	}, func(ctx context.Context, input *MutateRoleForUserInput) (*struct{}, error) {
 		err := stores.NewRoleStore(relationalDB).AddRoleToUser(input.Body.UserID, input.Body.RoleID)
 		if err != nil {
 			return nil, handleError(err)
 		}
+		flushSession(input.Body.UserID)
+		return nil, nil
+	})
+}
+
+func (o *roleOperations) RegisterRemoveRoleFromUser(api huma.API) {
+	name := "Remove a Role from a User"
+	description := "Remove a specific role from a specific user."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"administrator"}
+	method := http.MethodPut
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *MutateRoleForUserInput) (*struct{}, error) {
+		err := stores.NewRoleStore(relationalDB).RemoveRoleFromUser(input.Body.UserID, input.Body.RoleID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		flushSession(input.Body.UserID)
 		return nil, nil
 	})
 }
