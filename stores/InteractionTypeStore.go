@@ -50,7 +50,10 @@ func (s *InteractionTypeStore) Get(interactionTypeID int) (*models.InteractionTy
 }
 
 func (s *InteractionTypeStore) GetAll() ([]models.InteractionType, error) {
-	rows, err := s.relationalDB.Query(s.query)
+	query := s.query + `
+		ORDER BY "ID"
+	`
+	rows, err := s.relationalDB.Query(query)
 	return s.process(rows, err)
 }
 
@@ -61,6 +64,20 @@ func (s *InteractionTypeStore) Add(interactionType *models.InteractionType) (*mo
 	`
 	var id int
 	row := s.relationalDB.QueryRow(query, interactionType.NameNL, interactionType.NameEN, interactionType.DescriptionNL, interactionType.DescriptionEN)
+	if err := row.Scan(&id); err != nil {
+		return nil, err
+	}
+	return s.Get(id)
+}
+
+func (s *InteractionTypeStore) Update(interactionTypeID int, interactionType *models.InteractionType) (*models.InteractionType, error) {
+	query := `
+		UPDATE "interactionType" SET "nameNL" = $2, "nameEN" = $3, "descriptionNL" = $4, "descriptionEN" = $5
+		WHERE "ID" = $1
+		RETURNING "ID"
+	`
+	var id int
+	row := s.relationalDB.QueryRow(query, interactionTypeID, interactionType.NameNL, interactionType.NameEN, interactionType.DescriptionNL, interactionType.DescriptionEN)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

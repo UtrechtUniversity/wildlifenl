@@ -13,6 +13,11 @@ type InteractionTypeHolder struct {
 	Body *models.InteractionType `json:"interactionType"`
 }
 
+type UpdateInteractionTypeHolder struct {
+	ID   int                     `query:"ID" doc:"The ID of the interaction type to be updated."`
+	Body *models.InteractionType `json:"interactionType"`
+}
+
 type InteractionTypesHolder struct {
 	Body []models.InteractionType `json:"interactionTypes"`
 }
@@ -50,6 +55,23 @@ func (o *interactionTypeOperations) RegisterAdd(api huma.API) {
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *InteractionTypeHolder) (*InteractionTypeHolder, error) {
 		interactionType, err := stores.NewInteractionTypeStore(relationalDB).Add(input.Body)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &InteractionTypeHolder{Body: interactionType}, nil
+	})
+}
+
+func (o *interactionTypeOperations) RegisterUpdate(api huma.API) {
+	name := "Update Interaction Type"
+	description := "Update an existing interaction type."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"administrator"}
+	method := http.MethodPut
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *UpdateInteractionTypeHolder) (*InteractionTypeHolder, error) {
+		interactionType, err := stores.NewInteractionTypeStore(relationalDB).Update(input.ID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
