@@ -51,7 +51,7 @@ func Start(config *Configuration) error {
 	apiConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{"auth": {Type: "http", Scheme: "bearer"}}
 	apiConfig.DocsPath = "/"
 
-	router := http.NewServeMux()
+	router := NewServeMux()
 	api := humago.New(router, apiConfig)
 	api.UseMiddleware(NewMiddleware(api))
 	huma.AutoRegister(api, newAlarmOperations())
@@ -106,12 +106,6 @@ func initializeMailer(config *Configuration) error {
 
 func NewMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
-		ctx.SetHeader("Access-Control-Allow-Origin", "*")
-		m := ctx.Method()
-		if m == http.MethodOptions {
-			return
-		}
-
 		var anyOfNeededScopes []string
 		isAuthorizationRequired := false
 		for _, opScheme := range ctx.Operation().Security {
