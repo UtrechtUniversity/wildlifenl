@@ -89,7 +89,7 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 		interaction.Questionnaire = questionnaire
 
 		// Add Interaction -> Create Alarms.
-		if interaction.Type.ID == 1 { // TODO issue #15: Uses magic number.
+		if interaction.Type.ID == 1 {
 			ids, err := stores.NewAlarmStore(relationalDB).AddAllFromInteraction(interaction)
 			if err != nil {
 				return nil, handleError(err)
