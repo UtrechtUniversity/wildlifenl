@@ -12,7 +12,7 @@ func NewQuestionnaireStore(db *sql.DB) *QuestionnaireStore {
 	s := QuestionnaireStore{
 		relationalDB: db,
 		query: `
-		SELECT q."ID", q."name", e."ID", e."name", e."start", e."end", t."ID", t."nameNL", t."nameEN", t."descriptionNL", t."descriptionEN", u."ID", u."name"
+		SELECT q."ID", q."name", q."identifier", e."ID", e."name", e."start", e."end", t."ID", t."nameNL", t."nameEN", t."descriptionNL", t."descriptionEN", u."ID", u."name"
 		FROM "questionnaire" q
 		INNER JOIN "experiment" e ON e."ID" = q."experimentID"
 		INNER JOIN "interactionType" t ON t."ID" = q."interactionTypeID"
@@ -32,7 +32,7 @@ func (s *QuestionnaireStore) process(rows *sql.Rows, err error) ([]models.Questi
 		var experiment models.Experiment
 		var interactionType models.InteractionType
 		var user models.User
-		if err := rows.Scan(&questionnaire.ID, &questionnaire.Name, &experiment.ID, &experiment.Name, &experiment.Start, &experiment.End, &interactionType.ID, &interactionType.NameNL, &interactionType.NameEN, &interactionType.DescriptionNL, &interactionType.DescriptionEN, &user.ID, &user.Name); err != nil {
+		if err := rows.Scan(&questionnaire.ID, &questionnaire.Name, &questionnaire.Identifier, &experiment.ID, &experiment.Name, &experiment.Start, &experiment.End, &interactionType.ID, &interactionType.NameNL, &interactionType.NameEN, &interactionType.DescriptionNL, &interactionType.DescriptionEN, &user.ID, &user.Name); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
@@ -68,11 +68,11 @@ func (s *QuestionnaireStore) GetAll() ([]models.Questionnaire, error) {
 
 func (s *QuestionnaireStore) Add(questionnaire *models.QuestionnaireRecord) (*models.Questionnaire, error) {
 	query := `
-		INSERT INTO "questionnaire"("name", "experimentID", "interactionTypeID") VALUES($1, $2, $3)
+		INSERT INTO "questionnaire"("name", "identifier", "experimentID", "interactionTypeID") VALUES($1, $2, $3, $4)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.ExperimentID, questionnaire.InteractionTypeID)
+	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.Identifier, questionnaire.ExperimentID, questionnaire.InteractionTypeID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
