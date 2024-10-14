@@ -14,7 +14,7 @@ type NewExperimentInput struct {
 	Body *models.ExperimentRecord `json:"experiment"`
 }
 
-type EditExperimentInput struct {
+type UpdateExperimentInput struct {
 	Input
 	ID   string                   `query:"ID" format:"uuid" doc:"The ID of the experiment to be updated."`
 	Body *models.ExperimentRecord `json:"experiment"`
@@ -115,7 +115,7 @@ func (o *experimentOperations) RegisterUpdate(api huma.API) {
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *EditExperimentInput) (*ExperimentHolder, error) {
+	}, func(ctx context.Context, input *UpdateExperimentInput) (*ExperimentHolder, error) {
 		experiment, err := stores.NewExperimentStore(relationalDB).Update(input.credential.UserID, input.ID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
