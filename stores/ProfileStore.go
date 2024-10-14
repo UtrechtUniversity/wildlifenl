@@ -81,25 +81,3 @@ func (s *ProfileStore) GetAll() ([]models.Profile, error) {
 	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
 }
-
-func (s *ProfileStore) GetByCredentialToken(token string) (*models.Profile, error) {
-	query := `
-		SELECT u."ID", u."email"
-		FROM "user" u
-		INNER JOIN "credential" c ON c."email" = u."email"
-		WHERE c."token" = $1
-	`
-	var userID string
-	var email string
-	row := s.relationalDB.QueryRow(query, token)
-	if err := row.Scan(&userID, &email); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, err
-	}
-	if userID != "" {
-		return s.Get(userID)
-	}
-	return nil, nil
-}

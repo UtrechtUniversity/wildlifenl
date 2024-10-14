@@ -71,7 +71,7 @@ func (o *profileOperations) RegisterGetMine(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *Input) (*ProfileHolder, error) {
-		me, err := stores.NewProfileStore(relationalDB).GetByCredentialToken(input.credential.Token)
+		me, err := stores.NewProfileStore(relationalDB).Get(input.credential.UserID)
 		if err != nil {
 			return nil, handleError(err)
 		}
