@@ -8,7 +8,7 @@ type InteractionRecord struct {
 	Description string    `json:"description" doc:"The description of this interaction."`
 	SpeciesID   string    `json:"speciesID" format:"uuid" writeOnly:"true"`
 	Location    Point     `json:"location" doc:"The place where the interaction was reported."`
-	TypeID      int       `json:"typeID" minimum:"1" writeOnly:"true"`
+	TypeID      int       `json:"typeID,omitempty" minimum:"1" writeOnly:"true" required:"true" docs:"The ID of the interaction type for this interaction."`
 }
 
 type Interaction struct {
