@@ -12,7 +12,7 @@ func NewAnswerStore(db *sql.DB) *AnswerStore {
 	s := AnswerStore{
 		relationalDB: db,
 		query: `
-		SELECT a."ID", a."text", a."index"
+		SELECT a."ID", a."text", a."index", a."nextQuestionID"
 		FROM "answer" a
 		`,
 	}
@@ -25,11 +25,11 @@ func (s *AnswerStore) process(rows *sql.Rows, err error) ([]models.Answer, error
 	}
 	answers := make([]models.Answer, 0)
 	for rows.Next() {
-		var answer models.Answer
-		if err := rows.Scan(&answer.ID, &answer.Text, &answer.Index); err != nil {
+		var a models.Answer
+		if err := rows.Scan(&a.ID, &a.Text, &a.Index, &a.NextQuestionID); err != nil {
 			return nil, err
 		}
-		answers = append(answers, answer)
+		answers = append(answers, a)
 	}
 	return answers, nil
 }
@@ -51,11 +51,11 @@ func (s *AnswerStore) Get(answerID string) (*models.Answer, error) {
 
 func (s *AnswerStore) Add(answer *models.AnswerRecord) (*models.Answer, error) {
 	query := `
-		INSERT INTO "answer"("text", "index", "questionID") VALUES($1, $2, $3)
+		INSERT INTO "answer"("text", "index", "questionID", "nextQuestionID") VALUES($1, $2, $3, $4)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, answer.Text, answer.Index, answer.QuestionID)
+	row := s.relationalDB.QueryRow(query, answer.Text, answer.Index, answer.QuestionID, answer.NextQuestionID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

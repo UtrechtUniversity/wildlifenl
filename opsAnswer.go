@@ -59,22 +59,36 @@ func (o *answerOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewAnswerInput) (*AnswerHolder, error) {
+		if input.Body.NextQuestionID != nil && *input.Body.NextQuestionID == input.Body.QuestionID {
+			return nil, huma.Error400BadRequest("Fields questionID and nextQuestionID must have different values")
+		}
 		store := stores.NewQuestionnaireStore(relationalDB)
 		questionnaires, err := store.GetByUser(input.credential.UserID)
 		if err != nil {
 			return nil, handleError(err)
 		}
 		var question models.Question
+		var nextQuestion models.Question
 		for _, r := range questionnaires {
 			for _, q := range r.Questions {
 				if q.ID == input.Body.QuestionID {
 					question = q
-					break
+				}
+				if input.Body.NextQuestionID != nil && q.ID == *input.Body.NextQuestionID {
+					nextQuestion = q
 				}
 			}
 		}
 		if question.ID == "" {
 			return nil, generateNotFoundForThisUserError("question", input.Body.QuestionID)
+		}
+		if input.Body.NextQuestionID != nil {
+			if nextQuestion.ID == "" {
+				return nil, generateNotFoundForThisUserError("question", *input.Body.NextQuestionID)
+			}
+			if nextQuestion.QuestionnaireID != question.QuestionnaireID {
+				return nil, huma.Error400BadRequest("Fields questionID and nextQuestionID must both refer to questions in the same questionnaire.")
+			}
 		}
 		answer, err := stores.NewAnswerStore(relationalDB).Add(input.Body)
 		if err != nil {
