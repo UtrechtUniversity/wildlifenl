@@ -3,6 +3,7 @@ package wildlifenl
 import (
 	"context"
 	"net/http"
+	"regexp"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
@@ -66,6 +67,16 @@ func (o *responseOperations) RegisterAdd(api huma.API) {
 		}
 		if !question.AllowOpenResponse && input.Body.Text != nil {
 			return nil, huma.Error400BadRequest("question (" + question.ID + ") does not allow open responses, therefore field text must not be present")
+		}
+		if question.AllowOpenResponse && question.OpenResponseFormat != nil {
+			r, err := regexp.Compile(*question.OpenResponseFormat)
+			if err != nil {
+				return nil, handleError(err)
+			}
+			text := *input.Body.Text
+			if loc := r.FindStringIndex(text); loc == nil || text[loc[0]:loc[1]] != text {
+				return nil, huma.Error400BadRequest("Field text does not match regular expression " + *question.OpenResponseFormat)
+			}
 		}
 		earlierResponses, err := stores.NewResponseStore(relationalDB).GetForInteractionByQuestion(input.Body.InteractionID, input.Body.QuestionID)
 		if err != nil {

@@ -3,6 +3,7 @@ package wildlifenl
 import (
 	"context"
 	"net/http"
+	"regexp"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
@@ -59,6 +60,11 @@ func (o *questionOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *NewQuestionInput) (*QuestionHolder, error) {
+		if input.Body.OpenResponseFormat != nil {
+			if _, err := regexp.Compile(*input.Body.OpenResponseFormat); err != nil {
+				return nil, huma.Error400BadRequest("Field openResponseFormat must either be not present or contain a regular expression")
+			}
+		}
 		store := stores.NewQuestionnaireStore(relationalDB)
 		questionnaires, err := store.GetByUser(input.credential.UserID)
 		if err != nil {
