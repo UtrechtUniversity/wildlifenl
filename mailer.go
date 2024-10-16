@@ -16,8 +16,14 @@ func newMailer(config *Configuration) *Mailer {
 }
 
 func (e *Mailer) Ping() error {
-	// TODO #36: test connection to email provider.
-	return nil
+	if e.config.EmailHost == "no-email" {
+		return nil
+	}
+	s, err := e.dailer().Dial()
+	if err != nil {
+		return err
+	}
+	return s.Close()
 }
 
 func (e *Mailer) SendCode(appName, displayName, email, code string) error {
@@ -34,6 +40,9 @@ func (e *Mailer) SendCode(appName, displayName, email, code string) error {
 	m.SetHeader("To", email)
 	m.SetHeader("Subject", emailSubject)
 	m.SetBody("text/html", body)
-	d := mail.NewDialer(e.config.EmailHost, 587, e.config.EmailUser, e.config.EmailPassword)
-	return d.DialAndSend(m)
+	return e.dailer().DialAndSend(m)
+}
+
+func (e *Mailer) dailer() *mail.Dialer {
+	return mail.NewDialer(e.config.EmailHost, 587, e.config.EmailUser, e.config.EmailPassword)
 }
