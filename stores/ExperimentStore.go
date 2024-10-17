@@ -18,7 +18,7 @@ func NewExperimentStore(relationalDB *sql.DB) *ExperimentStore {
 		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
 		LEFT JOIN (SELECT "experimentID", COUNT("ID") AS x FROM "questionnaire" GROUP BY "experimentID") qc ON qc."experimentID" = e."ID"
 		LEFT JOIN (SELECT "experimentID", COUNT("ID") AS x FROM "message" GROUP BY "experimentID") mc ON mc."experimentID" = e."ID"
-		LEFT JOIN (SELECT "experimentID", COUNT(*) AS x FROM (SELECT a."experimentID" AS "experimentID", a."ID" FROM "response" r INNER JOIN "question" q ON q."ID" = r."questionID" INNER JOIN "questionnaire" a ON a."ID" = q."questionnaireID" GROUP BY a."experimentID", a."ID") GROUP BY "experimentID") qa ON qa."experimentID" = e."ID"
+		LEFT JOIN (SELECT "experimentID", COUNT(*) AS x FROM (SELECT a."experimentID" AS "experimentID", a."ID" FROM "response" r INNER JOIN "question" q ON q."ID" = r."questionID" INNER JOIN "questionnaire" a ON a."ID" = q."questionnaireID" GROUP BY a."experimentID", a."ID") AS z GROUP BY "experimentID") qa ON qa."experimentID" = e."ID"
 		LEFT JOIN (SELECT m."experimentID", COUNT(c."ID") AS x FROM "conveyance" c INNER JOIN "message" m ON m."ID" = c."messageID" GROUP BY m."experimentID") ca ON ca."experimentID" = e."ID"
 		`,
 	}
