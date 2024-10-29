@@ -29,7 +29,7 @@ func newBorneSensorReadingOperations() *borneSensorReadingOperations {
 
 func (o *borneSensorReadingOperations) RegisterGetAll(api huma.API) {
 	name := "Get All BorneSensorReadings"
-	description := "Retrieve all borne sensor reading of the last hour."
+	description := "Retrieve all borne sensor reading of the last year."
 	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"herd-manager"}
 	method := http.MethodGet
@@ -72,5 +72,24 @@ func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 		}
 
 		return nil, nil
+	})
+}
+
+func (o *borneSensorReadingOperations) RegisterGetAllBySensor(api huma.API) {
+	name := "Get BorneSensorReadings By Sensor"
+	description := "Retrieve all borne-sensor readings by sensorID."
+	path := "/" + o.Endpoint + "s/{id}"
+	scopes := []string{"land-user", "nature-area-manager", "wildlife-manager", "herd-manager"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" doc:"The sensorID to retrieve borne-sensor readings for."`
+	}) (*BorneSensorReadingsHolder, error) {
+		borneSensorReadings, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).GetAllBySensorID(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &BorneSensorReadingsHolder{Body: borneSensorReadings}, nil
 	})
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/timeseries"
+	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 )
 
@@ -30,6 +31,22 @@ func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) 
 	if err != nil {
 		return nil, err
 	}
+	return s.process(records)
+}
+
+func (s *BorneSensorReadingStore) GetAllBySensorID(sensorID string) ([]models.BorneSensorReading, error) {
+	query := s.query + `
+		|> filter(fn: (r) => r["sensorID"] == "` + sensorID + `")
+	`
+	reader := s.timeseriesDB.Reader()
+	records, err := reader.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+	return s.process(records)
+}
+
+func (s *BorneSensorReadingStore) process(records *api.QueryTableResult) ([]models.BorneSensorReading, error) {
 	readings := make(map[string]map[time.Time]*models.BorneSensorReading)
 	for records.Next() {
 		r := records.Record()
