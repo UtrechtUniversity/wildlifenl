@@ -3,6 +3,7 @@ package stores
 import (
 	"context"
 	"database/sql"
+	"sort"
 	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -37,7 +38,6 @@ func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) 
 func (s *BorneSensorReadingStore) GetAllBySensorID(sensorID string) ([]models.BorneSensorReading, error) {
 	query := s.query + `
 		|> filter(fn: (r) => r["sensorID"] == "` + sensorID + `")
-		|> sort(columns: ["_time"], desc: true)
 	`
 	reader := s.timeseriesDB.Reader()
 	records, err := reader.Query(context.Background(), query)
@@ -116,6 +116,7 @@ func (s *BorneSensorReadingStore) process(records *api.QueryTableResult) ([]mode
 			results = append(results, *reading)
 		}
 	}
+	sort.Slice(results, func(i, j int) bool { return results[i].Timestamp.After(results[j].Timestamp) })
 	return results, nil
 }
 
