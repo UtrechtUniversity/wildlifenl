@@ -37,6 +37,7 @@ func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) 
 func (s *BorneSensorReadingStore) GetAllBySensorID(sensorID string) ([]models.BorneSensorReading, error) {
 	query := s.query + `
 		|> filter(fn: (r) => r["sensorID"] == "` + sensorID + `")
+		|> sort(columns: ["_time"], desc: true)
 	`
 	reader := s.timeseriesDB.Reader()
 	records, err := reader.Query(context.Background(), query)
