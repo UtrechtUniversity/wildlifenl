@@ -13,7 +13,7 @@ func NewZoneStore(db *sql.DB) *ZoneStore {
 	s := ZoneStore{
 		relationalDB: db,
 		query: `
-		SELECT z."ID", z."deactivated", z."created", z."name", z."description", z."area", u."ID", u."name", COALESCE(s."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonNameNL",''), COALESCE(s."commonNameEN", '')
+		SELECT z."ID", z."deactivated", z."created", z."name", z."description", z."area", u."ID", u."name", COALESCE(s."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonName",'')
 		FROM "zone" z
 		INNER JOIN "user" u ON u."ID" = z."userID"
 		LEFT JOIN "zone_species" x ON x."zoneID" = z."ID"
@@ -38,7 +38,7 @@ func (s *ZoneStore) process(rows *sql.Rows, err error) ([]models.Zone, error) {
 	for rows.Next() {
 		var user models.User
 		var species models.Species
-		if err := rows.Scan(&zoneID, &zoneDeactivated, &zoneCreated, &zoneName, &zoneDescription, &zoneArea, &user.ID, &user.Name, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN); err != nil {
+		if err := rows.Scan(&zoneID, &zoneDeactivated, &zoneCreated, &zoneName, &zoneDescription, &zoneArea, &user.ID, &user.Name, &species.ID, &species.Name, &species.CommonName); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}

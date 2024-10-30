@@ -12,7 +12,7 @@ func NewMessageStore(db *sql.DB) *MessageStore {
 	s := MessageStore{
 		relationalDB: db,
 		query: `
-		SELECT m."ID", m."name", m."severity", m."text", m."trigger", m."encounterMeters", m."encounterMinutes", e."ID", e."name", e."description", e."start", e."end", u."ID", u."name", COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonNameNL",''), COALESCE(s."commonNameEN",''), COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0)
+		SELECT m."ID", m."name", m."severity", m."text", m."trigger", m."encounterMeters", m."encounterMinutes", e."ID", e."name", e."description", e."start", e."end", u."ID", u."name", COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonName",''), COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0)
 		FROM "message" m
 		INNER JOIN "experiment" e ON e."ID" = m."experimentID"
 		INNER JOIN "user" u ON u."ID" = e."userID"
@@ -32,7 +32,7 @@ func (s *MessageStore) process(rows *sql.Rows, err error) ([]models.Message, err
 		var m models.Message
 		var s models.Species
 		var a models.Answer
-		if err := rows.Scan(&m.ID, &m.Name, &m.Severity, &m.Text, &m.Trigger, &m.EncounterMeters, &m.EncounterMinutes, &m.Experiment.ID, &m.Experiment.Name, &m.Experiment.Description, &m.Experiment.Start, &m.Experiment.End, &m.Experiment.User.ID, &m.Experiment.User.Name, &s.ID, &s.Name, &s.CommonNameNL, &s.CommonNameEN, &a.ID, &a.Text, &a.Index); err != nil {
+		if err := rows.Scan(&m.ID, &m.Name, &m.Severity, &m.Text, &m.Trigger, &m.EncounterMeters, &m.EncounterMinutes, &m.Experiment.ID, &m.Experiment.Name, &m.Experiment.Description, &m.Experiment.Start, &m.Experiment.End, &m.Experiment.User.ID, &m.Experiment.User.Name, &s.ID, &s.Name, &s.CommonName, &a.ID, &a.Text, &a.Index); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}

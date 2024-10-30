@@ -12,7 +12,7 @@ func NewSpeciesStore(db *sql.DB) *SpeciesStore {
 	s := SpeciesStore{
 		relationalDB: db,
 		query: `
-		SELECT s."ID", s."name", s."commonNameNL", s."commonNameEN"
+		SELECT s."ID", s."name", s."commonName"
 		FROM "species" s
 		`,
 	}
@@ -26,7 +26,7 @@ func (s *SpeciesStore) process(rows *sql.Rows, err error) ([]models.Species, err
 	speciesX := make([]models.Species, 0)
 	for rows.Next() {
 		var s models.Species
-		if err := rows.Scan(&s.ID, &s.Name, &s.CommonNameNL, &s.CommonNameEN); err != nil {
+		if err := rows.Scan(&s.ID, &s.Name, &s.CommonName); err != nil {
 			return nil, err
 		}
 		speciesX = append(speciesX, s)
@@ -59,11 +59,11 @@ func (s *SpeciesStore) GetAll() ([]models.Species, error) {
 
 func (s *SpeciesStore) Add(species *models.Species) (*models.Species, error) {
 	query := `
-		INSERT INTO "species"("name", "commonNameNL", "commonNameEN") VALUES($1, $2, $3)
+		INSERT INTO "species"("name", "commonName") VALUES($1, $2)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, species.Name, species.CommonNameNL, species.CommonNameEN)
+	row := s.relationalDB.QueryRow(query, species.Name, species.CommonName)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

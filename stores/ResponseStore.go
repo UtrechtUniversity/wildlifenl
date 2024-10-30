@@ -12,7 +12,7 @@ func NewResponseStore(db *sql.DB) *ResponseStore {
 	s := ResponseStore{
 		relationalDB: db,
 		query: `
-		SELECT r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", i."ID", i."timestamp", i."description", i."location", u."ID", u."name", t."ID", t."nameNL", t."nameEN", t."descriptionNL", t."descriptionEN", COALESCE(a."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(a."text", ''), COALESCE(a."index", 0)
+		SELECT r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", i."ID", i."timestamp", i."description", i."location", u."ID", u."name", t."ID", t."name", t."description", COALESCE(a."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(a."text", ''), COALESCE(a."index", 0)
 		FROM "response" r
 		INNER JOIN "question" q ON q."ID" = r."questionID"
 		INNER JOIN "interaction" i ON i."ID" = r."interactionID"
@@ -32,7 +32,7 @@ func (s *ResponseStore) process(rows *sql.Rows, err error) ([]models.Response, e
 	for rows.Next() {
 		var r models.Response
 		var a models.Answer
-		if err := rows.Scan(&r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.User.ID, &r.Interaction.User.Name, &r.Interaction.Type.ID, &r.Interaction.Type.NameNL, &r.Interaction.Type.NameEN, &r.Interaction.Type.DescriptionNL, &r.Interaction.Type.DescriptionEN, &a.ID, &a.Text, &a.Index); err != nil {
+		if err := rows.Scan(&r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.User.ID, &r.Interaction.User.Name, &r.Interaction.Type.ID, &r.Interaction.Type.Name, &r.Interaction.Type.Description, &a.ID, &a.Text, &a.Index); err != nil {
 			return nil, err
 		}
 		if a.ID != "00000000-0000-0000-0000-000000000000" {

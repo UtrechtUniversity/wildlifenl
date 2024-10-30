@@ -12,7 +12,7 @@ func NewBorneSensorDeploymentStore(relationalDB *sql.DB) *BorneSensorDeploymentS
 	s := BorneSensorDeploymentStore{
 		relationalDB: relationalDB,
 		query: `
-			SELECT d."sensorID", d."start", d."end", a."ID", a."name", a."location", s."ID", s."name", s."commonNameNL", s."commonNameEN"
+			SELECT d."sensorID", d."start", d."end", a."ID", a."name", a."location", s."ID", s."name", s."commonName"
 			FROM "borneSensorDeployment" d
 			INNER JOIN "animal" a ON a."ID" = d."animalID"
 			INNER JOIN "species" s ON s."ID" = a."speciesID"
@@ -31,7 +31,7 @@ func (s *BorneSensorDeploymentStore) process(rows *sql.Rows, err error) ([]model
 		var borneSensorDeployment models.BorneSensorDeployment
 		var animal models.Animal
 		var species models.Species
-		if err := rows.Scan(&borneSensorDeployment.SensorID, &borneSensorDeployment.Start, &borneSensorDeployment.End, &animal.ID, &animal.Name, &animal.Location, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN); err != nil {
+		if err := rows.Scan(&borneSensorDeployment.SensorID, &borneSensorDeployment.Start, &borneSensorDeployment.End, &animal.ID, &animal.Name, &animal.Location, &species.ID, &species.Name, &species.CommonName); err != nil {
 			return nil, err
 		}
 		animal.Species = species

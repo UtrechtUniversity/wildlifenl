@@ -12,7 +12,7 @@ func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
 		relationalDB: db,
 		query: `
-		SELECT i."ID", i."timestamp", i."description", i."location", s."ID", s."name", s."commonNameNL", s."commonNameEN", u."ID", u."name", t."ID", t."nameNL", t."nameEN", t."descriptionNL", t."descriptionEN"
+		SELECT i."ID", i."timestamp", i."description", i."location", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description"
 		FROM "interaction" i
 		INNER JOIN "species" s ON s."ID" = i."speciesID"
 		INNER JOIN "user" u ON u."ID" = i."userID"
@@ -32,7 +32,7 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 		var species models.Species
 		var user models.User
 		var interactionType models.InteractionType
-		if err := rows.Scan(&interaction.ID, &interaction.Timestamp, &interaction.Description, &interaction.Location, &species.ID, &species.Name, &species.CommonNameNL, &species.CommonNameEN, &user.ID, &user.Name, &interactionType.ID, &interactionType.NameNL, &interactionType.NameEN, &interactionType.DescriptionNL, &interactionType.DescriptionEN); err != nil {
+		if err := rows.Scan(&interaction.ID, &interaction.Timestamp, &interaction.Description, &interaction.Location, &species.ID, &species.Name, &species.CommonName, &user.ID, &user.Name, &interactionType.ID, &interactionType.Name, &interactionType.Description); err != nil {
 			return nil, err
 		}
 		interaction.Species = species

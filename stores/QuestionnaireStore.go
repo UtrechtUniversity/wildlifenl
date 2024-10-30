@@ -12,7 +12,7 @@ func NewQuestionnaireStore(db *sql.DB) *QuestionnaireStore {
 	s := QuestionnaireStore{
 		relationalDB: db,
 		query: `
-		SELECT q."ID", q."name", q."identifier", e."ID", e."name", e."start", e."end", t."ID", t."nameNL", t."nameEN", t."descriptionNL", t."descriptionEN", u."ID", u."name"
+		SELECT q."ID", q."name", q."identifier", e."ID", e."name", e."start", e."end", t."ID", t."name", t."description", u."ID", u."name"
 		FROM "questionnaire" q
 		INNER JOIN "experiment" e ON e."ID" = q."experimentID"
 		INNER JOIN "interactionType" t ON t."ID" = q."interactionTypeID"
@@ -32,7 +32,7 @@ func (s *QuestionnaireStore) process(rows *sql.Rows, err error) ([]models.Questi
 		var experiment models.Experiment
 		var interactionType models.InteractionType
 		var user models.User
-		if err := rows.Scan(&questionnaire.ID, &questionnaire.Name, &questionnaire.Identifier, &experiment.ID, &experiment.Name, &experiment.Start, &experiment.End, &interactionType.ID, &interactionType.NameNL, &interactionType.NameEN, &interactionType.DescriptionNL, &interactionType.DescriptionEN, &user.ID, &user.Name); err != nil {
+		if err := rows.Scan(&questionnaire.ID, &questionnaire.Name, &questionnaire.Identifier, &experiment.ID, &experiment.Name, &experiment.Start, &experiment.End, &interactionType.ID, &interactionType.Name, &interactionType.Description, &user.ID, &user.Name); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
