@@ -98,6 +98,26 @@ func (o *questionnaireOperations) RegisterAdd(api huma.API) {
 	})
 }
 
+func (o *questionnaireOperations) RegisterGetByExperiment(api huma.API) {
+	name := "Get Questionnaires By Experiment"
+	description := "Retrieve all questionnaires by experimentID."
+	path := "/" + o.Endpoint + "s/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" doc:"The ID of the experiment to retrieve questionnaires for." format:"uuid"`
+	}) (*QuestionnairesHolder, error) {
+		questionnaires, err := stores.NewQuestionnaireStore(relationalDB).GetByExperiment(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &QuestionnairesHolder{Body: questionnaires}, nil
+	})
+}
+
+/*
 func (o *questionnaireOperations) RegisterGetMine(api huma.API) {
 	name := "Get My Questionnaires"
 	description := "Retrieve my questionnaires."
@@ -114,3 +134,4 @@ func (o *questionnaireOperations) RegisterGetMine(api huma.API) {
 		return &QuestionnairesHolder{Body: questionnaires}, nil
 	})
 }
+*/

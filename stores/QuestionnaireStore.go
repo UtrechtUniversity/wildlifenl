@@ -51,14 +51,14 @@ func (s *QuestionnaireStore) Get(questionnaireID string) (*models.Questionnaire,
 		WHERE q."ID" = $1
 	`
 	rows, err := s.relationalDB.Query(query, questionnaireID)
-	result, err := s.process(rows, err)
+	questionnaires, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
 	}
-	if len(result) != 1 {
+	if len(questionnaires) != 1 {
 		return nil, nil
 	}
-	return s.addQuestions(result[0])
+	return s.addQuestions(&questionnaires[0])
 }
 
 func (s *QuestionnaireStore) GetAll() ([]models.Questionnaire, error) {
@@ -88,17 +88,19 @@ func (s *QuestionnaireStore) GetByUser(userID string) ([]models.Questionnaire, e
 	if err != nil {
 		return nil, err
 	}
-	// This is a potential performance issue because it calls the DB in a loop, but let's cross that bridge when we get there.
-	result := make([]models.Questionnaire, 0)
-	for _, q := range questionnaires {
-		questionnaire, err := s.addQuestions(q)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, *questionnaire)
+	return s.addQuestionsAll(questionnaires)
+}
+
+func (s *QuestionnaireStore) GetByExperiment(experimentID string) ([]models.Questionnaire, error) {
+	query := s.query + `
+		WHERE e."ID" = $1
+		`
+	rows, err := s.relationalDB.Query(query, experimentID)
+	questionnaires, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
 	}
-	// ---
-	return result, nil
+	return s.addQuestionsAll(questionnaires)
 }
 
 func (s *QuestionnaireStore) GetRandomByInteraction(interaction *models.Interaction) (*models.Questionnaire, error) {
@@ -119,14 +121,26 @@ func (s *QuestionnaireStore) GetRandomByInteraction(interaction *models.Interact
 	if len(questionnaires) == 0 {
 		return nil, nil
 	}
-	return s.addQuestions(questionnaires[0])
+	return s.addQuestions(&questionnaires[0])
 }
 
-func (s *QuestionnaireStore) addQuestions(questionnaire models.Questionnaire) (*models.Questionnaire, error) {
+func (s *QuestionnaireStore) addQuestions(questionnaire *models.Questionnaire) (*models.Questionnaire, error) {
 	questions, err := NewQuestionStore(s.relationalDB).GetByQuestionnaire(questionnaire.ID)
 	if err != nil {
 		return nil, err
 	}
 	questionnaire.Questions = questions
-	return &questionnaire, nil
+	return questionnaire, nil
+}
+
+func (s *QuestionnaireStore) addQuestionsAll(questionnaires []models.Questionnaire) ([]models.Questionnaire, error) {
+	// This is a potential performance issue because it calls the DB in a loop, but let's cross that bridge when we get there.
+	for i := 0; i < len(questionnaires); i++ {
+		questionnaire, err := s.addQuestions(&questionnaires[i])
+		if err != nil {
+			return nil, err
+		}
+		questionnaires[i] = *questionnaire
+	}
+	return questionnaires, nil
 }
