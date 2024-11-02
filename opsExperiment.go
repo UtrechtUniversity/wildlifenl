@@ -34,6 +34,7 @@ func newExperimentOperations() *experimentOperations {
 	return &experimentOperations{Endpoint: "experiment"}
 }
 
+/*
 func (o *experimentOperations) RegisterGet(api huma.API) {
 	name := "Get Experiment By ID"
 	description := "Retrieve a specific experiment by ID."
@@ -55,6 +56,7 @@ func (o *experimentOperations) RegisterGet(api huma.API) {
 		return &ExperimentHolder{Body: experiment}, nil
 	})
 }
+*/
 
 func (o *experimentOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Experiments"
