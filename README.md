@@ -99,7 +99,7 @@ Upon a new `Tracking-Reading` being posted, including lat/long, it should be che
 
 
 ### From created Alarms -> Create Conveyances
-Whenever a new `Alarm` is created it should be checked whether a `Message` exists //TODO
+Whenever a new `Alarm` is created it should be checked whether a `Message` exists with trigger type `alarm` that is for the same `Species` as the animal that triggered the alarm. If the `Message` is associated with an `Experiment` that is bound by a `LivingLab` there should be a spetiotemperal overlap[^3] between the `Zone` that the alarm is for and this `LivingLab`. If so, a new  `Conveyance` must be created that referring to that `Message` and is associated with the `Alarm` and NOT with an `Animal`, and NOT with a `Response`. Any `Conveyance` instances that are created this way and their `Message` should be in the response body of the post request.
 
 ---
 
