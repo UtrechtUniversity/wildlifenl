@@ -82,11 +82,25 @@ func (s *MessageStore) Add(message *models.MessageRecord) (*models.Message, erro
 	return s.Get(id)
 }
 
+/*
 func (s *MessageStore) GetByUser(userID string) ([]models.Message, error) {
 	query := s.query + `
 		WHERE u."ID" = $1
 		`
 	rows, err := s.relationalDB.Query(query, userID)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+*/
+
+func (s *MessageStore) GetByExperiment(experimentID string) ([]models.Message, error) {
+	query := s.query + `
+		WHERE e."ID" = $1
+		`
+	rows, err := s.relationalDB.Query(query, experimentID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
