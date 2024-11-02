@@ -50,23 +50,6 @@ func (o *questionnaireOperations) RegisterGet(api huma.API) {
 	})
 }
 
-func (o *questionnaireOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Questionnaires"
-	description := "Retrieve all questionnaires."
-	path := "/" + o.Endpoint + "s/"
-	scopes := []string{"administrator"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*QuestionnairesHolder, error) {
-		questionnaires, err := stores.NewQuestionnaireStore(relationalDB).GetAll()
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &QuestionnairesHolder{Body: questionnaires}, nil
-	})
-}
-
 func (o *questionnaireOperations) RegisterAdd(api huma.API) {
 	name := "Add Questionnaire"
 	description := "Add a new questionnaire."
@@ -116,6 +99,25 @@ func (o *questionnaireOperations) RegisterGetByExperiment(api huma.API) {
 		return &QuestionnairesHolder{Body: questionnaires}, nil
 	})
 }
+
+/*
+func (o *questionnaireOperations) RegisterGetAll(api huma.API) {
+	name := "Get All Questionnaires"
+	description := "Retrieve all questionnaires."
+	path := "/" + o.Endpoint + "s/"
+	scopes := []string{"administrator"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct{}) (*QuestionnairesHolder, error) {
+		questionnaires, err := stores.NewQuestionnaireStore(relationalDB).GetAll()
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &QuestionnairesHolder{Body: questionnaires}, nil
+	})
+}
+*/
 
 /*
 func (o *questionnaireOperations) RegisterGetMine(api huma.API) {
