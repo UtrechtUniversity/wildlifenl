@@ -18,4 +18,5 @@ type Message struct {
 	Experiment Experiment `json:"experiment" doc:"The experiment that this questionnaire belongs to."`
 	Species    *Species   `json:"species,omitempty" doc:"The optional species this message is associated with."`
 	Answer     *Answer    `json:"answer,omitempty" doc:"The optional answer this message is associated with."`
+	Activity   *int       `json:"activity,omitempty" doc:"The number of conveyances."`
 }
