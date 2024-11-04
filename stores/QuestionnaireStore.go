@@ -124,6 +124,28 @@ func (s *QuestionnaireStore) GetRandomByInteraction(interaction *models.Interact
 	return s.addQuestions(&questionnaires[0])
 }
 
+func (s *QuestionnaireStore) Update(userID string, questionnaireID string, questionnaire *models.QuestionnaireRecord) (*models.Questionnaire, error) {
+	query := `
+		UPDATE "questionnaire" q
+		SET "name" = $1, "identifier" = $2, "experimentID" = $3, "interactionTypeID" = $4
+		FROM "experiment" e
+		WHERE q."ID" = $5
+		AND e."userID" = $6
+		AND e."ID" = $3
+		AND e."start" > NOW()
+		RETURNING q."ID"
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.Identifier, questionnaire.ExperimentID, questionnaire.InteractionTypeID, questionnaireID, userID)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return s.Get(id)
+}
+
 func (s *QuestionnaireStore) addQuestions(questionnaire *models.Questionnaire) (*models.Questionnaire, error) {
 	questions, err := NewQuestionStore(s.relationalDB).GetByQuestionnaire(questionnaire.ID)
 	if err != nil {

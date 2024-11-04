@@ -14,6 +14,12 @@ type NewQuestionnaireInput struct {
 	Body *models.QuestionnaireRecord `json:"questionnaire"`
 }
 
+type UpdateQuestionnaireInput struct {
+	Input
+	ID   string                      `query:"ID" format:"uuid" doc:"The ID of the questionnaire to be updated."`
+	Body *models.QuestionnaireRecord `json:"questionnaire"`
+}
+
 type QuestionnaireHolder struct {
 	Body *models.Questionnaire `json:"questionnaire"`
 }
@@ -97,6 +103,26 @@ func (o *questionnaireOperations) RegisterGetByExperiment(api huma.API) {
 			return nil, handleError(err)
 		}
 		return &QuestionnairesHolder{Body: questionnaires}, nil
+	})
+}
+
+func (o *questionnaireOperations) RegisterUpdate(api huma.API) {
+	name := "Update Questionnaire"
+	description := "Update an existing questionnaire for which the experiment has not started yet."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"researcher"}
+	method := http.MethodPut
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *UpdateQuestionnaireInput) (*QuestionnaireHolder, error) {
+		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).Update(input.credential.UserID, input.ID, input.Body)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		if questionnaire == nil {
+			return nil, generateNotFoundForThisUserError("questionnaire", input.ID)
+		}
+		return &QuestionnaireHolder{Body: questionnaire}, nil
 	})
 }
 
