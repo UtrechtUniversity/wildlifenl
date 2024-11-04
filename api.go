@@ -74,6 +74,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newRoleOperations())
 	huma.AutoRegister(api, newSpeciesOperations())
 	huma.AutoRegister(api, newTrackingReadingOperations())
+	huma.AutoRegister(api, newTriggerTypeOperations())
 	huma.AutoRegister(api, newUserOperations())
 	huma.AutoRegister(api, newZoneOperations())
 	return http.ListenAndServe(config.Host+":"+strconv.Itoa(config.Port), router)
