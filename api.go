@@ -16,6 +16,7 @@ import (
 	"github.com/UtrechtUniversity/wildlifenl/timeseries"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
+	"github.com/google/uuid"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -125,8 +126,8 @@ func NewMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context))
 			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Missing bearer token.")
 			return
 		}
-		account := getCredential(token)
-		if account == nil {
+		credential := getCredential(token)
+		if credential == nil {
 			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Invalid bearer token.")
 			return
 		}
@@ -134,7 +135,7 @@ func NewMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context))
 			next(ctx)
 			return
 		}
-		for _, scope := range account.Scopes {
+		for _, scope := range credential.Scopes {
 			if slices.Contains(anyOfNeededScopes, scope) {
 				next(ctx)
 				return
@@ -191,9 +192,12 @@ func getCredential(token string) *models.Credential {
 	if credential, ok := sessions.Get(token); ok {
 		return credential.(*models.Credential)
 	}
+	if _, err := uuid.Parse(token); err != nil {
+		return nil
+	}
 	credential, err := stores.NewCredentialStore(relationalDB).Get(token)
 	if err != nil {
-		log.Fatal("ERROR getting credential from store:", err)
+		log.Println("ERROR getting credential from store:", err)
 	}
 	if credential == nil {
 		return nil

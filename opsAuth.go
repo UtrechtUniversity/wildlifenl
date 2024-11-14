@@ -18,7 +18,6 @@ type AuthenticationInput struct {
 	Body struct {
 		DisplayNameApp string `json:"displayNameApp" doc:"The display name of the requesting app, will be used in the email message." example:"MyApp"`
 		Email          string `json:"email" doc:"The email address that the authentication code should be send to." format:"email"`
-		//Language        string `json:"language,omitempty" doc:"The two digit code [nl,en] for the language that the email message should be written in. Default:nl" minLength:"2" maxLength:"2" example:"nl"`
 	}
 }
 
@@ -36,7 +35,7 @@ func (o *authOperations) RegisterAuthentication(api huma.API) {
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"": scopes}},
 	}, func(ctx context.Context, input *AuthenticationInput) (*AuthenticationResult, error) {
 		if err := authenticate(input.Body.DisplayNameApp, input.Body.Email); err != nil {
-			return nil, huma.Error500InternalServerError("An email message could not be sent to the provided email address.")
+			return nil, handleError(err)
 		}
 		return &AuthenticationResult{Body: "The authentication code has been sent to: " + input.Body.Email}, nil
 	})
