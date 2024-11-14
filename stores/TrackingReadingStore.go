@@ -39,5 +39,6 @@ func (s *TrackingReadingStore) Add(userID string, trackingReading *models.Tracki
 	if err != nil {
 		return nil, err
 	}
+	trackingReading.UserID = userID
 	return &models.TrackingReading{TrackingReadingRecord: *trackingReading}, nil
 }
