@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/go-mail/mail"
 	"github.com/lib/pq"
 )
 
@@ -31,6 +32,8 @@ func generateDescription(text string, scopes []string) string {
 
 func handleError(err error) error {
 	switch typedError := err.(type) {
+	case *mail.SendError:
+		return huma.Error504GatewayTimeout("could not send email because the SMTP server is unavailable, please try again")
 	case *pq.Error:
 		message := typedError.Message
 		detail := typedError.Detail
