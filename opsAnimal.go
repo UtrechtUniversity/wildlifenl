@@ -36,7 +36,7 @@ func (o *animalOperations) RegisterGet(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" doc:"The ID of this animal." format:"uuid"`
+		ID string `path:"id" format:"uuid" doc:"The ID of this animal."`
 	}) (*AnimalHolder, error) {
 		animal, err := stores.NewAnimalStore(relationalDB, timeseriesDB).Get(input.ID)
 		if err != nil {
