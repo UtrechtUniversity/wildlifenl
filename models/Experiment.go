@@ -8,7 +8,7 @@ type ExperimentRecord struct {
 	Description string     `json:"description" doc:"The description of this experiment."`
 	Start       time.Time  `json:"start" format:"date-time" doc:"The moment this experiment started."`
 	End         *time.Time `json:"end,omitempty" format:"date-time" doc:"The moment this experiment ended."`
-	LivingLabID *string    `json:"livingLabID,omitempty" format:"uuid" writeOnly:"true" docs:"The optional ID of the living lab this experiment is bound to."`
+	LivingLabID *string    `json:"livingLabID,omitempty" format:"uuid" writeOnly:"true" doc:"The optional ID of the living lab this experiment is bound to."`
 }
 
 type Experiment struct {
