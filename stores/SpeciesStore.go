@@ -12,7 +12,7 @@ func NewSpeciesStore(db *sql.DB) *SpeciesStore {
 	s := SpeciesStore{
 		relationalDB: db,
 		query: `
-		SELECT s."ID", s."name", s."commonName"
+		SELECT s."ID", s."name", s."commonName", s."category", s."advice", s."didYouKnow"
 		FROM "species" s
 		`,
 	}
@@ -26,7 +26,7 @@ func (s *SpeciesStore) process(rows *sql.Rows, err error) ([]models.Species, err
 	speciesX := make([]models.Species, 0)
 	for rows.Next() {
 		var s models.Species
-		if err := rows.Scan(&s.ID, &s.Name, &s.CommonName); err != nil {
+		if err := rows.Scan(&s.ID, &s.Name, &s.CommonName, &s.Category, &s.Advice, &s.DidYouKnow); err != nil {
 			return nil, err
 		}
 		speciesX = append(speciesX, s)
@@ -59,12 +59,29 @@ func (s *SpeciesStore) GetAll() ([]models.Species, error) {
 
 func (s *SpeciesStore) Add(species *models.Species) (*models.Species, error) {
 	query := `
-		INSERT INTO "species"("name", "commonName") VALUES($1, $2)
+		INSERT INTO "species"("name", "commonName", "category", "advice", "didYouKnow") VALUES($1, $2, $3, $4, $5)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, species.Name, species.CommonName)
+	row := s.relationalDB.QueryRow(query, species.Name, species.CommonName, species.Category, species.Advice, species.DidYouKnow)
 	if err := row.Scan(&id); err != nil {
+		return nil, err
+	}
+	return s.Get(id)
+}
+
+func (s *SpeciesStore) Update(speciesID string, species *models.Species) (*models.Species, error) {
+	query := `
+		UPDATE "species" SET "name" = $2, "commonName" = $3, "category" = $4, "advice" = $5, "didYouKnow" = $6
+		WHERE "ID" = $1
+		RETURNING "ID"
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, speciesID, species.Name, species.CommonName, species.Category, species.Advice, species.DidYouKnow)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return s.Get(id)

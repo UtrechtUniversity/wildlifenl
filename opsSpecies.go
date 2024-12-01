@@ -17,6 +17,12 @@ type SpecieSHolder struct {
 	Body []models.Species `json:"species"`
 }
 
+type UpdateSpeciesInput struct {
+	Input
+	ID   string          `query:"ID" format:"uuid" doc:"The ID of the species to be updated."`
+	Body *models.Species `json:"species"`
+}
+
 type speciesOperations Operations
 
 func newSpeciesOperations() *speciesOperations {
@@ -72,6 +78,23 @@ func (o *speciesOperations) RegisterAdd(api huma.API) {
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *SpeciesHolder) (*SpeciesHolder, error) {
 		species, err := stores.NewSpeciesStore(relationalDB).Add(input.Body)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &SpeciesHolder{Body: species}, nil
+	})
+}
+
+func (o *speciesOperations) RegisterUpdate(api huma.API) {
+	name := "Update Species"
+	description := "Update an existing species."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"administrator"}
+	method := http.MethodPut
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *UpdateSpeciesInput) (*SpeciesHolder, error) {
+		species, err := stores.NewSpeciesStore(relationalDB).Update(input.ID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
