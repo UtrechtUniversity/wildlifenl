@@ -9,15 +9,20 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewExperimentInput struct {
+type ExperimentNewInput struct {
 	Input
 	Body *models.ExperimentRecord `json:"experiment"`
 }
 
-type UpdateExperimentInput struct {
+type ExperimentUpdateInput struct {
 	Input
 	ID   string                   `query:"ID" format:"uuid" doc:"The ID of the experiment to be updated."`
 	Body *models.ExperimentRecord `json:"experiment"`
+}
+
+type ExperimentEndInput struct {
+	Input
+	ID string `query:"ID" format:"uuid" doc:"The ID of the experiment to be ended."`
 }
 
 type ExperimentHolder struct {
@@ -83,7 +88,7 @@ func (o *experimentOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewExperimentInput) (*ExperimentHolder, error) {
+	}, func(ctx context.Context, input *ExperimentNewInput) (*ExperimentHolder, error) {
 		experiment, err := stores.NewExperimentStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
@@ -117,8 +122,28 @@ func (o *experimentOperations) RegisterUpdate(api huma.API) {
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *UpdateExperimentInput) (*ExperimentHolder, error) {
+	}, func(ctx context.Context, input *ExperimentUpdateInput) (*ExperimentHolder, error) {
 		experiment, err := stores.NewExperimentStore(relationalDB).Update(input.credential.UserID, input.ID, input.Body)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		if experiment == nil {
+			return nil, generateNotFoundForThisUserError("experiment", input.ID)
+		}
+		return &ExperimentHolder{Body: experiment}, nil
+	})
+}
+
+func (o *experimentOperations) RegisterEnd(api huma.API) {
+	name := "End Experiment"
+	description := "End an existing experiment immediately."
+	path := "/" + o.Endpoint + "/end/"
+	scopes := []string{"researcher"}
+	method := http.MethodPut
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *ExperimentEndInput) (*ExperimentHolder, error) {
+		experiment, err := stores.NewExperimentStore(relationalDB).EndNow(input.credential.UserID, input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}

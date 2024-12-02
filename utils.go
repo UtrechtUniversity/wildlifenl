@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/UtrechtUniversity/wildlifenl/stores"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/go-mail/mail"
 	"github.com/lib/pq"
@@ -34,6 +35,8 @@ func handleError(err error) error {
 	switch typedError := err.(type) {
 	case *mail.SendError:
 		return huma.Error504GatewayTimeout("could not send email because the SMTP server is unavailable, please try again")
+	case *stores.CannotUpdateError:
+		return huma.Error409Conflict(err.Error())
 	case *pq.Error:
 		message := typedError.Message
 		detail := typedError.Detail

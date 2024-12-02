@@ -92,14 +92,52 @@ func (s *ExperimentStore) GetByUser(userID string) ([]models.Experiment, error) 
 
 func (s *ExperimentStore) Update(userID string, experimentID string, experiment *models.ExperimentRecord) (*models.Experiment, error) {
 	query := `
-		UPDATE "experiment" SET "name" = $1, "description" = $2, "start" = $3, "end" = $4, "livingLabID" = $5
-		WHERE "ID" = $6
-		AND "userID" = $7
-		AND "start" > NOW()
+		WITH update_query AS (
+			UPDATE "experiment"
+			SET "name" = $1, "description" = $2, "start" = $3, "end" = $4, "livingLabID" = $5
+			WHERE "ID" = $6 AND "userID" = $7 AND "start" > NOW()
+			RETURNING "ID"
+		)
+		SELECT 
+			c."ID", 
+			CASE 
+				WHEN u."ID" IS NOT NULL THEN 'OK'
+				WHEN c."start" <= NOW() THEN 'STARTED'
+			END AS status
+		FROM (
+			SELECT "ID", "start"
+			FROM "experiment"
+			WHERE "ID" = $6 
+		) c
+		LEFT JOIN update_query u ON c."ID" = u."ID"
+	`
+	var id string
+	var status string
+	row := s.relationalDB.QueryRow(query, experiment.Name, experiment.Description, experiment.Start, experiment.End, experiment.LivingLabID, experimentID, userID)
+	if err := row.Scan(&id, &status); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	switch status {
+	case "STARTED":
+		return nil, &CannotUpdateError{message: "experiment already started"}
+	case "OK":
+		return s.Get(id)
+	}
+	return nil, nil
+}
+
+func (s *ExperimentStore) EndNow(userID string, experimentID string) (*models.Experiment, error) {
+	query := `
+		UPDATE "experiment"
+		SET "end" = NOW()
+		WHERE "ID" = $1 AND "userID" = $2 AND "end" IS NULL
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, experiment.Name, experiment.Description, experiment.Start, experiment.End, experiment.LivingLabID, experimentID, userID)
+	row := s.relationalDB.QueryRow(query, experimentID, userID)
 	if err := row.Scan(&id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil

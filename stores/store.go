@@ -11,3 +11,11 @@ type Store struct {
 	timeseriesDB *timeseries.Timeseries
 	query        string
 }
+
+type CannotUpdateError struct {
+	message string
+}
+
+func (e *CannotUpdateError) Error() string {
+	return e.message
+}
