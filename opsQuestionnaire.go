@@ -28,6 +28,11 @@ type QuestionnairesHolder struct {
 	Body []models.Questionnaire `json:"questionnaires"`
 }
 
+type QuestionnaireDeleteInput struct {
+	Input
+	ID string `path:"id" format:"uuid" doc:"The ID of the questionnaire to be deleted."`
+}
+
 type questionnaireOperations Operations
 
 func newQuestionnaireOperations() *questionnaireOperations {
@@ -123,6 +128,23 @@ func (o *questionnaireOperations) RegisterUpdate(api huma.API) {
 			return nil, generateNotFoundForThisUserError("questionnaire", input.ID)
 		}
 		return &QuestionnaireHolder{Body: questionnaire}, nil
+	})
+}
+
+func (o *questionnaireOperations) RegisterDelete(api huma.API) {
+	name := "Delete Questionnaire"
+	description := "Delete a questionnaire."
+	path := "/" + o.Endpoint + "/{id}"
+	scopes := []string{}
+	method := http.MethodDelete
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *QuestionnaireDeleteInput) (*struct{}, error) {
+		err := stores.NewQuestionnaireStore(relationalDB).Delete(input.ID, input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return nil, nil
 	})
 }
 
