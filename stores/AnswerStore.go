@@ -2,6 +2,7 @@ package stores
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 )
@@ -60,4 +61,42 @@ func (s *AnswerStore) Add(answer *models.AnswerRecord) (*models.Answer, error) {
 		return nil, err
 	}
 	return s.Get(id)
+}
+
+func (s *AnswerStore) Delete(answerID string, userID string) error {
+	query := `
+		WITH deleted AS (
+			DELETE FROM "answer" a
+			USING "question" q
+			JOIN "questionnaire" qq ON q."questionnaireID" = qq."ID"
+			JOIN "experiment" e ON qq."experimentID" = e."ID"
+			WHERE a."ID" = $1
+			AND e."userID" = $2
+			AND e.start > NOW()
+			RETURNING a."ID"
+		)
+		SELECT 
+			CASE 
+				WHEN NOT EXISTS (SELECT 1 FROM "answer" WHERE "ID" = $1) THEN 'INVALID'
+				WHEN NOT EXISTS (SELECT 1 FROM "answer" a JOIN "question" q ON a."questionID" = q."ID" JOIN "questionnaire" qq ON q."questionnaireID" = qq."ID" JOIN "experiment" e ON qq."experimentID" = e."ID" WHERE a."ID" = $1 AND e."userID" = $2) THEN 'USER'
+				WHEN EXISTS (SELECT 1 FROM "answer" WHERE "ID" = $1) AND NOT EXISTS (SELECT 1 FROM deleted) THEN 'STARTED'
+				WHEN EXISTS (SELECT 1 FROM deleted) THEN 'OK'
+			END AS result;
+	`
+	var state string
+	row := s.relationalDB.QueryRow(query, answerID, userID)
+	if err := row.Scan(&state); err != nil {
+		return err
+	}
+	switch state {
+	case "INVALID":
+		return &CannotUpdateError{message: "answer was not found"}
+	case "USER":
+		return &CannotUpdateError{message: "answer does not exist for the current user"}
+	case "STARTED":
+		return &CannotUpdateError{message: "cannot delete answer for an experiment that has started"}
+	case "OK":
+		return nil
+	}
+	return errors.New("unknown error")
 }
