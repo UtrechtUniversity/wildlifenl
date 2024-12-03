@@ -2,6 +2,7 @@ package stores
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 )
@@ -87,4 +88,41 @@ func (s *QuestionStore) GetByQuestionnaire(questionnaireID string) ([]models.Que
 		return nil, err
 	}
 	return result, nil
+}
+
+func (s *QuestionStore) Delete(questionID string, userID string) error {
+	query := `
+		WITH deleted AS (
+			DELETE FROM "question" q
+			USING "questionnaire" qq
+			JOIN "experiment" e ON qq."experimentID" = e."ID"
+			WHERE q."ID" = $1
+			AND e."userID" = $2
+			AND e.start > NOW()
+			RETURNING q."ID"
+		)
+		SELECT 
+			CASE 
+				WHEN NOT EXISTS (SELECT 1 FROM "question" WHERE "ID" = $1) THEN 'INVALID'
+				WHEN NOT EXISTS (SELECT 1 FROM "question" q JOIN "questionnaire" qq ON q."questionnaireID" = qq."ID" JOIN "experiment" e ON qq."experimentID" = e."ID" WHERE q."ID" = $1 AND e."userID" = $2) THEN 'USER'
+				WHEN EXISTS (SELECT 1 FROM "question" WHERE "ID" = $1) AND NOT EXISTS (SELECT 1 FROM deleted) THEN 'STARTED'
+				WHEN EXISTS (SELECT 1 FROM deleted) THEN 'OK'
+			END AS result;
+	`
+	var state string
+	row := s.relationalDB.QueryRow(query, questionID, userID)
+	if err := row.Scan(&state); err != nil {
+		return err
+	}
+	switch state {
+	case "INVALID":
+		return &CannotUpdateError{message: "question was not found"}
+	case "USER":
+		return &CannotUpdateError{message: "question does not exist for the current user"}
+	case "STARTED":
+		return &CannotUpdateError{message: "cannot delete question for an experiment that has started"}
+	case "OK":
+		return nil
+	}
+	return errors.New("unknown error")
 }

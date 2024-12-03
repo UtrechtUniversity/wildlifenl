@@ -23,6 +23,11 @@ type QuestionsHolder struct {
 	Body []models.Question `json:"questions"`
 }
 
+type QuestionDeleteInput struct {
+	Input
+	ID string `path:"id" format:"uuid" doc:"The ID of the question to be deleted."`
+}
+
 type questionOperations Operations
 
 func newQuestionOperations() *questionOperations {
@@ -85,5 +90,22 @@ func (o *questionOperations) RegisterAdd(api huma.API) {
 			return nil, handleError(err)
 		}
 		return &QuestionHolder{Body: question}, nil
+	})
+}
+
+func (o *questionOperations) RegisterDelete(api huma.API) {
+	name := "Delete Question"
+	description := "Delete a question."
+	path := "/" + o.Endpoint + "/{id}"
+	scopes := []string{}
+	method := http.MethodDelete
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *QuestionDeleteInput) (*struct{}, error) {
+		err := stores.NewQuestionStore(relationalDB).Delete(input.ID, input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return nil, nil
 	})
 }

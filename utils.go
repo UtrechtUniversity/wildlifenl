@@ -42,7 +42,14 @@ func handleError(err error) error {
 		detail := typedError.Detail
 		switch typedError.Code {
 		case "23503": // violates foreign key constraint
-			text := detail[4:strings.LastIndex(detail, ")")+1] + " does not exist."
+			text := detail
+			if strings.Contains(detail, "is still referenced from table") {
+				text = detail[4:]
+				text = strings.ReplaceAll(text, "referenced from table", "used by")
+				text = strings.ReplaceAll(text, "\"", "'")
+			} else {
+				text = detail[4:strings.LastIndex(detail, ")")+1] + " does not exist."
+			}
 			return huma.Error400BadRequest(text)
 		case "23514": // violates check constraint
 			text := strings.ReplaceAll(message, "new row for relation", "cannot add or update")
