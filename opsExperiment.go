@@ -136,7 +136,7 @@ func (o *experimentOperations) RegisterUpdate(api huma.API) {
 
 func (o *experimentOperations) RegisterEnd(api huma.API) {
 	name := "End Experiment"
-	description := "End an existing experiment immediately."
+	description := "End a started experiment immediately."
 	path := "/" + o.Endpoint + "/end/"
 	scopes := []string{"researcher"}
 	method := http.MethodPut

@@ -133,7 +133,7 @@ func (s *ExperimentStore) EndNow(userID string, experimentID string) (*models.Ex
 	query := `
 		UPDATE "experiment"
 		SET "end" = NOW()
-		WHERE "ID" = $1 AND "userID" = $2 AND "end" IS NULL
+		WHERE "ID" = $1 AND "userID" = $2
 		RETURNING "ID"
 	`
 	var id string

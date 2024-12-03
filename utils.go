@@ -49,6 +49,10 @@ func handleError(err error) error {
 			text = strings.ReplaceAll(text, "violates", "because it violates")
 			text = strings.ReplaceAll(text, "\"", "'")
 			return huma.Error400BadRequest(text)
+		case "P0001": // raised exception
+			return huma.Error400BadRequest(message)
+		default:
+			return huma.Error400BadRequest("")
 		}
 	}
 	pc := make([]uintptr, 15)
