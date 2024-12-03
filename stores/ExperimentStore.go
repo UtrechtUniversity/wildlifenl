@@ -2,6 +2,7 @@ package stores
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 )
@@ -145,4 +146,39 @@ func (s *ExperimentStore) EndNow(userID string, experimentID string) (*models.Ex
 		return nil, err
 	}
 	return s.Get(id)
+}
+
+func (s *ExperimentStore) Delete(questionID string, userID string) error {
+	query := `
+		WITH deleted AS (
+			DELETE FROM "experiment" 
+			WHERE "ID" = $1
+			AND "userID" = $2
+			AND start > NOW()
+			RETURNING "ID"
+		)
+		SELECT 
+			CASE 
+				WHEN NOT EXISTS (SELECT 1 FROM "experiment" WHERE "ID" = $1) THEN 'INVALID'
+				WHEN NOT EXISTS (SELECT 1 FROM "experiment" WHERE "ID" = $1 AND "userID" = $2) THEN 'USER'
+				WHEN EXISTS (SELECT 1 FROM "experiment" WHERE "ID" = $1) AND NOT EXISTS (SELECT 1 FROM deleted) THEN 'STARTED'
+				WHEN EXISTS (SELECT 1 FROM deleted) THEN 'OK'
+			END AS result;
+	`
+	var state string
+	row := s.relationalDB.QueryRow(query, questionID, userID)
+	if err := row.Scan(&state); err != nil {
+		return err
+	}
+	switch state {
+	case "INVALID":
+		return &CannotUpdateError{message: "experiment was not found"}
+	case "USER":
+		return &CannotUpdateError{message: "experiment does not exist for the current user"}
+	case "STARTED":
+		return &CannotUpdateError{message: "cannot delete an experiment that has started"}
+	case "OK":
+		return nil
+	}
+	return errors.New("unknown error")
 }

@@ -33,6 +33,11 @@ type ExperimentsHolder struct {
 	Body []models.Experiment `json:"experiments"`
 }
 
+type ExperimentDeleteInput struct {
+	Input
+	ID string `path:"id" format:"uuid" doc:"The ID of the experiment to be deleted."`
+}
+
 type experimentOperations Operations
 
 func newExperimentOperations() *experimentOperations {
@@ -151,5 +156,22 @@ func (o *experimentOperations) RegisterEnd(api huma.API) {
 			return nil, generateNotFoundForThisUserError("experiment", input.ID)
 		}
 		return &ExperimentHolder{Body: experiment}, nil
+	})
+}
+
+func (o *experimentOperations) RegisterDelete(api huma.API) {
+	name := "Delete Experiment"
+	description := "Delete an experiment."
+	path := "/" + o.Endpoint + "/{id}"
+	scopes := []string{}
+	method := http.MethodDelete
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *ExperimentDeleteInput) (*struct{}, error) {
+		err := stores.NewExperimentStore(relationalDB).Delete(input.ID, input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return nil, nil
 	})
 }
