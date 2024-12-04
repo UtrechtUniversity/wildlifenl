@@ -12,10 +12,18 @@ type Store struct {
 	query        string
 }
 
-type CannotUpdateError struct {
+type ErrRecordInattainable struct {
 	message string
 }
 
-func (e *CannotUpdateError) Error() string {
+func (e *ErrRecordInattainable) Error() string {
+	return e.message
+}
+
+type ErrRecordImmutable struct {
+	message string
+}
+
+func (e *ErrRecordImmutable) Error() string {
 	return e.message
 }

@@ -123,7 +123,7 @@ func (s *ExperimentStore) Update(userID string, experimentID string, experiment 
 	}
 	switch status {
 	case "STARTED":
-		return nil, &CannotUpdateError{message: "experiment already started"}
+		return nil, &ErrRecordImmutable{message: "experiment already started"}
 	case "OK":
 		return s.Get(id)
 	}
@@ -172,11 +172,11 @@ func (s *ExperimentStore) Delete(questionID string, userID string) error {
 	}
 	switch state {
 	case "INVALID":
-		return &CannotUpdateError{message: "experiment was not found"}
+		return &ErrRecordInattainable{message: "experiment was not found"}
 	case "USER":
-		return &CannotUpdateError{message: "experiment does not exist for the current user"}
+		return &ErrRecordInattainable{message: "experiment does not exist for the current user"}
 	case "STARTED":
-		return &CannotUpdateError{message: "cannot delete an experiment that has started"}
+		return &ErrRecordImmutable{message: "cannot delete an experiment that has started"}
 	case "OK":
 		return nil
 	}

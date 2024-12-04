@@ -116,11 +116,11 @@ func (s *QuestionStore) Delete(questionID string, userID string) error {
 	}
 	switch state {
 	case "INVALID":
-		return &CannotUpdateError{message: "question was not found"}
+		return &ErrRecordInattainable{message: "question was not found"}
 	case "USER":
-		return &CannotUpdateError{message: "question does not exist for the current user"}
+		return &ErrRecordInattainable{message: "question does not exist for the current user"}
 	case "STARTED":
-		return &CannotUpdateError{message: "cannot delete question for an experiment that has started"}
+		return &ErrRecordImmutable{message: "cannot delete question for an experiment that has started"}
 	case "OK":
 		return nil
 	}

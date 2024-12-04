@@ -90,11 +90,11 @@ func (s *AnswerStore) Delete(answerID string, userID string) error {
 	}
 	switch state {
 	case "INVALID":
-		return &CannotUpdateError{message: "answer was not found"}
+		return &ErrRecordInattainable{message: "answer was not found"}
 	case "USER":
-		return &CannotUpdateError{message: "answer does not exist for the current user"}
+		return &ErrRecordInattainable{message: "answer does not exist for the current user"}
 	case "STARTED":
-		return &CannotUpdateError{message: "cannot delete answer for an experiment that has started"}
+		return &ErrRecordImmutable{message: "cannot delete answer for an experiment that has started"}
 	case "OK":
 		return nil
 	}

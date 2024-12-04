@@ -193,11 +193,11 @@ func (s *QuestionnaireStore) Delete(questionID string, userID string) error {
 	}
 	switch state {
 	case "INVALID":
-		return &CannotUpdateError{message: "questionnaire was not found"}
+		return &ErrRecordInattainable{message: "questionnaire was not found"}
 	case "USER":
-		return &CannotUpdateError{message: "questionnaire does not exist for the current user"}
+		return &ErrRecordInattainable{message: "questionnaire does not exist for the current user"}
 	case "STARTED":
-		return &CannotUpdateError{message: "cannot delete questionnaire for an experiment that has started"}
+		return &ErrRecordImmutable{message: "cannot delete questionnaire for an experiment that has started"}
 	case "OK":
 		return nil
 	}

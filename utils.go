@@ -31,12 +31,15 @@ func generateDescription(text string, scopes []string) string {
 	return text + "<br/><br/>**Scopes**<br/>" + strings.Join(result, ", ")
 }
 
+// handleError uses some "fuzzy hocus pocus" to convert a Go error of different sources and natures to an huma REST error (of HTTP status 4xx) if it can infer the most likely type and a reasonable end-user message, otherwise it returns an huma REST error (of HTTP status 500) and logs the Go error.
 func handleError(err error) error {
 	switch typedError := err.(type) {
 	case *mail.SendError:
 		return huma.Error504GatewayTimeout("could not send email because the SMTP server is unavailable, please try again")
-	case *stores.CannotUpdateError:
-		return huma.Error409Conflict(err.Error())
+	case *stores.ErrRecordInattainable:
+		return huma.Error404NotFound("record is inattainable: " + err.Error())
+	case *stores.ErrRecordImmutable:
+		return huma.Error409Conflict("record is immutable: " + err.Error())
 	case *pq.Error:
 		message := typedError.Message
 		detail := typedError.Detail
