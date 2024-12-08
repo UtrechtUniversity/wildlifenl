@@ -4,7 +4,7 @@ import "time"
 
 type InteractionRecord struct {
 	ID          string    `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this interaction."`
-	Timestamp   time.Time `json:"timestamp" format:"date-time" readOnly:"true" doc:"The moment this interaction was reported."`
+	Timestamp   time.Time `json:"timestamp" format:"date-time" doc:"The moment this interaction was reported."`
 	Description string    `json:"description" doc:"The description of this interaction."`
 	SpeciesID   string    `json:"speciesID,omitempty" format:"uuid" writeOnly:"true" required:"true" doc:"The ID of the species involved in this interaction."`
 	Location    Point     `json:"location" doc:"The place where the interaction was reported."`

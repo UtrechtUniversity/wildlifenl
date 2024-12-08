@@ -65,11 +65,11 @@ func (s *InteractionStore) GetAll() ([]models.Interaction, error) {
 
 func (s *InteractionStore) Add(userID string, interaction *models.InteractionRecord) (*models.Interaction, error) {
 	query := `
-		INSERT INTO "interaction"("description", "location","speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5)
+		INSERT INTO "interaction"("description", "location", "speciesID", "timestamp", "userID", "typeID") VALUES($1, $2, $3, $4, $5, $6)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.SpeciesID, userID, interaction.TypeID)
+	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.SpeciesID, interaction.Timestamp, userID, interaction.TypeID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
