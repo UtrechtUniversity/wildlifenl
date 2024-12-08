@@ -17,7 +17,7 @@ type AnswersHolder struct {
 	Body []models.Answer `json:"answers"`
 }
 
-type NewAnswerInput struct {
+type AnswerAddInput struct {
 	Input
 	Body *models.AnswerRecord `json:"answer"`
 }
@@ -63,7 +63,7 @@ func (o *answerOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewAnswerInput) (*AnswerHolder, error) {
+	}, func(ctx context.Context, input *AnswerAddInput) (*AnswerHolder, error) {
 		if input.Body.NextQuestionID != nil && *input.Body.NextQuestionID == input.Body.QuestionID {
 			return nil, huma.Error400BadRequest("Fields questionID and nextQuestionID must have different values")
 		}

@@ -9,16 +9,16 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewBorneSensorDeploymentInput struct {
-	Body *models.BorneSensorDeploymentRecord `json:"borneSensorDeployment"`
-}
-
 type BorneSensorDeploymentHolder struct {
 	Body *models.BorneSensorDeployment `json:"borneSensorDeployment"`
 }
 
 type BorneSensorDeploymentsHolder struct {
 	Body []models.BorneSensorDeployment `json:"borneSensorDeployments"`
+}
+
+type BorneSensorDeploymentAddInput struct {
+	Body *models.BorneSensorDeploymentRecord `json:"borneSensorDeployment"`
 }
 
 type borneSensorDeploymentOperations Operations
@@ -55,7 +55,7 @@ func (o *borneSensorDeploymentOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewBorneSensorDeploymentInput) (*BorneSensorDeploymentHolder, error) {
+	}, func(ctx context.Context, input *BorneSensorDeploymentAddInput) (*BorneSensorDeploymentHolder, error) {
 		borneSensorDeployment, err := stores.NewBorneSensorDeploymentStore(relationalDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)

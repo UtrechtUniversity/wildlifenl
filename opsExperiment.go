@@ -9,6 +9,14 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
+type ExperimentHolder struct {
+	Body *models.Experiment `json:"experiment"`
+}
+
+type ExperimentsHolder struct {
+	Body []models.Experiment `json:"experiments"`
+}
+
 type ExperimentNewInput struct {
 	Input
 	Body *models.ExperimentRecord `json:"experiment"`
@@ -20,22 +28,14 @@ type ExperimentUpdateInput struct {
 	Body *models.ExperimentRecord `json:"experiment"`
 }
 
-type ExperimentEndInput struct {
-	Input
-	ID string `query:"ID" format:"uuid" doc:"The ID of the experiment to be ended."`
-}
-
-type ExperimentHolder struct {
-	Body *models.Experiment `json:"experiment"`
-}
-
-type ExperimentsHolder struct {
-	Body []models.Experiment `json:"experiments"`
-}
-
 type ExperimentDeleteInput struct {
 	Input
 	ID string `path:"id" format:"uuid" doc:"The ID of the experiment to be deleted."`
+}
+
+type ExperimentEndInput struct {
+	Input
+	ID string `query:"ID" format:"uuid" doc:"The ID of the experiment to be ended."`
 }
 
 type experimentOperations Operations
@@ -43,30 +43,6 @@ type experimentOperations Operations
 func newExperimentOperations() *experimentOperations {
 	return &experimentOperations{Endpoint: "experiment"}
 }
-
-/*
-func (o *experimentOperations) RegisterGet(api huma.API) {
-	name := "Get Experiment By ID"
-	description := "Retrieve a specific experiment by ID."
-	path := "/" + o.Endpoint + "/{id}"
-	scopes := []string{"researcher"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" doc:"The ID of this experiment." format:"uuid"`
-	}) (*ExperimentHolder, error) {
-		experiment, err := stores.NewExperimentStore(relationalDB).Get(input.ID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		if experiment == nil {
-			return nil, generateNotFoundByIDError(o.Endpoint, input.ID)
-		}
-		return &ExperimentHolder{Body: experiment}, nil
-	})
-}
-*/
 
 func (o *experimentOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Experiments"
@@ -139,6 +115,23 @@ func (o *experimentOperations) RegisterUpdate(api huma.API) {
 	})
 }
 
+func (o *experimentOperations) RegisterDelete(api huma.API) {
+	name := "Delete Experiment"
+	description := "Delete an experiment."
+	path := "/" + o.Endpoint + "/{id}"
+	scopes := []string{}
+	method := http.MethodDelete
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *ExperimentDeleteInput) (*struct{}, error) {
+		err := stores.NewExperimentStore(relationalDB).Delete(input.ID, input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return nil, nil
+	})
+}
+
 func (o *experimentOperations) RegisterEnd(api huma.API) {
 	name := "End Experiment"
 	description := "End a started experiment immediately."
@@ -156,22 +149,5 @@ func (o *experimentOperations) RegisterEnd(api huma.API) {
 			return nil, generateNotFoundForThisUserError("experiment", input.ID)
 		}
 		return &ExperimentHolder{Body: experiment}, nil
-	})
-}
-
-func (o *experimentOperations) RegisterDelete(api huma.API) {
-	name := "Delete Experiment"
-	description := "Delete an experiment."
-	path := "/" + o.Endpoint + "/{id}"
-	scopes := []string{}
-	method := http.MethodDelete
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *ExperimentDeleteInput) (*struct{}, error) {
-		err := stores.NewExperimentStore(relationalDB).Delete(input.ID, input.credential.UserID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return nil, nil
 	})
 }

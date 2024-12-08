@@ -9,17 +9,17 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewMessageInput struct {
-	Input
-	Body *models.MessageRecord `json:"message"`
-}
-
 type MessageHolder struct {
 	Body *models.Message `json:"message"`
 }
 
 type MessagesHolder struct {
 	Body []models.Message `json:"messages"`
+}
+
+type MessageAddInput struct {
+	Input
+	Body *models.MessageRecord `json:"message"`
 }
 
 type messageOperations Operations
@@ -50,6 +50,25 @@ func (o *messageOperations) RegisterGet(api huma.API) {
 	})
 }
 
+func (o *messageOperations) RegisterGetByExperiment(api huma.API) {
+	name := "Get Messages By Experiment"
+	description := "Retrieve all messages by experimentID."
+	path := "/" + o.Endpoint + "s/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" doc:"The ID of the experiment to retrieve messages for." format:"uuid"`
+	}) (*MessagesHolder, error) {
+		messages, err := stores.NewMessageStore(relationalDB).GetByExperiment(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &MessagesHolder{Body: messages}, nil
+	})
+}
+
 func (o *messageOperations) RegisterAdd(api huma.API) {
 	name := "Add Message"
 	description := "Add a new message."
@@ -58,7 +77,7 @@ func (o *messageOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewMessageInput) (*MessageHolder, error) {
+	}, func(ctx context.Context, input *MessageAddInput) (*MessageHolder, error) {
 
 		switch input.Body.Trigger {
 		case "encounter":
@@ -96,60 +115,3 @@ func (o *messageOperations) RegisterAdd(api huma.API) {
 		return &MessageHolder{Body: message}, nil
 	})
 }
-
-func (o *messageOperations) RegisterGetByExperiment(api huma.API) {
-	name := "Get Messages By Experiment"
-	description := "Retrieve all messages by experimentID."
-	path := "/" + o.Endpoint + "s/{id}"
-	scopes := []string{"researcher"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" doc:"The ID of the experiment to retrieve messages for." format:"uuid"`
-	}) (*MessagesHolder, error) {
-		messages, err := stores.NewMessageStore(relationalDB).GetByExperiment(input.ID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &MessagesHolder{Body: messages}, nil
-	})
-}
-
-/*
-func (o *messageOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Messages"
-	description := "Retrieve all messages."
-	path := "/" + o.Endpoint + "s/"
-	scopes := []string{"administrator"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*MessagesHolder, error) {
-		messages, err := stores.NewMessageStore(relationalDB).GetAll()
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &MessagesHolder{Body: messages}, nil
-	})
-}
-*/
-
-/*
-func (o *messageOperations) RegisterGetMine(api huma.API) {
-	name := "Get My Messages"
-	description := "Retrieve my messages."
-	path := "/" + o.Endpoint + "s/me/"
-	scopes := []string{"researcher"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *Input) (*MessagesHolder, error) {
-		messages, err := stores.NewMessageStore(relationalDB).GetByUser(input.credential.UserID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &MessagesHolder{Body: messages}, nil
-	})
-}
-*/

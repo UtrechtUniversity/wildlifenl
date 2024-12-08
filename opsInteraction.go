@@ -9,17 +9,17 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewInteractionInput struct {
-	Input
-	Body *models.InteractionRecord `json:"interaction"`
-}
-
 type InteractionHolder struct {
 	Body *models.Interaction `json:"interaction"`
 }
 
 type InteractionsHolder struct {
 	Body []models.Interaction `json:"interactions"`
+}
+
+type InteractionAddInput struct {
+	Input
+	Body *models.InteractionRecord `json:"interaction"`
 }
 
 type interactionOperations Operations
@@ -67,6 +67,23 @@ func (o *interactionOperations) RegisterGetAll(api huma.API) {
 	})
 }
 
+func (o *interactionOperations) RegisterGetMine(api huma.API) {
+	name := "Get My Interactions"
+	description := "Retrieve my interactions."
+	path := "/" + o.Endpoint + "s/me/"
+	scopes := []string{}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *Input) (*InteractionsHolder, error) {
+		interactions, err := stores.NewInteractionStore(relationalDB).GetByUser(input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &InteractionsHolder{Body: interactions}, nil
+	})
+}
+
 func (o *interactionOperations) RegisterAdd(api huma.API) {
 	name := "Add Interaction"
 	description := "Submit a new interaction."
@@ -75,7 +92,7 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewInteractionInput) (*InteractionHolder, error) {
+	}, func(ctx context.Context, input *InteractionAddInput) (*InteractionHolder, error) {
 		interaction, err := stores.NewInteractionStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
@@ -102,22 +119,5 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 		}
 
 		return &InteractionHolder{Body: interaction}, nil
-	})
-}
-
-func (o *interactionOperations) RegisterGetMine(api huma.API) {
-	name := "Get My Interactions"
-	description := "Retrieve my interactions."
-	path := "/" + o.Endpoint + "s/me/"
-	scopes := []string{}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *Input) (*InteractionsHolder, error) {
-		interactions, err := stores.NewInteractionStore(relationalDB).GetByUser(input.credential.UserID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &InteractionsHolder{Body: interactions}, nil
 	})
 }

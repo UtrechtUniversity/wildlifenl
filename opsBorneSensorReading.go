@@ -9,13 +9,13 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewBorneSensorReadingInput struct {
-	Input
-	Body *models.BorneSensorReadingRecord `json:"borneSensorReading"`
-}
-
 type BorneSensorReadingsHolder struct {
 	Body []models.BorneSensorReading `json:"borneSensorReadings"`
+}
+
+type BorneSensorReadingAddInput struct {
+	Input
+	Body *models.BorneSensorReadingRecord `json:"borneSensorReading"`
 }
 
 type borneSensorReadingOperations Operations
@@ -44,6 +44,25 @@ func (o *borneSensorReadingOperations) RegisterGetAll(api huma.API) {
 	})
 }
 
+func (o *borneSensorReadingOperations) RegisterGetAllBySensor(api huma.API) {
+	name := "Get BorneSensorReadings By Sensor"
+	description := "Retrieve all borne-sensor readings by sensorID."
+	path := "/" + o.Endpoint + "s/{id}"
+	scopes := []string{"land-user", "nature-area-manager", "wildlife-manager", "herd-manager"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" doc:"The sensorID to retrieve borne-sensor readings for."`
+	}) (*BorneSensorReadingsHolder, error) {
+		borneSensorReadings, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).GetAllBySensorID(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &BorneSensorReadingsHolder{Body: borneSensorReadings}, nil
+	})
+}
+
 func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 	name := "Add BorneSensorReading"
 	description := "Submit a new reading for a borne sensor."
@@ -52,7 +71,7 @@ func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewBorneSensorReadingInput) (*struct{}, error) {
+	}, func(ctx context.Context, input *BorneSensorReadingAddInput) (*struct{}, error) {
 		animal, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
@@ -72,24 +91,5 @@ func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 		}
 
 		return nil, nil
-	})
-}
-
-func (o *borneSensorReadingOperations) RegisterGetAllBySensor(api huma.API) {
-	name := "Get BorneSensorReadings By Sensor"
-	description := "Retrieve all borne-sensor readings by sensorID."
-	path := "/" + o.Endpoint + "s/{id}"
-	scopes := []string{"land-user", "nature-area-manager", "wildlife-manager", "herd-manager"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" doc:"The sensorID to retrieve borne-sensor readings for."`
-	}) (*BorneSensorReadingsHolder, error) {
-		borneSensorReadings, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).GetAllBySensorID(input.ID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &BorneSensorReadingsHolder{Body: borneSensorReadings}, nil
 	})
 }

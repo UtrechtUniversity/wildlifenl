@@ -9,17 +9,17 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewLivingLabInput struct {
-	Input
-	Body *models.LivingLab `json:"livinglab"`
-}
-
 type LivingLabHolder struct {
 	Body *models.LivingLab `json:"livinglab"`
 }
 
 type LivingLabsHolder struct {
 	Body []models.LivingLab `json:"livinglabs"`
+}
+
+type LivingLabAddInput struct {
+	Input
+	Body *models.LivingLab `json:"livinglab"`
 }
 
 type livinglabOperations Operations
@@ -75,7 +75,7 @@ func (o *livinglabOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewLivingLabInput) (*LivingLabHolder, error) {
+	}, func(ctx context.Context, input *LivingLabAddInput) (*LivingLabHolder, error) {
 		if len(input.Body.Definition) < 3 {
 			return nil, huma.Error400BadRequest("definition should contain 3 or more points")
 		}

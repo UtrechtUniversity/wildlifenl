@@ -17,22 +17,24 @@ type ZonesHolder struct {
 	Body []models.Zone `json:"zones"`
 }
 
-type NewZoneInput struct {
+type ZoneAddInput struct {
 	Input
 	Body *models.ZoneRecord `json:"zone"`
 }
 
-type SetZoneSpeciesInput struct {
-	Input
-	Body *struct {
-		ZondeID string `json:"zoneID" format:"uuid" doc:"The ID of the zone."`
-		Species []struct {
-			SpeciesID string `json:"speciesID" format:"uuid" doc:"The ID of the species to set for this zone."`
-		}
+type ZoneSpecies struct {
+	ZondeID string `json:"zoneID" format:"uuid" doc:"The ID of the zone."`
+	Species []struct {
+		SpeciesID string `json:"speciesID" format:"uuid" doc:"The ID of the species to set for this zone."`
 	}
 }
 
-type DeactivateZoneInput struct {
+type ZoneSpeciesUpdateInput struct {
+	Input
+	Body *ZoneSpecies
+}
+
+type ZoneDeactivateInput struct {
 	Input
 	ID string `path:"id" doc:"The ID of this zone." format:"uuid"`
 }
@@ -87,7 +89,7 @@ func (o *zoneOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewZoneInput) (*ZoneHolder, error) {
+	}, func(ctx context.Context, input *ZoneAddInput) (*ZoneHolder, error) {
 		species, err := stores.NewZoneStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
@@ -121,7 +123,7 @@ func (o *zoneOperations) RegisterSetSpecies(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *SetZoneSpeciesInput) (*ZoneHolder, error) {
+	}, func(ctx context.Context, input *ZoneSpeciesUpdateInput) (*ZoneHolder, error) {
 		store := stores.NewZoneStore(relationalDB)
 		zone, err := store.Get(input.Body.ZondeID)
 		if err != nil {
@@ -150,7 +152,7 @@ func (o *zoneOperations) RegisterDeactivate(api huma.API) {
 	method := http.MethodDelete
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *DeactivateZoneInput) (*ZoneHolder, error) {
+	}, func(ctx context.Context, input *ZoneDeactivateInput) (*ZoneHolder, error) {
 		store := stores.NewZoneStore(relationalDB)
 		var zone models.Zone
 		zones, err := store.GetByUser(input.credential.UserID)

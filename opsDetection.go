@@ -17,7 +17,7 @@ type DetectionsHolder struct {
 	Body []models.Detection `json:"detections"`
 }
 
-type NewDetectionInput struct {
+type DetectionAddInput struct {
 	Body models.DetectionRecord `json:"detection"`
 }
 
@@ -52,7 +52,7 @@ func (o *detectionOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewDetectionInput) (*DetectionHolder, error) {
+	}, func(ctx context.Context, input *DetectionAddInput) (*DetectionHolder, error) {
 		detection, err := stores.NewDetectionStore(relationalDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)

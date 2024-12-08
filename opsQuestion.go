@@ -10,17 +10,17 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewQuestionInput struct {
-	Input
-	Body *models.QuestionRecord `json:"question"`
-}
-
 type QuestionHolder struct {
 	Body *models.Question `json:"question"`
 }
 
 type QuestionsHolder struct {
 	Body []models.Question `json:"questions"`
+}
+
+type QuestionAddInput struct {
+	Input
+	Body *models.QuestionRecord `json:"question"`
 }
 
 type QuestionDeleteInput struct {
@@ -43,7 +43,7 @@ func (o *questionOperations) RegisterGet(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" doc:"The ID of this question." format:"uuid"`
+		ID string `path:"id" format:"uuid" doc:"The ID of the question to retrieve."`
 	}) (*QuestionHolder, error) {
 		question, err := stores.NewQuestionStore(relationalDB).Get(input.ID)
 		if err != nil {
@@ -64,7 +64,7 @@ func (o *questionOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewQuestionInput) (*QuestionHolder, error) {
+	}, func(ctx context.Context, input *QuestionAddInput) (*QuestionHolder, error) {
 		if input.Body.OpenResponseFormat != nil {
 			if _, err := regexp.Compile(*input.Body.OpenResponseFormat); err != nil {
 				return nil, huma.Error400BadRequest("Field openResponseFormat must either be not present or contain a regular expression")

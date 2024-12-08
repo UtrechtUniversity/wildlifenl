@@ -13,13 +13,13 @@ type ProfileHolder struct {
 	Body *models.Profile `json:"profile"`
 }
 
-type UpdateProfileHolder struct {
-	Input
-	Body *models.ProfileRecord `json:"profile"`
-}
-
 type ProfilesHolder struct {
 	Body []models.Profile `json:"profiles"`
+}
+
+type ProfileUpdateHolder struct {
+	Input
+	Body *models.ProfileRecord `json:"profile"`
 }
 
 type profileOperations Operations
@@ -92,7 +92,7 @@ func (o *profileOperations) RegisterUpdateMine(api huma.API) {
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *UpdateProfileHolder) (*ProfileHolder, error) {
+	}, func(ctx context.Context, input *ProfileUpdateHolder) (*ProfileHolder, error) {
 		me, err := stores.NewProfileStore(relationalDB).Update(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)

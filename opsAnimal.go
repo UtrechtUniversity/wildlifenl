@@ -9,16 +9,16 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewAnimalHolder struct {
-	Body *models.AnimalRecord `json:"animal"`
-}
-
 type AnimalHolder struct {
 	Body *models.Animal `json:"animal"`
 }
 
 type AnimalsHolder struct {
 	Body []models.Animal `json:"animals"`
+}
+
+type AnimalAddInput struct {
+	Body *models.AnimalRecord `json:"animal"`
 }
 
 type animalOperations Operations
@@ -74,7 +74,7 @@ func (o *animalOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewAnimalHolder) (*AnimalHolder, error) {
+	}, func(ctx context.Context, input *AnimalAddInput) (*AnimalHolder, error) {
 		species, err := stores.NewAnimalStore(relationalDB, timeseriesDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)

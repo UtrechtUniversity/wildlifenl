@@ -9,26 +9,19 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewTrackingReadingInput struct {
-	Input
-	Body *models.TrackingReadingRecord `json:"trackingReading"`
-}
-
 type TrackingReadingHolder struct {
 	Body *models.TrackingReading `json:"trackingReading"`
 }
 
-type TrackingReadingsHolder struct {
-	Body []models.TrackingReading `json:"trackingReadings"`
+type TrackingReadingAddInput struct {
+	Input
+	Body *models.TrackingReadingRecord `json:"trackingReading"`
 }
 
 type trackingReadingOperations Operations
 
 func newTrackingReadingOperations() *trackingReadingOperations {
-	o := trackingReadingOperations{
-		Endpoint: "tracking-reading",
-	}
-	return &o
+	return &trackingReadingOperations{Endpoint: "tracking-reading"}
 }
 
 func (o *trackingReadingOperations) RegisterAdd(api huma.API) {
@@ -39,7 +32,7 @@ func (o *trackingReadingOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewTrackingReadingInput) (*TrackingReadingHolder, error) {
+	}, func(ctx context.Context, input *TrackingReadingAddInput) (*TrackingReadingHolder, error) {
 		trackingReading, err := stores.NewTrackingReadingStore(relationalDB, timeseriesDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)

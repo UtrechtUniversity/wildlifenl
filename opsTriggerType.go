@@ -18,7 +18,7 @@ func newTriggerTypeOperations() *triggerTypeOperations {
 }
 
 func (o *triggerTypeOperations) RegisterGetAll(api huma.API) {
-	name := "Get All TriggerTypes"
+	name := "Get All TriggerTypes [deprecated]"
 	description := "Retrieve all trigger types."
 	path := "/" + o.Endpoint + "s/"
 	scopes := []string{}

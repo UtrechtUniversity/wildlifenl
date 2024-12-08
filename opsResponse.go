@@ -10,45 +10,19 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type NewResponseInput struct {
-	Input
-	Body *models.ResponseRecord `json:"response"`
-}
-
 type ResponseHolder struct {
 	Body *models.Response `json:"response"`
 }
 
-type ResponsesHolder struct {
-	Body []models.Response `json:"responses"`
+type ResponseAddInput struct {
+	Input
+	Body *models.ResponseRecord `json:"response"`
 }
 
 type responseOperations Operations
 
 func newResponseOperations() *responseOperations {
 	return &responseOperations{Endpoint: "response"}
-}
-
-func (o *responseOperations) RegisterGet(api huma.API) {
-	name := "Get Response By ID"
-	description := "Retrieve a specific response by ID."
-	path := "/" + o.Endpoint + "/{id}"
-	scopes := []string{"administrator"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" doc:"The ID of this response." format:"uuid"`
-	}) (*ResponseHolder, error) {
-		response, err := stores.NewResponseStore(relationalDB).Get(input.ID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		if response == nil {
-			return nil, generateNotFoundByIDError(o.Endpoint, input.ID)
-		}
-		return &ResponseHolder{Body: response}, nil
-	})
 }
 
 func (o *responseOperations) RegisterAdd(api huma.API) {
@@ -59,14 +33,14 @@ func (o *responseOperations) RegisterAdd(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *NewResponseInput) (*ResponseHolder, error) {
+	}, func(ctx context.Context, input *ResponseAddInput) (*ResponseHolder, error) {
 
 		question, err := stores.NewQuestionStore(relationalDB).Get(input.Body.QuestionID)
 		if err != nil {
 			return nil, handleError(err)
 		}
 		if !question.AllowOpenResponse && input.Body.Text != nil {
-			return nil, huma.Error400BadRequest("question (" + question.ID + ") does not allow open responses, therefore field text must not be present")
+			return nil, huma.Error400BadRequest("question (" + question.ID + ") does not allow open responses, therefore field 'text' must not be present")
 		}
 		if question.AllowOpenResponse && question.OpenResponseFormat != nil {
 			r, err := regexp.Compile(*question.OpenResponseFormat)

@@ -17,7 +17,7 @@ type SpecieSHolder struct {
 	Body []models.Species `json:"species"`
 }
 
-type UpdateSpeciesInput struct {
+type SpeciesUpdateInput struct {
 	Input
 	ID   string          `query:"ID" format:"uuid" doc:"The ID of the species to be updated."`
 	Body *models.Species `json:"species"`
@@ -93,7 +93,7 @@ func (o *speciesOperations) RegisterUpdate(api huma.API) {
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *UpdateSpeciesInput) (*SpeciesHolder, error) {
+	}, func(ctx context.Context, input *SpeciesUpdateInput) (*SpeciesHolder, error) {
 		species, err := stores.NewSpeciesStore(relationalDB).Update(input.ID, input.Body)
 		if err != nil {
 			return nil, handleError(err)

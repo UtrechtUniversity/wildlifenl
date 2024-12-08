@@ -9,7 +9,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
-type MutateRoleForUserInput struct {
+type RoleForUserUpdateInput struct {
 	Body *struct {
 		UserID string `json:"userID" format:"uuid" doc:"The ID of the user"`
 		RoleID int    `json:"roleID" minimum:"1" doc:"The ID of the role"`
@@ -51,7 +51,7 @@ func (o *roleOperations) RegisterAddRoleToUser(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *MutateRoleForUserInput) (*struct{}, error) {
+	}, func(ctx context.Context, input *RoleForUserUpdateInput) (*struct{}, error) {
 		err := stores.NewRoleStore(relationalDB).AddRoleToUser(input.Body.UserID, input.Body.RoleID)
 		if err != nil {
 			return nil, handleError(err)
@@ -69,7 +69,7 @@ func (o *roleOperations) RegisterRemoveRoleFromUser(api huma.API) {
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *MutateRoleForUserInput) (*struct{}, error) {
+	}, func(ctx context.Context, input *RoleForUserUpdateInput) (*struct{}, error) {
 		err := stores.NewRoleStore(relationalDB).RemoveRoleFromUser(input.Body.UserID, input.Body.RoleID)
 		if err != nil {
 			return nil, handleError(err)
