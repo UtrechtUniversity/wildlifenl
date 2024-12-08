@@ -22,6 +22,11 @@ type MessageAddInput struct {
 	Body *models.MessageRecord `json:"message"`
 }
 
+type MessageDeleteInput struct {
+	Input
+	ID string `path:"id" format:"uuid" doc:"The ID of the message to be deleted."`
+}
+
 type messageOperations Operations
 
 func newMessageOperations() *messageOperations {
@@ -113,5 +118,22 @@ func (o *messageOperations) RegisterAdd(api huma.API) {
 			return nil, handleError(err)
 		}
 		return &MessageHolder{Body: message}, nil
+	})
+}
+
+func (o *messageOperations) RegisterDelete(api huma.API) {
+	name := "Delete Message"
+	description := "Delete a message."
+	path := "/" + o.Endpoint + "/{id}"
+	scopes := []string{}
+	method := http.MethodDelete
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *MessageDeleteInput) (*struct{}, error) {
+		err := stores.NewMessageStore(relationalDB).Delete(input.ID, input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return nil, nil
 	})
 }

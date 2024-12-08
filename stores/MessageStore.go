@@ -2,6 +2,7 @@ package stores
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 )
@@ -83,20 +84,6 @@ func (s *MessageStore) Add(message *models.MessageRecord) (*models.Message, erro
 	return s.Get(id)
 }
 
-/*
-func (s *MessageStore) GetByUser(userID string) ([]models.Message, error) {
-	query := s.query + `
-		WHERE u."ID" = $1
-		`
-	rows, err := s.relationalDB.Query(query, userID)
-	result, err := s.process(rows, err)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-*/
-
 func (s *MessageStore) GetByExperiment(experimentID string) ([]models.Message, error) {
 	query := s.query + `
 		WHERE e."ID" = $1
@@ -107,4 +94,40 @@ func (s *MessageStore) GetByExperiment(experimentID string) ([]models.Message, e
 		return nil, err
 	}
 	return result, nil
+}
+
+func (s *MessageStore) Delete(messageID string, userID string) error {
+	query := `
+		WITH deleted AS (
+			DELETE FROM "message" m
+			USING "experiment" e 
+			WHERE m."ID" = $1
+			AND e."userID" = $2
+			AND e.start > NOW()
+			RETURNING m."ID"
+		)
+		SELECT 
+			CASE 
+				WHEN NOT EXISTS (SELECT 1 FROM "message" WHERE "ID" = $1) THEN 'INVALID'
+				WHEN NOT EXISTS (SELECT 1 FROM "message" m JOIN "experiment" e ON m."experimentID" = e."ID" WHERE m."ID" = $1 AND e."userID" = $2) THEN 'USER'
+				WHEN EXISTS (SELECT 1 FROM "message" WHERE "ID" = $1) AND NOT EXISTS (SELECT 1 FROM deleted) THEN 'STARTED'
+				WHEN EXISTS (SELECT 1 FROM deleted) THEN 'OK'
+			END AS result;
+	`
+	var state string
+	row := s.relationalDB.QueryRow(query, messageID, userID)
+	if err := row.Scan(&state); err != nil {
+		return err
+	}
+	switch state {
+	case "INVALID":
+		return &ErrRecordInattainable{message: "message was not found"}
+	case "USER":
+		return &ErrRecordInattainable{message: "message does not exist for the current user"}
+	case "STARTED":
+		return &ErrRecordImmutable{message: "cannot delete message for an experiment that has started"}
+	case "OK":
+		return nil
+	}
+	return errors.New("unknown error")
 }
