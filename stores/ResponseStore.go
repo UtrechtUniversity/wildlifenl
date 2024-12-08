@@ -15,6 +15,7 @@ func NewResponseStore(db *sql.DB) *ResponseStore {
 		SELECT r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", i."ID", i."timestamp", i."description", i."location", u."ID", u."name", t."ID", t."name", t."description", COALESCE(a."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(a."text", ''), COALESCE(a."index", 0)
 		FROM "response" r
 		INNER JOIN "question" q ON q."ID" = r."questionID"
+		INNER JOIN "questionnaire" n ON q."questionnaireID" = n."ID"
 		INNER JOIN "interaction" i ON i."ID" = r."interactionID"
 		INNER JOIN "user" u ON u."ID" = i."userID"
 		INNER JOIN "interactionType" t ON t."ID" = i."typeID"
@@ -56,6 +57,18 @@ func (s *ResponseStore) Get(responseID string) (*models.Response, error) {
 		return nil, nil
 	}
 	return &result[0], nil
+}
+
+func (s *ResponseStore) GetByQuestionnaire(questionnaireID string) ([]models.Response, error) {
+	query := s.query + `
+		WHERE n."ID" = $1
+		`
+	rows, err := s.relationalDB.Query(query, questionnaireID)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (s *ResponseStore) Add(userID string, response *models.ResponseRecord) (*models.Response, error) {

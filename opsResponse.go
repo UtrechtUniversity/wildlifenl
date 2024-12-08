@@ -14,6 +14,10 @@ type ResponseHolder struct {
 	Body *models.Response `json:"response"`
 }
 
+type ResponsesHolder struct {
+	Body []models.Response `json:"responses"`
+}
+
 type ResponseAddInput struct {
 	Input
 	Body *models.ResponseRecord `json:"response"`
@@ -23,6 +27,25 @@ type responseOperations Operations
 
 func newResponseOperations() *responseOperations {
 	return &responseOperations{Endpoint: "response"}
+}
+
+func (o *responseOperations) RegisterGetByQuestionnaire(api huma.API) {
+	name := "Get Responses by Questionnaire"
+	description := "Retrieve responses for a specific questionnaire."
+	path := "/" + o.Endpoint + "s/questionnaire/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" format:"uuid" doc:"The ID of the questionnaire to retrieve responses for."`
+	}) (*ResponsesHolder, error) {
+		responses, err := stores.NewResponseStore(relationalDB).GetByQuestionnaire(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &ResponsesHolder{Body: responses}, nil
+	})
 }
 
 func (o *responseOperations) RegisterAdd(api huma.API) {
