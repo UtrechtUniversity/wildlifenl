@@ -13,7 +13,7 @@ func NewQuestionStore(db *sql.DB) *QuestionStore {
 	s := QuestionStore{
 		relationalDB: db,
 		query: `
-		SELECT q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", q."openResponseFormat", COALESCE(a."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(a."text", ''), COALESCE(a."index", 0)
+		SELECT q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", q."openResponseFormat", COALESCE(a."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(a."text", ''), COALESCE(a."index", 0), a."nextQuestionID"
 		FROM "question" q
 		LEFT JOIN "answer" a ON a."questionID" = q."ID"
 		`,
@@ -30,7 +30,7 @@ func (s *QuestionStore) process(rows *sql.Rows, err error) ([]models.Question, e
 	for rows.Next() {
 		var q models.Question
 		var a models.Answer
-		if err := rows.Scan(&q.ID, &q.Text, &q.Description, &q.Index, &q.AllowMultipleResponse, &q.AllowOpenResponse, &q.OpenResponseFormat, &a.ID, &a.Text, &a.Index); err != nil {
+		if err := rows.Scan(&q.ID, &q.Text, &q.Description, &q.Index, &q.AllowMultipleResponse, &q.AllowOpenResponse, &q.OpenResponseFormat, &a.ID, &a.Text, &a.Index, &a.NextQuestionID); err != nil {
 			return nil, err
 		}
 		if question.ID == "" {

@@ -13,7 +13,7 @@ func NewAnswerStore(db *sql.DB) *AnswerStore {
 	s := AnswerStore{
 		relationalDB: db,
 		query: `
-		SELECT a."ID", a."text", a."index", a."nextQuestionID"
+		SELECT a."ID", a."questionID", a."text", a."index", a."nextQuestionID"
 		FROM "answer" a
 		`,
 	}
@@ -27,7 +27,7 @@ func (s *AnswerStore) process(rows *sql.Rows, err error) ([]models.Answer, error
 	answers := make([]models.Answer, 0)
 	for rows.Next() {
 		var a models.Answer
-		if err := rows.Scan(&a.ID, &a.Text, &a.Index, &a.NextQuestionID); err != nil {
+		if err := rows.Scan(&a.ID, &a.QuestionID, &a.Text, &a.Index, &a.NextQuestionID); err != nil {
 			return nil, err
 		}
 		answers = append(answers, a)
