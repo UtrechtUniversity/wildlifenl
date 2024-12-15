@@ -96,7 +96,9 @@ func (s *ExperimentStore) Update(userID string, experimentID string, experiment 
 		WITH update_query AS (
 			UPDATE "experiment"
 			SET "name" = $1, "description" = $2, "start" = $3, "end" = $4, "livingLabID" = $5
-			WHERE "ID" = $6 AND "userID" = $7 AND "start" > NOW()
+			WHERE "ID" = $6
+			AND "userID" = $7
+			AND "start" > NOW()
 			RETURNING "ID"
 		)
 		SELECT 

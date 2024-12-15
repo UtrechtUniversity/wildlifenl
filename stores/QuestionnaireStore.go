@@ -127,24 +127,48 @@ func (s *QuestionnaireStore) GetRandomByInteraction(interaction *models.Interact
 
 func (s *QuestionnaireStore) Update(userID string, questionnaireID string, questionnaire *models.QuestionnaireRecord) (*models.Questionnaire, error) {
 	query := `
-		UPDATE "questionnaire" q
-		SET "name" = $1, "identifier" = $2, "experimentID" = $3, "interactionTypeID" = $4
-		FROM "experiment" e
-		WHERE q."ID" = $5
-		AND e."userID" = $6
-		AND e."ID" = $3
-		AND e."start" > NOW()
-		RETURNING q."ID"
+		WITH update_query AS (
+			UPDATE "questionnaire" q
+			SET "name" = $1, "identifier" = $2, "interactionTypeID" = $4
+			FROM "experiment" e
+			WHERE q."ID" = $5
+			AND e."userID" = $6
+			AND e."ID" = $3
+			AND e."start" > NOW()
+			RETURNING q."ID"
+		)
+		SELECT 
+			c."ID", 
+			CASE 
+				WHEN u."ID" IS NOT NULL THEN 'OK'
+				WHEN u."ID" IS NULL THEN 'WRONG'
+				WHEN c."start" <= NOW() THEN 'STARTED'
+			END AS status
+		FROM (
+			SELECT "ID", "start"
+			FROM "experiment"
+			WHERE "ID" = $3 
+		) c
+		LEFT JOIN update_query u ON c."ID" = u."ID"
 	`
 	var id string
+	var status string
 	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.Identifier, questionnaire.ExperimentID, questionnaire.InteractionTypeID, questionnaireID, userID)
-	if err := row.Scan(&id); err != nil {
+	if err := row.Scan(&id, &status); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return s.Get(id)
+	switch status {
+	case "OK":
+		return s.Get(id)
+	case "WRONG": // It is technically possible to allow moving a questionnaire from a non-started experiment to another non-started expirement and that is why we accept experimentID in the input body of the end-point. However, for now we do not allow this as there is no user story for it.
+		return nil, &ErrRecordImmutable{message: "experimentID cannot be changed"}
+	case "STARTED":
+		return nil, &ErrRecordImmutable{message: "experiment already started"}
+	}
+	return nil, nil
 }
 
 func (s *QuestionnaireStore) addQuestions(questionnaire *models.Questionnaire) (*models.Questionnaire, error) {
