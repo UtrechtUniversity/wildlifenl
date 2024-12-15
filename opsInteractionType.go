@@ -18,7 +18,7 @@ type InteractionTypesHolder struct {
 }
 
 type InteractionTypeUpdateInput struct {
-	ID   int                     `query:"ID" doc:"The ID of the interaction type to be updated."`
+	ID   int                     `path:"id" doc:"The ID of the interaction type to be updated."`
 	Body *models.InteractionType `json:"interactionType"`
 }
 
@@ -65,7 +65,7 @@ func (o *interactionTypeOperations) RegisterAdd(api huma.API) {
 func (o *interactionTypeOperations) RegisterUpdate(api huma.API) {
 	name := "Update Interaction Type"
 	description := "Update an existing interaction type."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "/{id}"
 	scopes := []string{"administrator"}
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{

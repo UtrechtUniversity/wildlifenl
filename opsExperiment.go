@@ -24,7 +24,7 @@ type ExperimentNewInput struct {
 
 type ExperimentUpdateInput struct {
 	Input
-	ID   string                   `query:"ID" format:"uuid" doc:"The ID of the experiment to be updated."`
+	ID   string                   `path:"id" format:"uuid" doc:"The ID of the experiment to be updated."`
 	Body *models.ExperimentRecord `json:"experiment"`
 }
 
@@ -98,7 +98,7 @@ func (o *experimentOperations) RegisterGetMine(api huma.API) {
 func (o *experimentOperations) RegisterUpdate(api huma.API) {
 	name := "Update Experiment"
 	description := "Update an existing experiment that has not started yet."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "/{id}"
 	scopes := []string{"researcher"}
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{

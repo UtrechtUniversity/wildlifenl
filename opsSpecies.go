@@ -19,7 +19,7 @@ type SpecieSHolder struct {
 
 type SpeciesUpdateInput struct {
 	Input
-	ID   string          `query:"ID" format:"uuid" doc:"The ID of the species to be updated."`
+	ID   string          `path:"id" format:"uuid" doc:"The ID of the species to be updated."`
 	Body *models.Species `json:"species"`
 }
 
@@ -88,7 +88,7 @@ func (o *speciesOperations) RegisterAdd(api huma.API) {
 func (o *speciesOperations) RegisterUpdate(api huma.API) {
 	name := "Update Species"
 	description := "Update an existing species."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "/{id}"
 	scopes := []string{"administrator"}
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{

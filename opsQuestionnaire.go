@@ -24,7 +24,7 @@ type QuestionnaireAddInput struct {
 
 type QuestionnaireUpdateInput struct {
 	Input
-	ID   string                      `query:"ID" format:"uuid" doc:"The ID of the questionnaire to be updated."`
+	ID   string                      `path:"id" format:"uuid" doc:"The ID of the questionnaire to be updated."`
 	Body *models.QuestionnaireRecord `json:"questionnaire"`
 }
 
@@ -114,7 +114,7 @@ func (o *questionnaireOperations) RegisterAdd(api huma.API) {
 func (o *questionnaireOperations) RegisterUpdate(api huma.API) {
 	name := "Update Questionnaire"
 	description := "Update an existing questionnaire for which the experiment has not started yet."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "/{id}"
 	scopes := []string{"researcher"}
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
