@@ -35,7 +35,7 @@ type ExperimentDeleteInput struct {
 
 type ExperimentEndInput struct {
 	Input
-	ID string `query:"ID" format:"uuid" doc:"The ID of the experiment to be ended."`
+	ID string `path:"id" format:"uuid" doc:"The ID of the experiment to be ended."`
 }
 
 type experimentOperations Operations
