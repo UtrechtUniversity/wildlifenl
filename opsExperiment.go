@@ -135,7 +135,7 @@ func (o *experimentOperations) RegisterDelete(api huma.API) {
 func (o *experimentOperations) RegisterEnd(api huma.API) {
 	name := "End Experiment"
 	description := "End a started experiment immediately."
-	path := "/" + o.Endpoint + "/end/"
+	path := "/" + o.Endpoint + "/end/{id}"
 	scopes := []string{"researcher"}
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
