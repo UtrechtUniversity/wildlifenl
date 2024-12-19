@@ -12,6 +12,6 @@ type Response struct {
 	ResponseRecord
 	Question    Question    `json:"question" doc:"The question this response is for."`
 	Interaction Interaction `json:"interaction" doc:"The interaction this response belongs to."`
-	Answer      *Answer     `json:"answer" doc:"The answer that was selected for this response."`
+	Answer      *Answer     `json:"answer,omitempty" doc:"The answer that was selected for this response."`
 	Conveyance  *Conveyance `json:"conveyance,omitempty" doc:"The optional conveyance of a message that should be displayed to the user."`
 }
