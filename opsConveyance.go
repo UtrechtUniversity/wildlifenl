@@ -56,3 +56,22 @@ func (o *conveyanceOperations) RegisterGetMine(api huma.API) {
 		return &ConveyancesHolder{Body: conveyances}, nil
 	})
 }
+
+func (o *conveyanceOperations) RegisterGetByExperiment(api huma.API) {
+	name := "Get Conveyances By Experiment"
+	description := "Retrieve all conveyances for a specific experiment."
+	path := "/" + o.Endpoint + "s/experiment/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" format:"uuid" doc:"The ID of the experiment to retrieve conveyances for."`
+	}) (*ConveyancesHolder, error) {
+		conveyances, err := stores.NewConveyanceStore(relationalDB).GetByExperiment(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &ConveyancesHolder{Body: conveyances}, nil
+	})
+}

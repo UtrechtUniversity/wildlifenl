@@ -193,3 +193,12 @@ func (s *ConveyanceStore) AddForAlarmIDs(alarmIDs []string) error {
 	}
 	return nil
 }
+
+func (s *ConveyanceStore) GetByExperiment(experimentID string) ([]models.Conveyance, error) {
+	query := s.query + `
+		WHERE e."ID" = $1
+		ORDER BY c."timestamp" DESC
+		`
+	rows, err := s.relationalDB.Query(query, experimentID)
+	return s.process(rows, err)
+}
