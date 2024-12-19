@@ -15,8 +15,8 @@ type Experiment struct {
 	ExperimentRecord
 	User                   User       `json:"user" doc:"The User that created this experiment."`
 	LivingLab              *LivingLab `json:"livingLab,omitempty" doc:"The livingLab this experiment is bound to."`
-	NumberOfQuestionnaires *int       `json:"numberOfQuestionnaires,omitempty" doc:"The number of questionnaires associated with this experiment."`
-	NumberOfMessages       *int       `json:"numberOfMessages,omitempty" doc:"The number of messages associated with this experiment."`
-	QuestionnaireActivity  *int       `json:"questionnaireActivity,omitempty" doc:"The number of questionnaires with at least one response."`
-	MessageActivity        *int       `json:"messageActivity,omitempty" doc:"The number of conveyances."`
+	NumberOfQuestionnaires *int       `json:"numberOfQuestionnaires,omitempty" minimum:"0" doc:"The number of questionnaires associated with this experiment."`
+	NumberOfMessages       *int       `json:"numberOfMessages,omitempty" minimum:"0" doc:"The number of messages associated with this experiment."`
+	QuestionnaireActivity  *int       `json:"questionnaireActivity,omitempty" minimum:"0" doc:"The number of questionnaires with at least one response."`
+	MessageActivity        *int       `json:"messageActivity,omitempty" minimum:"0" doc:"The number of conveyances."`
 }
