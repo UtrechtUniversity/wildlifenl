@@ -46,14 +46,14 @@ func (o *borneSensorReadingOperations) RegisterGetAll(api huma.API) {
 
 func (o *borneSensorReadingOperations) RegisterGetAllBySensor(api huma.API) {
 	name := "Get BorneSensorReadings By Sensor"
-	description := "Retrieve all borne-sensor readings by sensorID."
-	path := "/" + o.Endpoint + "s/{id}"
+	description := "Retrieve all borne-sensor readings for a specific sensor."
+	path := "/" + o.Endpoint + "s/sensor/{id}"
 	scopes := []string{"land-user", "nature-area-manager", "wildlife-manager", "herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" doc:"The sensorID to retrieve borne-sensor readings for."`
+		ID string `path:"id" doc:"The ID of the sensor to retrieve borne-sensor readings for."`
 	}) (*BorneSensorReadingsHolder, error) {
 		borneSensorReadings, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).GetAllBySensorID(input.ID)
 		if err != nil {

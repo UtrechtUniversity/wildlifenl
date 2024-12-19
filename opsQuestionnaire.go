@@ -61,9 +61,9 @@ func (o *questionnaireOperations) RegisterGet(api huma.API) {
 	})
 }
 
-func (o *questionnaireOperations) RegisterGetByExperiment(api huma.API) {
-	name := "Get Questionnaires By Experiment"
-	description := "Retrieve all questionnaires by experimentID."
+func (o *questionnaireOperations) RegisterGetByExperimentDeprecated(api huma.API) {
+	name := "Get Questionnaires By Experiment [deprecated]"
+	description := "Retrieve all questionnaires by experimentID. DEPRECATED: Use Get Questionnaires By Experiment instead."
 	path := "/" + o.Endpoint + "s/{id}"
 	scopes := []string{"researcher"}
 	method := http.MethodGet
@@ -145,5 +145,24 @@ func (o *questionnaireOperations) RegisterDelete(api huma.API) {
 			return nil, handleError(err)
 		}
 		return nil, nil
+	})
+}
+
+func (o *questionnaireOperations) RegisterGetByExperiment(api huma.API) {
+	name := "Get Questionnaires By Experiment"
+	description := "Retrieve all questionnaires for a specific experiment."
+	path := "/" + o.Endpoint + "s/experiment/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" format:"uuid" doc:"The ID of the experiment to retrieve questionnaires for."`
+	}) (*QuestionnairesHolder, error) {
+		questionnaires, err := stores.NewQuestionnaireStore(relationalDB).GetByExperiment(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &QuestionnairesHolder{Body: questionnaires}, nil
 	})
 }
