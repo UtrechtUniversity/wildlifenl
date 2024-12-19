@@ -35,6 +35,7 @@ func (s *ResponseStore) process(rows *sql.Rows, err error) ([]models.Response, e
 	responses := make([]models.Response, 0)
 	for rows.Next() {
 		var r models.Response
+		r.Question.Questionnaire = new(models.Questionnaire)
 		var a models.Answer
 		var ll models.LivingLab
 		if err := rows.Scan(&r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Question.Questionnaire.ID, &r.Question.Questionnaire.Name, &r.Question.Questionnaire.Identifier, &r.Question.Questionnaire.Experiment.ID, &r.Question.Questionnaire.Experiment.Name, &r.Question.Questionnaire.Experiment.Description, &r.Question.Questionnaire.Experiment.Start, &r.Question.Questionnaire.Experiment.End, &r.Question.Questionnaire.Experiment.User.ID, &r.Question.Questionnaire.Experiment.User.Name, &ll.ID, &ll.Name, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.User.ID, &r.Interaction.User.Name, &r.Interaction.Type.ID, &r.Interaction.Type.Name, &r.Interaction.Type.Description, &a.ID, &a.Text, &a.Index); err != nil {
