@@ -12,14 +12,17 @@ func NewResponseStore(db *sql.DB) *ResponseStore {
 	s := ResponseStore{
 		relationalDB: db,
 		query: `
-		SELECT r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", i."ID", i."timestamp", i."description", i."location", u."ID", u."name", t."ID", t."name", t."description", COALESCE(a."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(a."text", ''), COALESCE(a."index", 0)
+		SELECT r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", n."ID", n."name", n."identifier", e."ID", e."name", e."description", e."start", e."end", uu."ID", uu."name", COALESCE(ll."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(ll."name", ''), i."ID", i."timestamp", i."description", i."location", u."ID", u."name", t."ID", t."name", t."description", COALESCE(a."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(a."text", ''), COALESCE(a."index", 0)
 		FROM "response" r
 		INNER JOIN "question" q ON q."ID" = r."questionID"
 		INNER JOIN "questionnaire" n ON q."questionnaireID" = n."ID"
+		INNER JOIN "experiment" e ON e."ID" = n."experimentID"
+		INNER JOIN "user" uu ON uu."ID" = e."userID"
 		INNER JOIN "interaction" i ON i."ID" = r."interactionID"
 		INNER JOIN "user" u ON u."ID" = i."userID"
 		INNER JOIN "interactionType" t ON t."ID" = i."typeID"
 		LEFT JOIN "answer" a ON a."ID" = r."answerID"
+		LEFT JOIN "livingLab" ll ON ll."ID" = e."livingLabID"
 		`,
 	}
 	return &s
@@ -33,11 +36,15 @@ func (s *ResponseStore) process(rows *sql.Rows, err error) ([]models.Response, e
 	for rows.Next() {
 		var r models.Response
 		var a models.Answer
-		if err := rows.Scan(&r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.User.ID, &r.Interaction.User.Name, &r.Interaction.Type.ID, &r.Interaction.Type.Name, &r.Interaction.Type.Description, &a.ID, &a.Text, &a.Index); err != nil {
+		var ll models.LivingLab
+		if err := rows.Scan(&r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Question.Questionnaire.ID, &r.Question.Questionnaire.Name, &r.Question.Questionnaire.Identifier, &r.Question.Questionnaire.Experiment.ID, &r.Question.Questionnaire.Experiment.Name, &r.Question.Questionnaire.Experiment.Description, &r.Question.Questionnaire.Experiment.Start, &r.Question.Questionnaire.Experiment.End, &r.Question.Questionnaire.Experiment.User.ID, &r.Question.Questionnaire.Experiment.User.Name, &ll.ID, &ll.Name, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.User.ID, &r.Interaction.User.Name, &r.Interaction.Type.ID, &r.Interaction.Type.Name, &r.Interaction.Type.Description, &a.ID, &a.Text, &a.Index); err != nil {
 			return nil, err
 		}
 		if a.ID != "00000000-0000-0000-0000-000000000000" {
 			r.Answer = &a
+		}
+		if ll.ID != "00000000-0000-0000-0000-000000000000" {
+			r.Question.Questionnaire.Experiment.LivingLab = &ll
 		}
 		responses = append(responses, r)
 	}
@@ -123,5 +130,13 @@ func (s *ResponseStore) GetForInteractionByQuestion(interactionID string, questi
 		AND q."ID" = $2
 		`
 	rows, err := s.relationalDB.Query(query, interactionID, questionID)
+	return s.process(rows, err)
+}
+
+func (s *ResponseStore) GetByExperiment(experimentID string) ([]models.Response, error) {
+	query := s.query + `
+		WHERE e."ID" = $1
+		`
+	rows, err := s.relationalDB.Query(query, experimentID)
 	return s.process(rows, err)
 }

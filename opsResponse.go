@@ -101,3 +101,22 @@ func (o *responseOperations) RegisterAdd(api huma.API) {
 		return &ResponseHolder{Body: response}, nil
 	})
 }
+
+func (o *responseOperations) RegisterGetByExperiment(api huma.API) {
+	name := "Get Responses by Experiment"
+	description := "Retrieve responses for a specific experiment."
+	path := "/" + o.Endpoint + "s/experiment/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" format:"uuid" doc:"The ID of the experiment to retrieve responses for."`
+	}) (*ResponsesHolder, error) {
+		responses, err := stores.NewResponseStore(relationalDB).GetByExperiment(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &ResponsesHolder{Body: responses}, nil
+	})
+}

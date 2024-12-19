@@ -24,8 +24,8 @@ func newConveyanceOperations() *conveyanceOperations {
 }
 
 func (o *conveyanceOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Conveyances"
-	description := "Retrieve all conveyances."
+	name := "Get All Conveyances [deprecated]"
+	description := "Retrieve all conveyances. DEPRECATED"
 	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"researcher"}
 	method := http.MethodGet
