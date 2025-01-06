@@ -13,7 +13,7 @@ func NewExperimentStore(relationalDB *sql.DB) *ExperimentStore {
 	s := ExperimentStore{
 		relationalDB: relationalDB,
 		query: `
-		SELECT e."ID", e."name", e."description", e."start", e."end", COALESCE(qc."x", 0), COALESCE(mc."x", 0), COALESCE(qa."x", 0), COALESCE(ca."x", 0), u."ID", u."name", COALESCE(l."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(l."name", '')
+		SELECT e."ID", e."name", e."description", e."start", e."end", COALESCE(qc."x", 0), COALESCE(mc."x", 0), COALESCE(qa."x", 0), COALESCE(ca."x", 0), u."ID", u."name", COALESCE(l."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(l."name", ''), COALESCE(l."definition", '((0,0))')
 		FROM "experiment" e
 		INNER JOIN "user" u ON u."ID" = e."userID"
 		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
@@ -35,7 +35,7 @@ func (s *ExperimentStore) process(rows *sql.Rows, err error) ([]models.Experimen
 		var e models.Experiment
 		var u models.User
 		var l models.LivingLab
-		if err := rows.Scan(&e.ID, &e.Name, &e.Description, &e.Start, &e.End, &e.NumberOfQuestionnaires, &e.NumberOfMessages, &e.QuestionnaireActivity, &e.MessageActivity, &u.ID, &u.Name, &l.ID, &l.Name); err != nil {
+		if err := rows.Scan(&e.ID, &e.Name, &e.Description, &e.Start, &e.End, &e.NumberOfQuestionnaires, &e.NumberOfMessages, &e.QuestionnaireActivity, &e.MessageActivity, &u.ID, &u.Name, &l.ID, &l.Name, &l.Definition); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
