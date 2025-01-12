@@ -14,22 +14,25 @@ func NewConveyanceStore(db *sql.DB) *ConveyanceStore {
 	s := ConveyanceStore{
 		relationalDB: db,
 		query: `
-		SELECT c."ID", c."timestamp", u."ID", u."name", m."ID", m."name", m."severity", m."text", e."ID", e."name", e."description", e."start", e."end", uu."ID", uu."name", COALESCE(ll."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(ll."name", ''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonName",''), r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", i."ID", i."timestamp", i."description", i."location", t."ID", t."name", t."description", COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0), COALESCE(l."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(l."timestamp",'2000-01-01'), COALESCE(z."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(z."deactivated",'200-01-01'), COALESCE(z."name",''), COALESCE(z."description",''), COALESCE(z."area",'<(0,0),1>') 
+		SELECT c."ID", c."timestamp", u."ID", u."name", m."ID", m."name", m."severity", m."text", m."trigger", m."encounterMeters", m."encounterMinutes", e."ID", e."name", e."description", e."start", e."end", uu."ID", uu."name", COALESCE(ll."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(ll."name", ''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonName",''), r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", i."ID", i."timestamp", i."description", i."location", t."ID", t."name", t."description", COALESCE(is."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(is."name",''), COALESCE(is."commonName",''), COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0), COALESCE(l."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(l."timestamp",'2000-01-01'), COALESCE(z."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(z."deactivated",'200-01-01'), COALESCE(z."name",''), COALESCE(z."description",''), COALESCE(z."area",'<(0,0),1>'), COALESCE(ms."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(ms."name",''), COALESCE(ms."commonName",'') 
 		FROM "conveyance" c
 		INNER JOIN "user" u ON u."ID" = c."userID"
 		INNER JOIN "message" m ON m."ID" = c."messageID"
 		INNER JOIN "experiment" e ON e."ID" = m."experimentID"
 		INNER JOIN "user" uu ON uu."ID" = e."userID"
 		LEFT JOIN "livingLab" ll ON ll."ID" = e."livingLabID"
+		LEFT JOIN "species" ms ON ms."ID" = m."speciesID"
 		LEFT JOIN "animal" n ON n."ID" = c."animalID"
 		LEFT JOIN "species" s ON s."ID" = n."speciesID"
 		LEFT JOIN "response" r ON r."ID" = c."responseID"
 		LEFT JOIN "question" q ON q."ID" = r."questionID"
 		LEFT JOIN "interaction" i ON i."ID" = r."interactionID"
 		LEFT JOIN "interactionType" t ON t."ID" = i."typeID"
+		LEFT JOIN "species" is ON is."ID" = i."speciesID"
 		LEFT JOIN "answer" a ON a."ID" = r."answerID"
 		LEFT JOIN "alarm" l ON l."ID" = c."alarmID"
 		LEFT JOIN "zone" z ON z."ID" = l."zoneID"
+		
 		`,
 	}
 	return &s
@@ -47,7 +50,7 @@ func (s *ConveyanceStore) process(rows *sql.Rows, err error) ([]models.Conveyanc
 		var a models.Answer
 		var l models.Alarm
 		var ll models.LivingLab
-		if err := rows.Scan(&c.ID, &c.Timestamp, &c.User.ID, &c.User.Name, &c.Message.ID, &c.Message.Name, &c.Message.Severity, &c.Message.Text, &c.Message.Experiment.ID, &c.Message.Experiment.Name, &c.Message.Experiment.Description, &c.Message.Experiment.Start, &c.Message.Experiment.End, &c.Message.Experiment.User.ID, &c.Message.Experiment.User.Name, &ll.ID, &ll.Name, &n.ID, &n.Name, &n.Species.ID, &n.Species.Name, &n.Species.CommonName, &r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.Type.ID, &r.Interaction.Type.Name, &r.Interaction.Type.Description, &a.ID, &a.Text, &a.Index, &l.ID, &l.Timestamp, &l.Zone.ID, &l.Zone.Deactivated, &l.Zone.Name, &l.Zone.Description, &l.Zone.Area); err != nil {
+		if err := rows.Scan(&c.ID, &c.Timestamp, &c.User.ID, &c.User.Name, &c.Message.ID, &c.Message.Name, &c.Message.Severity, &c.Message.Text, &c.Message.Trigger, &c.Message.EncounterMeters, &c.Message.EncounterMinutes, &c.Message.Experiment.ID, &c.Message.Experiment.Name, &c.Message.Experiment.Description, &c.Message.Experiment.Start, &c.Message.Experiment.End, &c.Message.Experiment.User.ID, &c.Message.Experiment.User.Name, &ll.ID, &ll.Name, &n.ID, &n.Name, &n.Species.ID, &n.Species.Name, &n.Species.CommonName, &r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.Type.ID, &r.Interaction.Type.Name, &r.Interaction.Type.Description, &r.Interaction.Species.ID, &r.Interaction.Species.Name, &r.Interaction.Species.CommonName, &a.ID, &a.Text, &a.Index, &l.ID, &l.Timestamp, &l.Zone.ID, &l.Zone.Deactivated, &l.Zone.Name, &l.Zone.Description, &l.Zone.Area, &c.Message.Species.ID, &c.Message.Species.Name, &c.Message.Species.CommonName); err != nil {
 			return nil, err
 		}
 		if n.ID != "00000000-0000-0000-0000-000000000000" {
