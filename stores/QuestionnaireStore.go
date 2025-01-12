@@ -135,21 +135,21 @@ func (s *QuestionnaireStore) Update(userID string, questionnaireID string, quest
 			AND e."userID" = $6
 			AND e."ID" = $3
 			AND e."start" > NOW()
-			RETURNING q."ID"
+			RETURNING q."ID", q."experimentID"
 		)
 		SELECT 
-			c."ID", 
+			u."ID", 
 			CASE 
-				WHEN u."ID" IS NOT NULL THEN 'OK'
-				WHEN u."ID" IS NULL THEN 'WRONG'
 				WHEN c."start" <= NOW() THEN 'STARTED'
+				WHEN u."ID" IS NULL THEN 'WRONG'	
+				WHEN u."ID" IS NOT NULL THEN 'OK'
 			END AS status
 		FROM (
 			SELECT "ID", "start"
 			FROM "experiment"
 			WHERE "ID" = $3 
 		) c
-		LEFT JOIN update_query u ON c."ID" = u."ID"
+		LEFT JOIN update_query u ON c."ID" = u."experimentID"
 	`
 	var id string
 	var status string
