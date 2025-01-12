@@ -49,8 +49,8 @@ func (s *ConveyanceStore) process(rows *sql.Rows, err error) ([]models.Conveyanc
 		var a models.Answer
 		var l models.Alarm
 		var ll models.LivingLab
-		c.Message.Species = new(models.Species)
-		if err := rows.Scan(&c.ID, &c.Timestamp, &c.User.ID, &c.User.Name, &c.Message.ID, &c.Message.Name, &c.Message.Severity, &c.Message.Text, &c.Message.Trigger, &c.Message.EncounterMeters, &c.Message.EncounterMinutes, &c.Message.Experiment.ID, &c.Message.Experiment.Name, &c.Message.Experiment.Description, &c.Message.Experiment.Start, &c.Message.Experiment.End, &c.Message.Experiment.User.ID, &c.Message.Experiment.User.Name, &ll.ID, &ll.Name, &n.ID, &n.Name, &n.Species.ID, &n.Species.Name, &n.Species.CommonName, &r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.Type.ID, &r.Interaction.Type.Name, &r.Interaction.Type.Description, &r.Interaction.Species.ID, &r.Interaction.Species.Name, &r.Interaction.Species.CommonName, &a.ID, &a.Text, &a.Index, &l.ID, &l.Timestamp, &l.Zone.ID, &l.Zone.Deactivated, &l.Zone.Name, &l.Zone.Description, &l.Zone.Area, &c.Message.Species.ID, &c.Message.Species.Name, &c.Message.Species.CommonName); err != nil {
+		var s models.Species
+		if err := rows.Scan(&c.ID, &c.Timestamp, &c.User.ID, &c.User.Name, &c.Message.ID, &c.Message.Name, &c.Message.Severity, &c.Message.Text, &c.Message.Trigger, &c.Message.EncounterMeters, &c.Message.EncounterMinutes, &c.Message.Experiment.ID, &c.Message.Experiment.Name, &c.Message.Experiment.Description, &c.Message.Experiment.Start, &c.Message.Experiment.End, &c.Message.Experiment.User.ID, &c.Message.Experiment.User.Name, &ll.ID, &ll.Name, &n.ID, &n.Name, &n.Species.ID, &n.Species.Name, &n.Species.CommonName, &r.ID, &r.Text, &r.Question.ID, &r.Question.Text, &r.Question.Description, &r.Question.Index, &r.Question.AllowMultipleResponse, &r.Question.AllowOpenResponse, &r.Interaction.ID, &r.Interaction.Timestamp, &r.Interaction.Description, &r.Interaction.Location, &r.Interaction.Type.ID, &r.Interaction.Type.Name, &r.Interaction.Type.Description, &r.Interaction.Species.ID, &r.Interaction.Species.Name, &r.Interaction.Species.CommonName, &a.ID, &a.Text, &a.Index, &l.ID, &l.Timestamp, &l.Zone.ID, &l.Zone.Deactivated, &l.Zone.Name, &l.Zone.Description, &l.Zone.Area, &s.ID, &s.Name, &s.CommonName); err != nil {
 			return nil, err
 		}
 		if n.ID != "00000000-0000-0000-0000-000000000000" {
@@ -68,6 +68,9 @@ func (s *ConveyanceStore) process(rows *sql.Rows, err error) ([]models.Conveyanc
 		}
 		if ll.ID != "00000000-0000-0000-0000-000000000000" {
 			c.Message.Experiment.LivingLab = &ll
+		}
+		if s.ID != "00000000-0000-0000-0000-000000000000" {
+			c.Message.Species = &s
 		}
 		conveyances = append(conveyances, c)
 	}
