@@ -14,7 +14,7 @@ func NewConveyanceStore(db *sql.DB) *ConveyanceStore {
 	s := ConveyanceStore{
 		relationalDB: db,
 		query: `
-		SELECT c."ID", c."timestamp", u."ID", u."name", m."ID", m."name", m."severity", m."text", m."trigger", m."encounterMeters", m."encounterMinutes", e."ID", e."name", e."description", e."start", e."end", uu."ID", uu."name", COALESCE(ll."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(ll."name", ''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonName",''), r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", i."ID", i."timestamp", i."description", i."location", t."ID", t."name", t."description", COALESCE(is."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(is."name",''), COALESCE(is."commonName",''), COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0), COALESCE(l."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(l."timestamp",'2000-01-01'), COALESCE(z."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(z."deactivated",'200-01-01'), COALESCE(z."name",''), COALESCE(z."description",''), COALESCE(z."area",'<(0,0),1>'), COALESCE(ms."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(ms."name",''), COALESCE(ms."commonName",'') 
+		SELECT c."ID", c."timestamp", u."ID", u."name", m."ID", m."name", m."severity", m."text", m."trigger", m."encounterMeters", m."encounterMinutes", e."ID", e."name", e."description", e."start", e."end", uu."ID", uu."name", COALESCE(ll."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(ll."name", ''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(s."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonName",''), r."ID", r."text", q."ID", q."text", q."description", q."index", q."allowMultipleResponse", q."allowOpenResponse", i."ID", i."timestamp", i."description", i."location", t."ID", t."name", t."description", COALESCE(ts."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(ts."name",''), COALESCE(ts."commonName",''), COALESCE(a."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(a."text",''), COALESCE(a."index",0), COALESCE(l."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(l."timestamp",'2000-01-01'), COALESCE(z."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(z."deactivated",'200-01-01'), COALESCE(z."name",''), COALESCE(z."description",''), COALESCE(z."area",'<(0,0),1>'), COALESCE(ms."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(ms."name",''), COALESCE(ms."commonName",'') 
 		FROM "conveyance" c
 		INNER JOIN "user" u ON u."ID" = c."userID"
 		INNER JOIN "message" m ON m."ID" = c."messageID"
@@ -28,11 +28,10 @@ func NewConveyanceStore(db *sql.DB) *ConveyanceStore {
 		LEFT JOIN "question" q ON q."ID" = r."questionID"
 		LEFT JOIN "interaction" i ON i."ID" = r."interactionID"
 		LEFT JOIN "interactionType" t ON t."ID" = i."typeID"
-		LEFT JOIN "species" is ON is."ID" = i."speciesID"
+		LEFT JOIN "species" ts ON ts."ID" = i."speciesID"
 		LEFT JOIN "answer" a ON a."ID" = r."answerID"
 		LEFT JOIN "alarm" l ON l."ID" = c."alarmID"
 		LEFT JOIN "zone" z ON z."ID" = l."zoneID"
-		
 		`,
 	}
 	return &s
