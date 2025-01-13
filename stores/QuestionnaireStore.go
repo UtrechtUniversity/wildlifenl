@@ -154,7 +154,7 @@ func (s *QuestionnaireStore) Update(userID string, questionnaireID string, quest
 	var id *string
 	var status string
 	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.Identifier, questionnaire.ExperimentID, questionnaire.InteractionTypeID, questionnaireID, userID)
-	if err := row.Scan(id, &status); err != nil {
+	if err := row.Scan(&id, &status); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
