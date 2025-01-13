@@ -151,10 +151,10 @@ func (s *QuestionnaireStore) Update(userID string, questionnaireID string, quest
 		) c
 		LEFT JOIN update_query u ON c."ID" = u."experimentID"
 	`
-	var id string
+	var id *string
 	var status string
 	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.Identifier, questionnaire.ExperimentID, questionnaire.InteractionTypeID, questionnaireID, userID)
-	if err := row.Scan(&id, &status); err != nil {
+	if err := row.Scan(id, &status); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -162,7 +162,7 @@ func (s *QuestionnaireStore) Update(userID string, questionnaireID string, quest
 	}
 	switch status {
 	case "OK":
-		return s.Get(id)
+		return s.Get(*id)
 	case "WRONG": // It is technically possible to allow moving a questionnaire from a non-started experiment to another non-started expirement and that is why we accept experimentID in the input body of the end-point. However, for now we do not allow this as there is no user story for it.
 		return nil, &ErrRecordImmutable{message: "experimentID cannot be changed"}
 	case "STARTED":
