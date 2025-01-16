@@ -65,7 +65,7 @@ func (o *responseOperations) RegisterAdd(api huma.API) {
 		if !question.AllowOpenResponse && input.Body.Text != nil {
 			return nil, huma.Error400BadRequest("question (" + question.ID + ") does not allow open responses, therefore field 'text' must not be present")
 		}
-		if question.AllowOpenResponse && question.OpenResponseFormat != nil {
+		if question.AllowOpenResponse && question.OpenResponseFormat != nil && input.Body.Text != nil {
 			r, err := regexp.Compile(*question.OpenResponseFormat)
 			if err != nil {
 				return nil, handleError(err)
