@@ -1,0 +1,18 @@
+ALTER TABLE "species"
+	ALTER COLUMN "category" TYPE VARCHAR,
+	ALTER COLUMN "category" SET NOT NULL,
+	ALTER COLUMN "category" SET DEFAULT '';
+ALTER TABLE "species"
+	ADD "behaviour" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "species"
+	ALTER COLUMN "advice" TYPE TEXT,
+	ALTER COLUMN "advice" SET NOT NULL,
+	ALTER COLUMN "advice" SET DEFAULT '';
+ALTER TABLE "species"
+	RENAME COLUMN "didYouKnow" TO "roleInNature";
+ALTER TABLE "species"
+	ALTER COLUMN "roleInNature" TYPE TEXT,
+	ALTER COLUMN "roleInNature" SET NOT NULL,
+	ALTER COLUMN "roleInNature" SET DEFAULT '';
+ALTER TABLE "species"
+	ADD "description" TEXT NOT NULL DEFAULT '';

@@ -12,7 +12,7 @@ func NewSpeciesStore(db *sql.DB) *SpeciesStore {
 	s := SpeciesStore{
 		relationalDB: db,
 		query: `
-		SELECT s."ID", s."name", s."commonName", s."category", s."advice", s."didYouKnow"
+		SELECT s."ID", s."name", s."commonName", s."category", s."advice", s."roleInNature", s."description", s."behaviour"
 		FROM "species" s
 		`,
 	}
@@ -26,7 +26,7 @@ func (s *SpeciesStore) process(rows *sql.Rows, err error) ([]models.Species, err
 	speciesX := make([]models.Species, 0)
 	for rows.Next() {
 		var s models.Species
-		if err := rows.Scan(&s.ID, &s.Name, &s.CommonName, &s.Category, &s.Advice, &s.DidYouKnow); err != nil {
+		if err := rows.Scan(&s.ID, &s.Name, &s.CommonName, &s.Category, &s.Advice, &s.RoleInNature, &s.Description, &s.Behaviour); err != nil {
 			return nil, err
 		}
 		speciesX = append(speciesX, s)
@@ -59,11 +59,11 @@ func (s *SpeciesStore) GetAll() ([]models.Species, error) {
 
 func (s *SpeciesStore) Add(species *models.Species) (*models.Species, error) {
 	query := `
-		INSERT INTO "species"("name", "commonName", "category", "advice", "didYouKnow") VALUES($1, $2, $3, $4, $5)
+		INSERT INTO "species"("name", "commonName", "category", "advice", "roleInNature", "description", "behaviour") VALUES($1, $2, $3, $4, $5)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, species.Name, species.CommonName, species.Category, species.Advice, species.DidYouKnow)
+	row := s.relationalDB.QueryRow(query, species.Name, species.CommonName, species.Category, species.Advice, species.RoleInNature, species.Description, species.Behaviour)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
@@ -72,12 +72,12 @@ func (s *SpeciesStore) Add(species *models.Species) (*models.Species, error) {
 
 func (s *SpeciesStore) Update(speciesID string, species *models.Species) (*models.Species, error) {
 	query := `
-		UPDATE "species" SET "name" = $2, "commonName" = $3, "category" = $4, "advice" = $5, "didYouKnow" = $6
+		UPDATE "species" SET "name" = $2, "commonName" = $3, "category" = $4, "advice" = $5, "roleInNature" = $6, "description" = $7, "behaviour" = $8
 		WHERE "ID" = $1
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, speciesID, species.Name, species.CommonName, species.Category, species.Advice, species.DidYouKnow)
+	row := s.relationalDB.QueryRow(query, speciesID, species.Name, species.CommonName, species.Category, species.Advice, species.RoleInNature, species.Description, species.Behaviour)
 	if err := row.Scan(&id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
