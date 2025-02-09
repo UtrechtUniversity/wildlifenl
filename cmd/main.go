@@ -110,7 +110,7 @@ func main() {
 	}
 
 	config.AdminEmailAddress = os.Getenv("ADMIN_EMAIL_ADDRESS")
-	if config.EmailPassword == "" {
+	if config.AdminEmailAddress == "" {
 		log.Fatal("environment variable ADMIN_EMAIL_ADDRESS cannot be empty")
 	}
 
