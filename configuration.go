@@ -19,4 +19,5 @@ type Configuration struct {
 	EmailHost                       string
 	EmailUser                       string
 	EmailPassword                   string
+	AdminEmailAddress               string
 }

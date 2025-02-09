@@ -109,6 +109,11 @@ func main() {
 		log.Fatal("environment variable EMAIL_PASS cannot be empty")
 	}
 
+	config.AdminEmailAddress = os.Getenv("ADMIN_EMAIL_ADDRESS")
+	if config.EmailPassword == "" {
+		log.Fatal("environment variable ADMIN_EMAIL_ADDRESS cannot be empty")
+	}
+
 	if err := migrateDatabase(config); err != nil {
 		log.Fatal("Database migration error:", err)
 	}

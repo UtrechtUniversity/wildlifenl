@@ -2,6 +2,7 @@ package wildlifenl
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"math/rand/v2"
@@ -44,6 +45,10 @@ func Start(config *Configuration) error {
 	if err := timeseriesDB.CreateBucketIfNotExists("humans"); err != nil {
 		return fmt.Errorf("could not create Timeseries bucket: %w", err)
 	}
+	if err := assertAdminUserExists(config); err != nil {
+		return fmt.Errorf("could not asset that admin user exists: %w", err)
+	}
+
 	sessions = cache.New(time.Duration(config.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
 	authRequests = cache.New(time.Duration(config.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
 	apiConfig := huma.DefaultConfig(appName, config.Version)
@@ -150,12 +155,12 @@ func authenticate(displayNameApp, email string) error {
 		code += strconv.Itoa(rand.IntN(10))
 	}
 	userName := email[:strings.Index(email, "@")]
-	name, err := stores.NewUserStore(relationalDB).GetNameFromEmail(email)
+	user, err := stores.NewUserStore(relationalDB).GetByEmail(email)
 	if err != nil {
 		return err
 	}
-	if name != "" {
-		userName = name
+	if user != nil {
+		userName = user.Name
 	}
 	if err := mailer.SendCode(displayNameApp, userName, email, code); err != nil {
 		return err
@@ -216,4 +221,41 @@ func flushSession(userID string) {
 	if selectedKey != "" {
 		sessions.Delete(selectedKey)
 	}
+}
+
+func assertAdminUserExists(config *Configuration) error {
+	roles, err := stores.NewRoleStore(relationalDB).GetAll()
+	if err != nil {
+		return err
+	}
+	var admin models.Role
+	for _, r := range roles {
+		if r.Name == "administrator" {
+			admin = r
+			break
+		}
+	}
+	if admin.ID <= 0 {
+		return errors.New("no administrator role was found in the relational database")
+	}
+	user, err := stores.NewUserStore(relationalDB).GetByEmail(config.AdminEmailAddress)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		user, err = stores.NewUserStore(relationalDB).CreateWithoutCredentials(config.AdminEmailAddress)
+		if err != nil {
+			return err
+		}
+	}
+	profile, err := stores.NewProfileStore(relationalDB).Get(user.ID)
+	if err != nil {
+		return err
+	}
+	for _, r := range profile.Roles {
+		if r.ID == admin.ID {
+			return nil
+		}
+	}
+	return stores.NewRoleStore(relationalDB).AddRoleToUser(profile.ID, admin.ID)
 }

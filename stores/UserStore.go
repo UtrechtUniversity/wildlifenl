@@ -76,17 +76,29 @@ func (s *UserStore) UpdateLocation(userID string, location models.Point, timesta
 	return s.Get(*id)
 }
 
-func (s *UserStore) GetNameFromEmail(email string) (string, error) {
+func (s *UserStore) GetByEmail(email string) (*models.User, error) {
 	query := s.query + `
 		WHERE "email" = $1
 	`
 	rows, err := s.relationalDB.Query(query, email)
 	result, err := s.process(rows, err)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if len(result) != 1 {
-		return "", nil
+		return nil, nil
 	}
-	return result[0].Name, nil
+	return &result[0], nil
+}
+
+func (s *UserStore) CreateWithoutCredentials(email string) (*models.User, error) {
+	query := `
+		INSERT INTO "user"("name", "email") VALUES($1, $2) 
+		RETURNING "ID"
+	`
+	var id string
+	if err := s.relationalDB.QueryRow(query, "", email).Scan(&id); err != nil {
+		return nil, err
+	}
+	return s.Get(id)
 }
