@@ -54,7 +54,6 @@ func (t *Timeseries) CreateBucketIfNotExists(name string) error {
 		}
 	}
 	if !bucketExists {
-		// TODO: Does not find organization???????
 		organization, err := t.client.OrganizationsAPI().FindOrganizationByName(context.Background(), t.organization)
 		if err != nil {
 			return err
