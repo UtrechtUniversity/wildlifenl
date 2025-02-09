@@ -44,6 +44,28 @@ func newExperimentOperations() *experimentOperations {
 	return &experimentOperations{Endpoint: "experiment"}
 }
 
+func (o *experimentOperations) RegisterGet(api huma.API) {
+	name := "Get Experiment By ID"
+	description := "Retrieve a specific experiment by ID."
+	path := "/" + o.Endpoint + "/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" format:"uuid" doc:"The ID of the experiment to retrieve."`
+	}) (*ExperimentHolder, error) {
+		experiment, err := stores.NewExperimentStore(relationalDB).Get(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		if experiment == nil {
+			return nil, generateNotFoundByIDError(o.Endpoint, input.ID)
+		}
+		return &ExperimentHolder{Body: experiment}, nil
+	})
+}
+
 func (o *experimentOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Experiments"
 	description := "Retrieve all experiments."
