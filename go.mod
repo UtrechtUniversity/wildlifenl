@@ -3,7 +3,7 @@ module github.com/UtrechtUniversity/wildlifenl
 go 1.22.6
 
 require (
-	github.com/danielgtaylor/huma/v2 v2.28.0
+	github.com/danielgtaylor/huma/v2 v2.23.0
 	github.com/go-mail/mail v2.3.1+incompatible
 	github.com/golang-migrate/migrate/v4 v4.18.2
 	github.com/google/uuid v1.6.0
