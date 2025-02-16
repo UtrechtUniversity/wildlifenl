@@ -54,6 +54,9 @@ func handleError(err error) error {
 				text = detail[4:strings.LastIndex(detail, ")")+1] + " does not exist."
 			}
 			return huma.Error400BadRequest(text)
+		case "23505": // violates primary key constraint
+			text := detail
+			return huma.Error400BadRequest(text)
 		case "23514": // violates check constraint
 			text := strings.ReplaceAll(message, "new row for relation", "cannot add or update")
 			text = strings.ReplaceAll(text, "violates", "because it violates")
