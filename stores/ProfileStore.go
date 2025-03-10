@@ -26,43 +26,45 @@ func (s *ProfileStore) process(rows *sql.Rows, err error) ([]models.Profile, err
 	if err != nil {
 		return nil, err
 	}
-	users := make([]models.Profile, 0)
-	var user models.Profile
+	profiles := make([]models.Profile, 0)
+	var p models.Profile
 	for rows.Next() {
-		var userID string
-		var userName string
-		var userEmail string
-		var userLocation *models.Point
-		var userLocationTimestamp *time.Time
-		var userDateOfBirth *string
-		var userGender *string
-		var userPostcode *string
-		var userDescription *string
+		var id string
+		var name string
+		var email string
+		var location *models.Point
+		var locationTimestamp *time.Time
+		var dateOfBirth *string
+		var gender *string
+		var postcode *string
+		var description *string
 		var r models.Role
-		if err := rows.Scan(&userID, &userName, &userEmail, &userLocation, &userLocationTimestamp, &userDateOfBirth, &userGender, &userPostcode, &userDescription, &r.ID, &r.Name); err != nil {
+		if err := rows.Scan(&id, &name, &email, &location, &locationTimestamp, &dateOfBirth, &gender, &postcode, &description, &r.ID, &r.Name); err != nil {
 			return nil, err
 		}
-		if user.ID != "" && user.ID != userID {
-			users = append(users, user)
-			user = models.Profile{}
+		if p.ID != id {
+			if p.ID != "" {
+				profiles = append(profiles, p)
+				p = models.Profile{}
+			}
+			p.ID = id
+			p.Name = name
+			p.Email = email
+			p.Location = location
+			p.LocationTimestamp = locationTimestamp
+			p.DateOfBirth = dateOfBirth
+			p.Gender = gender
+			p.Postcode = postcode
+			p.Description = description
 		}
-		user.ID = userID
-		user.Name = userName
-		user.Email = userEmail
-		user.Location = userLocation
-		user.LocationTimestamp = userLocationTimestamp
-		user.DateOfBirth = userDateOfBirth
-		user.Gender = userGender
-		user.Postcode = userPostcode
-		user.Description = userDescription
 		if r.ID > 0 {
-			user.Roles = append(user.Roles, r)
+			p.Roles = append(p.Roles, r)
 		}
 	}
-	if user.ID != "" {
-		users = append(users, user)
+	if p.ID != "" {
+		profiles = append(profiles, p)
 	}
-	return users, nil
+	return profiles, nil
 }
 
 func (s *ProfileStore) Get(userID string) (*models.Profile, error) {
@@ -81,7 +83,10 @@ func (s *ProfileStore) Get(userID string) (*models.Profile, error) {
 }
 
 func (s *ProfileStore) GetAll() ([]models.Profile, error) {
-	rows, err := s.relationalDB.Query(s.query)
+	query := s.query + `
+		ORDER BY u."ID"
+	`
+	rows, err := s.relationalDB.Query(query)
 	return s.process(rows, err)
 }
 
