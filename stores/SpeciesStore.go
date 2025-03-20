@@ -59,7 +59,7 @@ func (s *SpeciesStore) GetAll() ([]models.Species, error) {
 
 func (s *SpeciesStore) Add(species *models.Species) (*models.Species, error) {
 	query := `
-		INSERT INTO "species"("name", "commonName", "category", "advice", "roleInNature", "description", "behaviour") VALUES($1, $2, $3, $4, $5)
+		INSERT INTO "species"("name", "commonName", "category", "advice", "roleInNature", "description", "behaviour") VALUES($1, $2, $3, $4, $5, $6, $7)
 		RETURNING "ID"
 	`
 	var id string
