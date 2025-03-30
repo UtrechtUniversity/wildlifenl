@@ -46,8 +46,8 @@ func (o *userOperations) RegisterGet(api huma.API) {
 }
 
 func (o *userOperations) RegisterGetAll(api huma.API) {
-	name := "Get all Users"
-	description := "Retrieve all users."
+	name := "Get all Users [deprecated]"
+	description := "Retrieve all users. - Note that this end-point is deprecated and will be removed in the near future."
 	path := "/" + o.Endpoint + "s/"
 	scopes := []string{}
 	method := http.MethodGet
