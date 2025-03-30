@@ -91,13 +91,17 @@ func (s *UserStore) GetByEmail(email string) (*models.User, error) {
 	return &result[0], nil
 }
 
-func (s *UserStore) CreateWithoutCredentials(email string) (*models.User, error) {
+func (s *UserStore) Add(user *models.UserCreatedByAdmin) (*models.User, error) {
 	query := `
-		INSERT INTO "user"("name", "email") VALUES($1, $2) 
+		INSERT INTO "user"("name", "email") VALUES($1, LOWER($2)) 
 		RETURNING "ID"
 	`
 	var id string
-	if err := s.relationalDB.QueryRow(query, "", email).Scan(&id); err != nil {
+	row := s.relationalDB.QueryRow(query, user.Name, user.Email)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return s.Get(id)

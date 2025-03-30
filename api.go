@@ -243,7 +243,10 @@ func assertAdminUserExists(config *Configuration) error {
 		return err
 	}
 	if user == nil {
-		user, err = stores.NewUserStore(relationalDB).CreateWithoutCredentials(config.AdminEmailAddress)
+		defaultAdminUser := models.UserCreatedByAdmin{}
+		defaultAdminUser.Name = "_Administrator_"
+		defaultAdminUser.Email = config.AdminEmailAddress
+		user, err = stores.NewUserStore(relationalDB).Add(&defaultAdminUser)
 		if err != nil {
 			return err
 		}

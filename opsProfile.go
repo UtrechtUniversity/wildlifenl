@@ -17,6 +17,11 @@ type ProfilesHolder struct {
 	Body []models.Profile `json:"profiles"`
 }
 
+type ProfileNewHolder struct {
+	Input
+	Body *models.ProfileRecord `json:"profile"`
+}
+
 type ProfileUpdateHolder struct {
 	Input
 	Body *models.ProfileRecord `json:"profile"`

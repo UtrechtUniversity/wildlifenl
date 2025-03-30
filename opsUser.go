@@ -17,6 +17,11 @@ type UsersHolder struct {
 	Body []models.User `json:"users"`
 }
 
+type UserNewHolder struct {
+	Input
+	Body *models.UserCreatedByAdmin `json:"user"`
+}
+
 type userOperations Operations
 
 func newUserOperations() *userOperations {
@@ -40,6 +45,23 @@ func (o *userOperations) RegisterGet(api huma.API) {
 		}
 		if user == nil {
 			return nil, generateNotFoundByIDError(o.Endpoint, input.ID)
+		}
+		return &UserHolder{Body: user}, nil
+	})
+}
+
+func (o *userOperations) RegisterAdd(api huma.API) {
+	name := "Add User"
+	description := "Add a new user."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"administrator"}
+	method := http.MethodPost
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *UserNewHolder) (*UserHolder, error) {
+		user, err := stores.NewUserStore(relationalDB).Add(input.Body)
+		if err != nil {
+			return nil, handleError(err)
 		}
 		return &UserHolder{Body: user}, nil
 	})
