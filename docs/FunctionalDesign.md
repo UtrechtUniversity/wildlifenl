@@ -116,8 +116,8 @@ I use, and often own, land to produce food (crops, meat, dairy) or other natural
 |View the location of wild animals (collars, camera trap images, etc.)|	… can apply preventive measures.|1|
 |Designate (point with radius)  an area of interest, i.e. my fields or farm, and receive a message (push) when animals are within this area.|	… can take measures to prevent damage to my crops, herds, etc.	|1|
 |View the movement of a group of wild animals.|	… see how my preventive measures, and those of my neighbours, affect the wild animal movements.	|1|
-|View the paths that animals take to get into my area of interest.|	… investigate whether a preventive measure is needed, or can detect and report property damage.	|2|
- 
+|View the paths that animals take to get into my area of interest.|	… investigate whether a preventive measure is needed, or can detect and report property damage.|2|
+
 ### ResearchConnect
 *Being able to access the data from the data platform to use it in my research*
 
