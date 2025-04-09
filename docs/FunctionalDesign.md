@@ -11,21 +11,20 @@ In the document ‘User Story’s.docx’, regarding the WildlifeNL user stories
 As a result, the manageable roles structure is as follows:
 
 - 👲 Recreationist
-- 🧑‍🌾 Inhabitant
-- 🧑‍💼 Natural Resource Manager
-    - Nature Area Manager
-    - Wildlife Manager
-    - Land User
-    - Herd Manager (pending)
+- 😁 Inhabitant
+- 🧑‍🌾 Agrerian
+- 😁 Nature Area Manager
+- 😁 Wildlife Manager
+- 😁 "Herd Manager" (pending)
 - 🧑‍🔬 Researcher
 - 🧑🏻‍💻 Administrator
 
 ## Applications & User Stories
 To address the objectives of the WildlifeNL project, four end-user applications have been defined and functionalities, collected from User Stories, have been added to each application. Note that functionalities with a priority of 4 or lower have been added for archiving purposes but will not receive any resources for implementation yet. Two applications are aimed at mobile use using a smartphone or tablet, whereas the other two are aimed at large screen use in a web browser on a laptop/desktop, but also functions, albeit less comfortable, in a mobile web-browser on a smartphone or tablet. All applications share data via the WildlifeNL API (see chapter Architecture). An Administrator role is defined, but no application will be created yet for this role. Current administrators will use the default user interface of the Wildlife API to activate functionalities assigned to their role.
 
-- 👲 Recreationist -> 📱 WildGids (smartphone)
-- 🧑‍🌾 Inhabitant ->📱 Wilde Buren (smartphone)
-- 🧑‍💼 Natural Resource Manager -> 💻 WildRadar (web browser)
+- 👲 Recreationist, Inhabitant -> 📱 WildGids (smartphone)
+- 🧑‍🌾 Agrerian, Wildlife Manager, Nature Area Manager ->📱 WildReport (smartphone)
+- 🧑‍💼 Nature Manager, Wildlife Manager, Herd Manager -> 💻 WildRadar (web browser)
 - 🧑‍🔬 Researcher -> 💻 ResearchConnect (web browser)
 - 🧑🏻‍💻 Administrator -> 💻 Administration (web browser)
  
@@ -33,7 +32,7 @@ To address the objectives of the WildlifeNL project, four end-user applications 
 ### WildGids
 *Being able to enjoy human-wildlife interactions and reduce possible negative encounters with wildlife to recreate confidently and well-informed in a living lab*
 
-👲 Recreationist | 📱 Smartphone App
+👲 Recreationist, Inhabitant | 📱 Smartphone App
    
 I love being in and learning about nature, but feeling safe is important to me. Learning about the wild animals around me increases my positive nature experience. Knowing how to behave around wild animals or how to interact, or not interact, with them makes me feel more secure. I enjoy the freedom to choose activities like running, cycling, horseback riding, or walking. Sometimes I like being alone in nature, other times with my family and dog, or in a larger group. It is helpful to know where wild animals are so I can plan my route accordingly. Occasionally, I find it exciting to take photos of wildlife, but I want to make sure that it is appropriate or at the right time. I find it useful to register interactions I have with wild animals as this supports researchers, and if I spot something broken, I wish to report it for maintenance. Getting a notification with information on how to behave when I am approaching a potentially dangerous animal gives me peace of mind and reduces the probability of me performing undesirable behaviour (e.g., behaviour that leads to conflict with the wild animal or that negatively affects the welfare of the wild animal). 
 
@@ -53,7 +52,7 @@ I love being in and learning about nature, but feeling safe is important to me. 
 ### Wilde Buren
 *As an inhabitant of the living lab, I live with wild animals and want to do so in a way that safeguards the well-being of myself and my property but also that of the wild animals.*
 
-🧑🏻‍🌾 Inhabitant	📱 Smartphone App
+🧑🏻‍🌾 Agrerian, Wildlife Manager, Nature Area Manager	📱 Smartphone App
   
 I want to be better aware of the wild animals around me so that I can enjoy the positive interactions but also mitigate the negative ones. Being better informed about the animals around me and about ways to promote coexistence with them increases my tolerance towards these wild animals. I want to ensure that my pastures, fields, animals, garden, house, and property are safe from damage by wild animals. Knowing how to protect my land is crucial. Understanding which animals are near my property or the road I often travel on and how to respond to their presence and interact with them can help me avoid risks. It is essential for me to receive honest and proactive information, like if there are crop-raiding animals nearby and how to respond. I need the ability to report interactions with wild animals (e.g., wild animal observations, vehicle collisions, damage to property) and clarity on potential compensation and the necessary steps. Learning more about my wild animal neighbours, who they are, what they do and why they do this, helps me understand them better and increase my tolerance. Sharing positive experiences with my wild animal neighbours with others in my neighbourhood increases our shared sense of place and belonging.
 
