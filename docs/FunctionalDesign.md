@@ -12,7 +12,7 @@ As a result, the manageable roles structure is as follows:
 
 - 👲 Recreationist
 - 😁 Inhabitant
-- 🧑‍🌾 Agrerian
+- 🧑‍🌾 Agrarian
 - 😁 Nature Area Manager
 - 😁 Wildlife Manager
 - 😁 "Herd Manager" (pending)
@@ -49,19 +49,22 @@ I love being in and learning about nature, but feeling safe is important to me. 
 
 
 
-### Wilde Buren
+### WildReport
 *As an inhabitant of the living lab, I live with wild animals and want to do so in a way that safeguards the well-being of myself and my property but also that of the wild animals.*
 
-🧑🏻‍🌾 Agrerian, Wildlife Manager, Nature Area Manager	📱 Smartphone App
+🧑🏻‍🌾 Agrarian, Wildlife Manager, Nature Area Manager	📱 Smartphone App
   
 I want to be better aware of the wild animals around me so that I can enjoy the positive interactions but also mitigate the negative ones. Being better informed about the animals around me and about ways to promote coexistence with them increases my tolerance towards these wild animals. I want to ensure that my pastures, fields, animals, garden, house, and property are safe from damage by wild animals. Knowing how to protect my land is crucial. Understanding which animals are near my property or the road I often travel on and how to respond to their presence and interact with them can help me avoid risks. It is essential for me to receive honest and proactive information, like if there are crop-raiding animals nearby and how to respond. I need the ability to report interactions with wild animals (e.g., wild animal observations, vehicle collisions, damage to property) and clarity on potential compensation and the necessary steps. Learning more about my wild animal neighbours, who they are, what they do and why they do this, helps me understand them better and increase my tolerance. Sharing positive experiences with my wild animal neighbours with others in my neighbourhood increases our shared sense of place and belonging.
 
 |Functionality|So that I …|Priority|
 |-------------|-----------|--------|
-|View the location of wild animals (collars, camera trap images, etc.)|… can apply preventive measures. … get the confirmation that wild animals do not belong in my street and garden. … can enjoy nature if I want to. … can use this information to support my property damage claim.|1|
-|Report a human-wildlife interaction and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals (sighting). … report damage that was inflicted by wild animals (property damage). … report a wild animal-vehicle collision (animal-vehicle collision). … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
-|View information on wild animal species and how to interact with them.|	… learn more about the importance of their presence and perhaps change my opinion. … get advice on how to interact with them.|2|
+|Report a human-wildlife interaction (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
+|Report a human-wildlife interaction (property damage) and fill-out the corresponding questionnaire.| … report damage that was inflicted by wild animals.  … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
+|Report a human-wildlife interaction (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
+|View the reported interactions of others on a map|… can apply preventive measures.|2|
 |Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
+|View my reported interactions|… so I can look back at the data that I provided.|2|
+|View questionnaires that are assigned to me and the answers that I gave|… so I can look back at the data that I provided.|2|
 |Designate (point with radius) an area of interest, i.e. my fields or garden, and receive a message (push) when animals are within this area.|… can take measures to prevent damage to my crops, herds, garden, etc.|4|
 |View the location where wild animals cross the roads.|	… can avoid these places or be more attentive and improve traffic safety.|4|
 |Report a maintenance notice.|	… help in providing the information to the nature area managers and the problem gets resolved quicker.|4|
