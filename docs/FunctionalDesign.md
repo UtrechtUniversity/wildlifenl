@@ -30,7 +30,7 @@ To address the objectives of the WildlifeNL project, five end-user applications 
 ### WildGids
 *Being able to enjoy human-wildlife interactions and reduce possible negative encounters with wildlife to recreate confidently and well-informed in a living lab*
 
-👲 Recreationist, 🧑🏻‍💼 Inhabitant | 📱 Smartphone App
+👲 Recreationist, 🧑🏻‍💼 Inhabitant ||| 📱 Smartphone App
    
 I love being in and learning about nature, but feeling safe is important to me. Learning about the wild animals around me increases my positive nature experience. Knowing how to behave around wild animals or how to interact, or not interact, with them makes me feel more secure. I enjoy the freedom to choose activities like running, cycling, horseback riding, or walking. Sometimes I like being alone in nature, other times with my family and dog, or in a larger group. It is helpful to know where wild animals are so I can plan my route accordingly. Occasionally, I find it exciting to take photos of wildlife, but I want to make sure that it is appropriate or at the right time. I find it useful to register interactions I have with wild animals as this supports researchers, and if I spot something broken, I wish to report it for maintenance. Getting a notification with information on how to behave when I am approaching a potentially dangerous animal gives me peace of mind and reduces the probability of me performing undesirable behaviour (e.g., behaviour that leads to conflict with the wild animal or that negatively affects the welfare of the wild animal). 
 
@@ -51,7 +51,7 @@ I love being in and learning about nature, but feeling safe is important to me. 
 ### WildReport
 *I live with wild animals and want to do so in a way that safeguards the well-being of myself and my property but also that of the wild animals.*
 
-🧑🏻‍🌾 Agrarian, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager | 📱 Smartphone App
+🧑🏻‍🌾 Agrarian, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager ||| 📱 Smartphone App
   
 I want to be better aware of the wild animals around me so that I can enjoy the positive interactions but also mitigate the negative ones. Being better informed about the animals around me and about ways to promote coexistence with them increases my tolerance towards these wild animals. I want to ensure that my pastures, fields, animals, garden, house, and property are safe from damage by wild animals. Knowing how to protect my land is crucial. Understanding which animals are near my property or the road I often travel on and how to respond to their presence and interact with them can help me avoid risks. It is essential for me to receive honest and proactive information, like if there are crop-raiding animals nearby and how to respond. I need the ability to report interactions with wild animals (e.g., wild animal observations, vehicle collisions, damage to property) and clarity on potential compensation and the necessary steps. Learning more about my wild animal neighbours, who they are, what they do and why they do this, helps me understand them better and increase my tolerance. Sharing positive experiences with my wild animal neighbours with others in my neighbourhood increases our shared sense of place and belonging.
 
@@ -73,7 +73,7 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 ### WildRadar
 *Adaptive management of wild animals and human-wildlife interactions for more positive and less negative human-wildlife interactions*
 
-🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager | 💻 Web App
+🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager ||| 💻 Web App
    
 Note that this application presents a slightly different user interface and set of functionalities dependent on the role(s) of the logged in user. Some functionalities are associated with several roles for different reasons, and some are exclusive to a specific role. It is possible for a user to have multiple roles and the application should adapt accordingly. 
 
@@ -112,7 +112,7 @@ My responsibility is to prevent or reduce damage or nuisance caused by certain w
 ### ResearchConnect
 *Being able to access the data from the data platform to use it in my research*
 
-🧑‍🔬 Researcher	💻 Web App
+🧑‍🔬 Researcher ||| 💻 Web App
  
 Regarding my research, I wish to use applications of WildlifeNL to run experiments in order to gather data that I can use to address my research objectives and/or hypotheses. To do so, I would like to create questionnaires that end-users of the applications can fill-out, and I would like to send push messages to the end-users, hopefully nudging them into certain behaviours. Lastly, I want to access the data platform in a way that allows me to extract complete datasets and/or aggregations that I can use in my own research. The data platform does not need to present the data in aesthetically appealing ways, I just need the raw data. 
 
@@ -129,7 +129,7 @@ Regarding my research, I wish to use applications of WildlifeNL to run experimen
 ### Administration
 *Assign roles to other users and manage the content of the API backend.*
 
-🧑🏻‍💻 Administrator	💻 Web App
+🧑🏻‍💻 Administrator ||| 💻 Web App
  
 To ensure that the WildifeNL API and its backend contain the correct information and this information is provided to the correct users in the other applications, I can add, edit, and disable data elements. Also, I can assign and revoke roles for other users.
 Note that no specific admin tool will be created, for now the administrators will use the default user interface of the WildlifeNL API.
