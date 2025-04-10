@@ -60,7 +60,7 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 |Functionality|So that I …|Priority|
 |-------------|-----------|--------|
 |Report a human-wildlife interaction (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
-|Report a human-wildlife interaction (property damage) and fill-out the corresponding questionnaire.| … report damage that was inflicted by wild animals.  … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
+|Report a human-wildlife interaction (asset damage) and fill-out the corresponding questionnaire.| … report damage to my asset that was inflicted by wild animals.  … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |Report a human-wildlife interaction (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |View the reported interactions of others on a map|… can apply preventive measures.|2|
 |Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
