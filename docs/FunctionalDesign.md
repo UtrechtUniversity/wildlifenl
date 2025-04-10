@@ -26,7 +26,9 @@ To address the objectives of the WildlifeNL project, five end-user applications 
 - 🧑‍🔬 Researcher -> 💻 ResearchConnect (web browser)
 - 🧑🏻‍💻 Administrator -> 💻 Administration (web browser)
  
-	
+
+
+
 ### WildGids
 *Being able to enjoy human-wildlife interactions and reduce possible negative encounters with wildlife to recreate confidently and well-informed in a living lab*
 
@@ -69,6 +71,7 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 |Report a maintenance notice.|	… help in providing the information to the nature area managers and the problem gets resolved quicker.|4|
 |Receive a message if an animal disease is reported in my neighbourhood.|… take preventive measures to protect my herd or pet.|5|
 
+
  
 ### WildRadar
 *Adaptive management of wild animals and human-wildlife interactions for more positive and less negative human-wildlife interactions*
@@ -108,6 +111,8 @@ My responsibility is to prevent or reduce damage or nuisance caused by certain w
 |View food availability for wild animals in certain areas.|	… know where animals are likely going to move to or from and can estimate where they are going for reproduction.	|5|
 |View the population sizes of wild animals.|	… can change my management strategy accordingly in order to maintain the populations as well as prevent damage.	|5|
 |Report the population sizes of wild animals.|	… can change my management strategy accordingly in order to maintain the populations as well as prevent damage.	|5|
+
+
 
 ### ResearchConnect
 *Being able to access the data from the data platform to use it in my research*
