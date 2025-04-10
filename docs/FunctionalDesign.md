@@ -7,7 +7,7 @@ This functional design provides the basis for the development of the WildlifeNL 
 To address feasibility an earlier version of this document was reviewed by the WildlifeNL consortium partners that participate in the implementation (Gamr-holding and Fontys University of Applied Sciences) and review comments have been processed in this version. 
 
 ## Roles
-In the document ‘User Story’s’, regarding the WildlifeNL user stories, 7 different roles were defined (Agrariër, Omwonende, Recreant, Faunabeheerder, Kuddebeheerder, Terreinbeheerder and Onderzoeker). Due to time limitations, initially, the functionalities that originate from the Kuddebeheerder role will not be implemented, effectively putting that role on pending. Moreover, the roles Researcher and Administrator were added later. As a result, the manageable roles structure is as follows.
+In the workshop regarding the WildlifeNL user stories, 7 different roles were defined (Agrariër, Omwonende, Recreant, Faunabeheerder, Kuddebeheerder, Terreinbeheerder and Onderzoeker). Due to time limitations, the functionalities that originate from the Kuddebeheerder role will not be implemented for now, effectively putting that role on pending. Moreover, the roles Researcher and Administrator were added later. As a result, the manageable roles structure is as follows.
 
 - 👲 Recreationist
 - 🧑🏻‍💼 Inhabitant
