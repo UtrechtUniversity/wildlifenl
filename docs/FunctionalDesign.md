@@ -7,24 +7,22 @@ This functional design provides the basis for the development of the WildlifeNL 
 To address feasibility an earlier version of this document was reviewed by the WildlifeNL consortium partners that participate in the implementation (Gamr-holding and Fontys University of Applied Sciences) and review comments have been processed in this version. 
 
 ## Roles
-In the document ‘User Story’s.docx’, regarding the WildlifeNL user stories, 7 different roles were defined (Agrariër, Omwonende, Recreant, Faunabeheerder, Kuddebeheerder, Terreinbeheerder and Onderzoeker). Because developing 7 different applications is outside of the scope of the WildlifeNL project and some of the roles appear to have large overlaps, the roles Faunabeheerder, Kuddebeheerder, Terreinbeheerder have been combined into the more generic role Natural Resource Manager, so that they can be assigned to the same application. However, due to time limitations, initially the functionalities that are originate from the Kuddebeheerder role will not be implemented, effectively putting the role Herd Manager on pending. The role Agrariër was split into two parts so that one part can be merged with Omwonende into Inhabitant and use the corresponding Smartphone App, and the other part, Land User, is added to the group of other natural resource managers that use a Web App.
-As a result, the manageable roles structure is as follows:
+In the document ‘User Story’s’, regarding the WildlifeNL user stories, 7 different roles were defined (Agrariër, Omwonende, Recreant, Faunabeheerder, Kuddebeheerder, Terreinbeheerder and Onderzoeker). Due to time limitations, initially, the functionalities that originate from the Kuddebeheerder role will not be implemented, effectively putting that role on pending. Moreover, the roles Researcher and Administrator were added later. As a result, the manageable roles structure is as follows.
 
 - 👲 Recreationist
-- 😁 Inhabitant
+- 🧑🏻‍💼 Inhabitant
 - 🧑‍🌾 Agrarian
-- 😁 Nature Area Manager
-- 😁 Wildlife Manager
-- 😁 "Herd Manager" (pending)
+- 🧝🏻 Nature Area Manager
+- 🧑🏻‍🔧 Wildlife Manager
 - 🧑‍🔬 Researcher
 - 🧑🏻‍💻 Administrator
 
 ## Applications & User Stories
-To address the objectives of the WildlifeNL project, four end-user applications have been defined and functionalities, collected from User Stories, have been added to each application. Note that functionalities with a priority of 4 or lower have been added for archiving purposes but will not receive any resources for implementation yet. Two applications are aimed at mobile use using a smartphone or tablet, whereas the other two are aimed at large screen use in a web browser on a laptop/desktop, but also functions, albeit less comfortable, in a mobile web-browser on a smartphone or tablet. All applications share data via the WildlifeNL API (see chapter Architecture). An Administrator role is defined, but no application will be created yet for this role. Current administrators will use the default user interface of the Wildlife API to activate functionalities assigned to their role.
+To address the objectives of the WildlifeNL project, five end-user applications have been defined and functionalities, collected from User Stories, have been added to each application. Note that functionalities with a priority of 4 or lower have been added for archiving purposes but will not receive any resources for implementation yet. Two applications are aimed at mobile use using a smartphone or tablet, whereas the others are aimed at large screen use in a web browser on a laptop/desktop, but also functions, albeit less comfortable, in a mobile web-browser on a smartphone or tablet. All applications share data via the WildlifeNL API (see chapter Architecture). An Administrator role is defined, but no application will be created yet for this role. Current administrators will use the default user interface of the Wildlife API to activate functionalities assigned to their role.
 
-- 👲 Recreationist, Inhabitant -> 📱 WildGids (smartphone)
-- 🧑‍🌾 Agrerian, Wildlife Manager, Nature Area Manager ->📱 WildReport (smartphone)
-- 🧑‍💼 Nature Manager, Wildlife Manager, Herd Manager -> 💻 WildRadar (web browser)
+- 👲 Recreationist, 🧑🏻‍💼 Inhabitant -> 📱 WildGids (smartphone)
+- 🧑‍🌾 Agrarian, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager ->📱 WildReport (smartphone)
+- 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager -> 💻 WildRadar (web browser)
 - 🧑‍🔬 Researcher -> 💻 ResearchConnect (web browser)
 - 🧑🏻‍💻 Administrator -> 💻 Administration (web browser)
  
@@ -32,7 +30,7 @@ To address the objectives of the WildlifeNL project, four end-user applications 
 ### WildGids
 *Being able to enjoy human-wildlife interactions and reduce possible negative encounters with wildlife to recreate confidently and well-informed in a living lab*
 
-👲 Recreationist, Inhabitant | 📱 Smartphone App
+👲 Recreationist, 🧑🏻‍💼 Inhabitant | 📱 Smartphone App
    
 I love being in and learning about nature, but feeling safe is important to me. Learning about the wild animals around me increases my positive nature experience. Knowing how to behave around wild animals or how to interact, or not interact, with them makes me feel more secure. I enjoy the freedom to choose activities like running, cycling, horseback riding, or walking. Sometimes I like being alone in nature, other times with my family and dog, or in a larger group. It is helpful to know where wild animals are so I can plan my route accordingly. Occasionally, I find it exciting to take photos of wildlife, but I want to make sure that it is appropriate or at the right time. I find it useful to register interactions I have with wild animals as this supports researchers, and if I spot something broken, I wish to report it for maintenance. Getting a notification with information on how to behave when I am approaching a potentially dangerous animal gives me peace of mind and reduces the probability of me performing undesirable behaviour (e.g., behaviour that leads to conflict with the wild animal or that negatively affects the welfare of the wild animal). 
 
@@ -40,7 +38,8 @@ I love being in and learning about nature, but feeling safe is important to me. 
 |-------------|-----------|--------|
 |View the location of wild animals (collars, camera trap images, etc.)|… can go and see them in real life and perhaps make a photograph. … can avoid them if I do not want to have an interaction with them.|1|
 |Receive a message (push) if an encounter with a wild animal is imminent (distance based).|… know how to act accordingly, or can prevent a dangerous interaction.|1|
-|Report a human-wildlife interaction and fill-out the corresponding questionnaire.|… help researchers and managers regarding presence information of wild animals (sighting). … report a wild animal-vehicle collision (animal-vehicle collision). … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
+|Report a human-wildlife interaction (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
+|Report a human-wildlife interaction (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
 |View information on wild animal species and how to interact with them.|… learn more about their behaviour, history, reasons for being in this environment, etc. … know how to behave and prevent dangerous situation.|2|
 |Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
 |Play an educational game about wild animals.|… , regardless of being a young person, remain interested in wildlife management.|3|
@@ -50,9 +49,9 @@ I love being in and learning about nature, but feeling safe is important to me. 
 
 
 ### WildReport
-*As an inhabitant of the living lab, I live with wild animals and want to do so in a way that safeguards the well-being of myself and my property but also that of the wild animals.*
+*I live with wild animals and want to do so in a way that safeguards the well-being of myself and my property but also that of the wild animals.*
 
-🧑🏻‍🌾 Agrarian, Wildlife Manager, Nature Area Manager	📱 Smartphone App
+🧑🏻‍🌾 Agrarian, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager | 📱 Smartphone App
   
 I want to be better aware of the wild animals around me so that I can enjoy the positive interactions but also mitigate the negative ones. Being better informed about the animals around me and about ways to promote coexistence with them increases my tolerance towards these wild animals. I want to ensure that my pastures, fields, animals, garden, house, and property are safe from damage by wild animals. Knowing how to protect my land is crucial. Understanding which animals are near my property or the road I often travel on and how to respond to their presence and interact with them can help me avoid risks. It is essential for me to receive honest and proactive information, like if there are crop-raiding animals nearby and how to respond. I need the ability to report interactions with wild animals (e.g., wild animal observations, vehicle collisions, damage to property) and clarity on potential compensation and the necessary steps. Learning more about my wild animal neighbours, who they are, what they do and why they do this, helps me understand them better and increase my tolerance. Sharing positive experiences with my wild animal neighbours with others in my neighbourhood increases our shared sense of place and belonging.
 
@@ -74,9 +73,9 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 ### WildRadar
 *Adaptive management of wild animals and human-wildlife interactions for more positive and less negative human-wildlife interactions*
 
-🧑‍💼 Natural Resource Manager	💻 Web App
+🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager | 💻 Web App
    
-Note that this application presents a slightly different user interface and set of functionalities dependent on the role(s) of the logged in user; Nature Area Manager, Wildlife Manager, Land User and later also Herd Manager (pending). Some functionalities are associated with several roles for different reasons, and some are exclusive to a specific role. It is possible for a user to have multiple roles and the application should adapt accordingly. 
+Note that this application presents a slightly different user interface and set of functionalities dependent on the role(s) of the logged in user. Some functionalities are associated with several roles for different reasons, and some are exclusive to a specific role. It is possible for a user to have multiple roles and the application should adapt accordingly. 
 
 #### Nature Area Manager
 I serve as a manager of nature areas and my responsibility is providing space and developing habitat for wild animals but also for humans to recreate. Within this role, I am responsible for human-wildlife interactions in my areas, where I aim to reduce negative interactions and impacts on wildlife and humans present within these areas. I am also a neighbour, e.g. with adjacent agricultural lands or villages, and in that context responsible for maintaining respectful relations with these neighbours. Since human-wildlife interactions often cross the boundaries of my areas, I also need to work with my neighbours to manage these interactions. I manage wildlife and their habitat for the benefit of biodiversity, incl. the wildlife, but also people inside and around my areas. This means I also need to manage people. I offer education and guided tours. Additionally, I survey the flora and fauna, providing advice for nature management. I may be specialized in public engagement, management, ecology, or supervision.
@@ -109,16 +108,6 @@ My responsibility is to prevent or reduce damage or nuisance caused by certain w
 |View food availability for wild animals in certain areas.|	… know where animals are likely going to move to or from and can estimate where they are going for reproduction.	|5|
 |View the population sizes of wild animals.|	… can change my management strategy accordingly in order to maintain the populations as well as prevent damage.	|5|
 |Report the population sizes of wild animals.|	… can change my management strategy accordingly in order to maintain the populations as well as prevent damage.	|5|
-
-#### Land User
-I use, and often own, land to produce food (crops, meat, dairy) or other natural resources (e.g., wood). In doing this, I affect the landscapes in which wild animals live. Through these effects, I may positively and/or negatively affect wild animal individuals and populations. Wild animals may also affect my work and production and use of natural resources. Because of this I am interested to learn about ways for us to share the landscapes we live in in ways that allow both of us to make an honest living. For this, I am interested to learn more about the wild animals on and around my land, where they live, with how many they are, why they do what they do, and how the actions that I take influence all of this.
-
-|Functionality|So that I …|Priority|
-|-------------|-----------|--------|
-|View the location of wild animals (collars, camera trap images, etc.)|	… can apply preventive measures.|1|
-|Designate (point with radius)  an area of interest, i.e. my fields or farm, and receive a message (push) when animals are within this area.|	… can take measures to prevent damage to my crops, herds, etc.	|1|
-|View the movement of a group of wild animals.|	… see how my preventive measures, and those of my neighbours, affect the wild animal movements.	|1|
-|View the paths that animals take to get into my area of interest.|	… investigate whether a preventive measure is needed, or can detect and report property damage.|2|
 
 ### ResearchConnect
 *Being able to access the data from the data platform to use it in my research*
