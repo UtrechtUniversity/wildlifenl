@@ -21,7 +21,7 @@ In the workshop regarding the WildlifeNL user stories, 7 different roles were de
 To address the objectives of the WildlifeNL project, five end-user applications have been defined and functionalities, collected from User Stories, have been added to each application. Note that functionalities with a priority of 4 or lower have been added for archiving purposes but will not receive any resources for implementation yet. Two applications are aimed at mobile use using a smartphone or tablet, whereas the others are aimed at large screen use in a web browser on a laptop/desktop, but also functions, albeit less comfortable, in a mobile web-browser on a smartphone or tablet. All applications share data via the WildlifeNL API (see chapter Architecture). An Administrator role is defined, but no application will be created yet for this role. Current administrators will use the default user interface of the Wildlife API to activate functionalities assigned to their role.
 
 - 👲 Recreationist, 🧑🏻‍💼 Inhabitant -> 📱 WildGids (smartphone)
-- 🧑‍🌾 Agrarian, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager ->📱 WildReport (smartphone)
+- 🧑‍🌾 Agrarian, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager ->📱 WildRapport (smartphone)
 - 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager -> 💻 WildRadar (web browser)
 - 🧑‍🔬 Researcher -> 💻 ResearchConnect (web browser)
 - 🧑🏻‍💻 Administrator -> 💻 Administration (web browser)
@@ -50,7 +50,7 @@ I love being in and learning about nature, but feeling safe is important to me. 
 
 
 
-### WildReport
+### WildRapport
 *I live with wild animals and want to do so in a way that safeguards the well-being of myself and my property but also that of the wild animals.*
 
 🧑🏻‍🌾 Agrarian, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager ||| 📱 Smartphone App
@@ -60,7 +60,7 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 |Functionality|So that I …|Priority|
 |-------------|-----------|--------|
 |Report a human-wildlife interaction (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
-|Report a human-wildlife interaction (asset damage) and fill-out the corresponding questionnaire.| … report damage to my asset that was inflicted by wild animals.  … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
+|Report a human-wildlife interaction (damage) and fill-out the corresponding questionnaire.| … report damage to my belongings that was inflicted by wild animals.  … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |Report a human-wildlife interaction (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |View the reported interactions of others on a map|… can apply preventive measures.|2|
 |Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
