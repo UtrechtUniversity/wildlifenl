@@ -12,7 +12,7 @@ func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
 		relationalDB: db,
 		query: `
-		SELECT i."ID", i."timestamp", i."description", i."location", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description"
+		SELECT i."ID", i."timestamp", i."description", i."location", i."moment", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description"
 		FROM "interaction" i
 		INNER JOIN "species" s ON s."ID" = i."speciesID"
 		INNER JOIN "user" u ON u."ID" = i."userID"
@@ -28,17 +28,17 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 	}
 	interactions := make([]models.Interaction, 0)
 	for rows.Next() {
-		var interaction models.Interaction
-		var species models.Species
-		var user models.User
-		var interactionType models.InteractionType
-		if err := rows.Scan(&interaction.ID, &interaction.Timestamp, &interaction.Description, &interaction.Location, &species.ID, &species.Name, &species.CommonName, &user.ID, &user.Name, &interactionType.ID, &interactionType.Name, &interactionType.Description); err != nil {
+		var i models.Interaction
+		var s models.Species
+		var u models.User
+		var t models.InteractionType
+		if err := rows.Scan(&i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Moment, &s.ID, &s.Name, &s.CommonName, &u.ID, &u.Name, &t.ID, &t.Name, &t.Description); err != nil {
 			return nil, err
 		}
-		interaction.Species = species
-		interaction.User = user
-		interaction.Type = interactionType
-		interactions = append(interactions, interaction)
+		i.Species = s
+		i.User = u
+		i.Type = t
+		interactions = append(interactions, i)
 	}
 	return interactions, nil
 }
@@ -65,11 +65,11 @@ func (s *InteractionStore) GetAll() ([]models.Interaction, error) {
 
 func (s *InteractionStore) Add(userID string, interaction *models.InteractionRecord) (*models.Interaction, error) {
 	query := `
-		INSERT INTO "interaction"("description", "location", "speciesID", "timestamp", "userID", "typeID") VALUES($1, $2, $3, $4, $5, $6)
+		INSERT INTO "interaction"("description", "location", "moment", "speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5, $6)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.SpeciesID, interaction.Timestamp, userID, interaction.TypeID)
+	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.Moment, interaction.SpeciesID, userID, interaction.TypeID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
