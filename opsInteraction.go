@@ -93,6 +93,16 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *InteractionAddInput) (*InteractionHolder, error) {
+		if input.Body.TypeID == 1 && input.Body.ReportOfSighting == nil {
+			return nil, huma.Error400BadRequest("Interaction of TypeID=2 must contain a report of sighting")
+		}
+		if input.Body.TypeID == 2 && input.Body.ReportOfDamage == nil {
+			return nil, huma.Error400BadRequest("Interaction of TypeID=2 must contain a report of damage")
+		}
+		if input.Body.TypeID == 3 && input.Body.ReportOfCollision == nil {
+			return nil, huma.Error400BadRequest("Interaction of TypeID=3 must contain a report of collision")
+		}
+
 		interaction, err := stores.NewInteractionStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
