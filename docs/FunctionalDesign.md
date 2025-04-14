@@ -144,6 +144,7 @@ Note that no specific admin tool will be created, for now the administrators wil
 |-------------|-----------|--------|
 |Assign or revoke user roles for other users.|	… can manage authorisation.	|1|
 |Manage (add, edit, disable?) the animal species in the system.|	… ensure the correct information on animal species is available for the other applications.	|1|
+|Manage (add, edit, disable?) the belonging types that can be used in damage reports in the system.|	… ensure the correct information on belongings is available for the other applications.	|1|
 Manage (add, edit, disable?) the living labs in the system.|	… ensure the correct information on living labs is available for the other applications.	|2|
 
  
