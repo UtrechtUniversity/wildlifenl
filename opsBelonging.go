@@ -52,8 +52,8 @@ func (o *belongingOperations) RegisterGet(api huma.API) {
 }
 
 func (o *belongingOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Belonging"
-	description := "Retrieve all belonging."
+	name := "Get All Belongings"
+	description := "Retrieve all belongings."
 	path := "/" + o.Endpoint + "/"
 	scopes := []string{}
 	method := http.MethodGet
