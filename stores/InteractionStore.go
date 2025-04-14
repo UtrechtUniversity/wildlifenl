@@ -12,7 +12,7 @@ func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
 		relationalDB: db,
 		query: `
-		SELECT i."ID", i."timestamp", i."description", i."location", i."moment", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description", COALESCE(dr."impactType",''), COALESCE(dr."impactValue",0), COALESCE(dr."estimatedDamage",0), COALESCE(dr."estimatedLoss",0), COALESCE(cr."estimatedDamage",0), COALESCE(cr."intensity",''), COALESCE(cr."urgency",''), COALESCE(b."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(b."name",''), COALESCE(b."category",'')FROM "interaction" i
+		SELECT i."ID", i."timestamp", i."description", i."location", i."moment", i."place", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description", COALESCE(dr."impactType",''), COALESCE(dr."impactValue",0), COALESCE(dr."estimatedDamage",0), COALESCE(dr."estimatedLoss",0), COALESCE(cr."estimatedDamage",0), COALESCE(cr."intensity",''), COALESCE(cr."urgency",''), COALESCE(b."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(b."name",''), COALESCE(b."category",'')FROM "interaction" i
 		INNER JOIN "species" s ON s."ID" = i."speciesID"
 		INNER JOIN "user" u ON u."ID" = i."userID"
 		LEFT JOIN "interactionType" t ON t."ID" = i."typeID"
@@ -35,7 +35,7 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 		var sr models.SightingReport
 		var dr models.DamageReport
 		var cr models.CollisionReport
-		if err := rows.Scan(&i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Moment, &i.Species.ID, &i.Species.Name, &i.Species.CommonName, &i.User.ID, &i.User.Name, &i.Type.ID, &i.Type.Name, &i.Type.Description, &dr.ImpactType, &dr.ImpactValue, &dr.EstimatedDamage, &dr.EstimatedLoss, &cr.EstimatedDamage, &cr.Intensity, &cr.Urgency, &dr.Belonging.ID, &dr.Belonging.Name, &dr.Belonging.Category); err != nil {
+		if err := rows.Scan(&i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Moment, &i.Place, &i.Species.ID, &i.Species.Name, &i.Species.CommonName, &i.User.ID, &i.User.Name, &i.Type.ID, &i.Type.Name, &i.Type.Description, &dr.ImpactType, &dr.ImpactValue, &dr.EstimatedDamage, &dr.EstimatedLoss, &cr.EstimatedDamage, &cr.Intensity, &cr.Urgency, &dr.Belonging.ID, &dr.Belonging.Name, &dr.Belonging.Category); err != nil {
 			return nil, err
 		}
 		if i.Type.ID == 1 {
@@ -122,11 +122,11 @@ func (s *InteractionStore) Add(userID string, interaction *models.InteractionRec
 		}
 	*/
 	query := `
-		INSERT INTO "interaction"("description", "location", "moment", "speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5, $6)
+		INSERT INTO "interaction"("description", "location", "moment", "place", "speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5, $6, $7)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.Moment, interaction.SpeciesID, userID, interaction.TypeID)
+	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.Moment, interaction.Place, interaction.SpeciesID, userID, interaction.TypeID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
