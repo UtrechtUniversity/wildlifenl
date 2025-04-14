@@ -67,6 +67,7 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 |View my reported interactions|… so I can look back at the data that I provided.|2|
 |View questionnaires that are assigned to me and the answers that I gave|… so I can look back at the data that I provided.|2|
 |Designate (point with radius) an area of interest, i.e. my fields or garden, and receive a message (push) when animals are within this area.|… can take measures to prevent damage to my crops, herds, garden, etc.|4|
+|Rather than manually asign the impact of a damage report, walk around the damaged area and have the app calculate the number of square meters inside.|… can be sure that my damage report has an acurate estimation of impact.|4|
 |View the location where wild animals cross the roads.|	… can avoid these places or be more attentive and improve traffic safety.|4|
 |Report a maintenance notice.|	… help in providing the information to the nature area managers and the problem gets resolved quicker.|4|
 |Receive a message if an animal disease is reported in my neighbourhood.|… take preventive measures to protect my herd or pet.|5|
