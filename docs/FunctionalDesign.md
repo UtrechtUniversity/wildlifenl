@@ -40,8 +40,8 @@ I love being in and learning about nature, but feeling safe is important to me. 
 |-------------|-----------|--------|
 |View the location of wild animals (collars, camera trap images, etc.)|… can go and see them in real life and perhaps make a photograph. … can avoid them if I do not want to have an interaction with them.|1|
 |Receive a message (push) if an encounter with a wild animal is imminent (distance based).|… know how to act accordingly, or can prevent a dangerous interaction.|1|
-|Report a human-wildlife interaction (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
-|Report a human-wildlife interaction (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
+|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
+|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
 |View information on wild animal species and how to interact with them.|… learn more about their behaviour, history, reasons for being in this environment, etc. … know how to behave and prevent dangerous situation.|2|
 |Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
 |Play an educational game about wild animals.|… , regardless of being a young person, remain interested in wildlife management.|3|
@@ -59,9 +59,9 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 
 |Functionality|So that I …|Priority|
 |-------------|-----------|--------|
-|Report a human-wildlife interaction (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
+|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |Report a human-wildlife interaction (damage) and fill-out the corresponding questionnaire.| … report damage to my belongings that was inflicted by wild animals.  … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
-|Report a human-wildlife interaction (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
+|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |View the reported interactions of others on a map|… can apply preventive measures.|2|
 |Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
 |View my reported interactions|… so I can look back at the data that I provided.|2|
