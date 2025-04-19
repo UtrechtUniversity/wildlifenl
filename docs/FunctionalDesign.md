@@ -51,6 +51,7 @@ I love being in and learning about nature, but feeling safe is important to me. 
 |❌|View my tracked movements on a map|… know which movements I made that are shared with the project.|1|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
+|✅|View my reported interactions|… so I can look back at the data that I provided.|2|
 |✅|View information on wild animal species and how to interact with them.|… learn more about their behaviour, history, reasons for being in this environment, etc. … know how to behave and prevent dangerous situation.|2|
 |✅|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
 |❌|Play an educational game about wild animals.|… , regardless of being a young person, remain interested in wildlife management.|3|
@@ -75,7 +76,7 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 |❌|View my tracked movements on a map|… know which movements I made that are shared with the project. … can use this as proof that I was in the field|1|
 |❌|View the reported interactions of others on a map|… can apply preventive measures.|2|
 |✅|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
-|❌|View my reported interactions|… so I can look back at the data that I provided.|2|
+|✅|View my reported interactions|… so I can look back at the data that I provided.|2|
 |❌|View questionnaires that are assigned to me and the answers that I gave|… so I can look back at the data that I provided.|2|
 |✅|Designate (point with radius) an area of interest, i.e. my fields or garden, and receive a message (push) when animals are within this area.|… can take measures to prevent damage to my crops, herds, garden, etc.|4|
 |❌|Rather than manually asign the impact of a damage report, walk around the damaged area and have the app calculate the number of square meters inside.|… can be sure that my damage report has an acurate estimation of impact.|4|
