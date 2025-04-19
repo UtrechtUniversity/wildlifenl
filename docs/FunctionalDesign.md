@@ -88,7 +88,7 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 ### WildRadar
 *Adaptive management of wild animals and human-wildlife interactions for more positive and less negative human-wildlife interactions*
 
-🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager ||| 💻 Web App
+💻 Web App : 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager
    
 Note that this application presents a slightly different user interface and set of functionalities dependent on the role(s) of the logged in user. Some functionalities are associated with several roles for different reasons, and some are exclusive to a specific role. It is possible for a user to have multiple roles and the application should adapt accordingly. 
 
