@@ -107,23 +107,50 @@ func (s *ZoneStore) GetByUser(userID string) ([]models.Zone, error) {
 	return s.process(rows, err)
 }
 
-func (s *ZoneStore) SetZoneSpecies(zoneID string, speciesIDs []string) (*models.Zone, error) {
+func (s *ZoneStore) AddSpeciesToZone(userID string, zoneID string, speciesID string) (*models.Zone, error) {
 	query := `
-		DELETE FROM "zone_species" 
-		WHERE "zoneID" = $1
-		`
-	if _, err := s.relationalDB.Exec(query, zoneID); err != nil {
+		WITH inserted AS (
+			INSERT INTO "zone_species" ("zoneID", "speciesID")
+			SELECT $1, $2
+			WHERE EXISTS (
+				SELECT 1
+				FROM "zone"
+				WHERE "ID" = $1 AND "userID" = $3
+				LIMIT 1
+		    )
+			RETURNING "zoneID"
+		)
+		SELECT "zoneID" FROM inserted;
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, zoneID, speciesID, userID)
+	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
-	query = `
-		INSERT INTO "zone_species"("zoneID", "speciesID") VALUES($1, $2)
-		`
-	for _, speciesID := range speciesIDs {
-		if _, err := s.relationalDB.Exec(query, zoneID, speciesID); err != nil {
-			return nil, err
-		}
+	return s.Get(id)
+}
+
+func (s *ZoneStore) RemoveSpeciesFromZone(userID string, zoneID string, speciesID string) (*models.Zone, error) {
+	query := `
+		WITH deleted AS (
+			DELETE FROM "zone_species"
+			WHERE "zoneID" = $1 AND "speciesID" = $2
+			RETURNING "zoneID"
+		),
+		zone_check AS (
+			SELECT "ID"
+			FROM "zone"
+			WHERE "ID" = $1 AND "userID" = $3
+		)
+		SELECT "ID"
+		FROM zone_check
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, zoneID, speciesID, userID)
+	if err := row.Scan(&id); err != nil {
+		return nil, err
 	}
-	return s.Get(zoneID)
+	return s.Get(id)
 }
 
 func (s *ZoneStore) Deactivate(zoneID string) (*models.Zone, error) {

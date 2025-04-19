@@ -22,16 +22,12 @@ type ZoneAddInput struct {
 	Body *models.ZoneRecord `json:"zone"`
 }
 
-type ZoneSpecies struct {
-	ZondeID string `json:"zoneID" format:"uuid" doc:"The ID of the zone."`
-	Species []struct {
-		SpeciesID string `json:"speciesID" format:"uuid" doc:"The ID of the species to set for this zone."`
-	}
-}
-
-type ZoneSpeciesUpdateInput struct {
+type SpeciesForZoneUpdateInput struct {
 	Input
-	Body *ZoneSpecies
+	Body *struct {
+		ZoneID    string `json:"zoneID" format:"uuid" doc:"The ID of the zone"`
+		SpeciesID string `json:"speciesID" format:"uuid" doc:"The ID of the species"`
+	}
 }
 
 type ZoneDeactivateInput struct {
@@ -115,28 +111,33 @@ func (o *zoneOperations) RegisterGetMine(api huma.API) {
 	})
 }
 
-func (o *zoneOperations) RegisterSetSpecies(api huma.API) {
-	name := "Set Zone Species"
-	description := "Set the species for which this zone should create alarms."
+func (o *zoneOperations) RegisterAddSpeciesToZone(api huma.API) {
+	name := "Add a Species to a Zone"
+	description := "Add a species for which this zone should create alarms."
 	path := "/" + o.Endpoint + "/species/"
 	scopes := []string{}
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *ZoneSpeciesUpdateInput) (*ZoneHolder, error) {
-		store := stores.NewZoneStore(relationalDB)
-		zone, err := store.Get(input.Body.ZondeID)
+	}, func(ctx context.Context, input *SpeciesForZoneUpdateInput) (*ZoneHolder, error) {
+		zone, err := stores.NewZoneStore(relationalDB).AddSpeciesToZone(input.credential.UserID, input.Body.ZoneID, input.Body.SpeciesID)
 		if err != nil {
 			return nil, handleError(err)
 		}
-		if zone == nil || zone.User.ID != input.credential.UserID {
-			return nil, generateNotFoundForThisUserError(o.Endpoint, input.Body.ZondeID)
-		}
-		speciesIDs := make([]string, 0)
-		for _, species := range input.Body.Species {
-			speciesIDs = append(speciesIDs, species.SpeciesID)
-		}
-		zone, err = store.SetZoneSpecies(input.Body.ZondeID, speciesIDs)
+		return &ZoneHolder{Body: zone}, nil
+	})
+}
+
+func (o *zoneOperations) RegisterRemoveSpeciesFromZone(api huma.API) {
+	name := "Remove a Species from a Zone"
+	description := "Remove a species for which this zone should create alarms."
+	path := "/" + o.Endpoint + "/species/"
+	scopes := []string{}
+	method := http.MethodPut
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *SpeciesForZoneUpdateInput) (*ZoneHolder, error) {
+		zone, err := stores.NewZoneStore(relationalDB).RemoveSpeciesFromZone(input.credential.UserID, input.Body.ZoneID, input.Body.SpeciesID)
 		if err != nil {
 			return nil, handleError(err)
 		}
