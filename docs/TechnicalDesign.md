@@ -89,7 +89,7 @@ A circular area in the world with a central postion (latitude/longitude) and rad
 
 ## Entity-Relation Diagram
 
-![entity-relation-diagram](entity-relation-diagram.svg)
+![entity-relation-diagram](assets/entity-relation-diagram.svg)
 
 The blue entities are stored in a relational database, whereas the green entities are stored in a timeseries database. As a result the relationships between blue and green entities are "by convention" of having the same IDs rather than them being enforced by any rules. For `Sensor-Reading` and `Borne-Sensor-Reading` this brings an advantage in the cases where data is ingested from external automated systems as it is therefore possible to accept and store these data, regardless of there being a way to use and retreive them in a meaningful context (even if there are no `Sensor-Installation` or `Borne-Sensor-Deployment` with the referenced ID), subsequently allowing that the installation or deployment that adds meaning be added later, rather than rejecting these data for the reason of there being no meaningful context, and perhaps make external automated systems fail. Note that this advantage is not needed for `Tracking-Reading` as it is highly unlikely for a new reading to refer to a userID that is unknown.
 

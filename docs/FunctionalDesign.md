@@ -191,7 +191,7 @@ The Data Platform will be developed in an object oriented modular design, facili
 ## Architecture
 The applications work together in an architecture that defines the WildlifeNL system as specified in the image below, and cater for all the roles that are being addressed. The Data Platform discloses an API for the application to connect to and exchange data. Moreover, the WildlifeNL system allows for extension by accepting data from external systems. Multiple of such systems can be connected to the WildlifeNL system for example to acquire information on the location of animals from different sources (collar, camera trap, acoustic sensor, etc.) as well as visitor counts or additional geographic information. As an initial setup an existing Trapper ([Bubnicki et al., 2016](https://doi.org/10.1111/2041-210X.12571)) installation is added to allow Natural Resource Managers to deploy camera trap projects. Trapper offers an API for data exchange with the WildlifeNL system and thus can be connected to the WildlifeNL API. Also, an existing system for collar data from the consortium member Smart Parks will be connected to the WildlifeNL API.
 
-![system-architecture](system-architecture.svg)
+![system-architecture](assets/system-architecture.svg)
  
 *existing system 
 
@@ -199,6 +199,6 @@ The applications work together in an architecture that defines the WildlifeNL sy
 ## Conceptual Model
 The conceptual model describes the main concepts as used in the WildlifeNL system and how they are associated in a high-level overview.
 
-![conceptual-model](conceptual-model.svg)
+![conceptual-model](assets/conceptual-model.svg)
  
 A User has one or more Roles, and can report an Interaction with wildlife of a certain Species. As a result of the Interaction the user is possibly presented with a Questionnaire to fill out. Based on the answers given in the questionnaire it is possible that the user receives a Message. Moreover, the user can have an Encounter (being close to each other in terms of time, latitude and longitude) with an Animal of a certain Species and receive a Message about this encounter. Lastly the User can specify a Zone of interest and receive an Alarm when an Animal enters that zone, when an Interaction is reported within that zone, or when a Detection is reported within that zone. A Detection is a record of a sensor, for example a camera trap, having detected a member of a certain Species.
