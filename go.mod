@@ -1,6 +1,8 @@
 module github.com/UtrechtUniversity/wildlifenl
 
-go 1.22.6
+go 1.23.0
+
+toolchain go1.24.2
 
 require (
 	github.com/danielgtaylor/huma/v2 v2.27.0
@@ -19,7 +21,7 @@ require (
 	github.com/influxdata/line-protocol v0.0.0-20210922203350-b1ad95c89adf // indirect
 	github.com/oapi-codegen/runtime v1.1.1 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/net v0.34.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect
 )
