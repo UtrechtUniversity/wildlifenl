@@ -12,8 +12,14 @@ The `wildlifenl` API discloses access to the following entities using end-points
 ### Animal
 A specific instance of an animal. For example: that one horse. Usually this implies that the animal in question carries an animal-borne sensor for unique identifaction.
 
+### Animal-Info
+Additional information on an animal that is involved in an `SightingReport` or `CollisionReport` as reported by the end-user.
+
 ### Answer
 A possible answer for a question (choice).
+
+### Belonging
+Additional information for a `DamageReport` specifying the type of belonging being damaged. 
 
 ### Borne-Sensor-Deployment
 A record associating `Borne-Sensor-Reading` records with an `Animal`, having a start and end timestamp to match records of type `Borne-Sensor-Reading` with the correct `Borne-Sensor-Deployment`.
@@ -21,8 +27,14 @@ A record associating `Borne-Sensor-Reading` records with an `Animal`, having a s
 ### Borne-Sensor-Reading
 A timestamped reading from an animal borne sensor including its location (latitude/longitude), type and values. Note that `Borne-Sensor-Reading` is weakly linked (using a corresponding sensorID) to `Borne-Sensor-Deployment` because it resides in another database.
 
+### Collision-Report
+Additional information about an interaction with type `animal-vehicle-collision`. The corresponding `Interaction` can have just one additional report.
+
 ### Conveyance
 The record of a message being sent to a user. A `Conveyance` is the result of an `Encounter` or a given `Response`.
+
+### Damage-Report
+Additional information about an interaction with type `property-damage`. The corresponding `Interaction` can have just one additional report.
 
 ### Detection
 A timestamped record of the location of a member of a specified animal species.
@@ -54,11 +66,8 @@ The answer the user gave to the question. If the `Question` has associated possi
 ### Role 
 An authorization record for a set of functionalities. A user having a certain role is authorized to call the functionalities assigned to that role.
 
-### Sensor-Installation (pending)
-A record associating `Sensor-Reading` records with a `LivingLab`, including the most recent data. Only readings that have a timestamp between *`StartTimestamp`* and *`EndTimestamp`* are considered valid readings for this installation, and *`EndTimestamp`* can be empty. Note that *`SensorID`* is weakly linked to the *`SensorID`* of `Sensor-Reading`.
-
-### Sensor-Reading (pending)
-A timestamped reading from a sensor including its location (latitude/longitude), type and value. Note that *`SensorID`* is weakly linked to the *`SensorID`* of `Sensor-Installation`.
+### Sighting-Report
+Additional information about an interaction with type `sighting`. The corresponding `Interaction` can have just one additional report.
 
 ### Species 
 The definition for a group of animals (for example: horses), having a field that defines the encounter distance in meters and encounter time in minutes.
@@ -68,6 +77,12 @@ A timestamped record of the location a user. Note that `Tracking-Reading` is wea
 
 ### User
 A human user of any role. The `Role` records associated with the user authorize him/her to more functionality. A user can also have no associated `Role` records, which referes to the most prohibited user types (Recreationist, Inhabitant). User also optionally includes the most recent tracked location.
+
+### Visitor-Sensor-Deployment
+A sensor that counts human presence in a certain area specified by a location (latitude/longitude).
+
+### Visitor-Sensor-Reading
+A timestamped reading from a visitor sensor. Note that *`SensorID`* is weakly linked to the *`SensorID`* of `Visitor-Sensor-Deployment`.
 
 ### Zone
 A circular area in the world with a central postion (latitude/longitude) and radius in meters[^1], that is of interest to a user, for example including agriculture fields or a gardens.
