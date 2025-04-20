@@ -13,6 +13,10 @@ type TrackingReadingHolder struct {
 	Body *models.TrackingReading `json:"trackingReading"`
 }
 
+type TrackingReadingsHolder struct {
+	Body []models.TrackingReading `json:"trackingReadings"`
+}
+
 type TrackingReadingAddInput struct {
 	Input
 	Body *models.TrackingReadingRecord `json:"trackingReading"`
@@ -46,5 +50,22 @@ func (o *trackingReadingOperations) RegisterAdd(api huma.API) {
 		trackingReading.Conveyance = conveyance
 
 		return &TrackingReadingHolder{Body: trackingReading}, nil
+	})
+}
+
+func (o *trackingReadingOperations) RegisterGetMine(api huma.API) {
+	name := "Get My TrackingReadings"
+	description := "Retrieve my tracking readings."
+	path := "/" + o.Endpoint + "s/me/"
+	scopes := []string{}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *Input) (*TrackingReadingsHolder, error) {
+		trackingReadings, err := stores.NewTrackingReadingStore(relationalDB, timeseriesDB).GetForUser(input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &TrackingReadingsHolder{Body: trackingReadings}, nil
 	})
 }
