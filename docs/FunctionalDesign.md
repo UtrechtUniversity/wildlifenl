@@ -46,9 +46,9 @@ I love being in and learning about nature, but feeling safe is important to me. 
 |API|Functionality|So that I …|Priority|
 |---|-------------|-----------|--------|
 |✅|Read and accept the terms of use and activate location tracking when I use this app.|… know that using this app means that my location is automatically tracked for the purpose of academic research.|1|
+|❌|View my tracked movements on a map|… know which movements I made that are shared with the project.|1|
 |✅|View the location of wild animals (collars, camera trap images, etc.)|… can go and see them in real life and perhaps make a photograph. … can avoid them if I do not want to have an interaction with them.|1|
 |✅|Receive a message (push) if an encounter with a wild animal is imminent (distance based).|… know how to act accordingly, or can prevent a dangerous interaction.|1|
-|❌|View my tracked movements on a map|… know which movements I made that are shared with the project.|1|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
 |✅|View my reported interactions|… so I can look back at the data that I provided.|2|
@@ -70,10 +70,10 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 |API|Functionality|So that I …|Priority|
 |---|-------------|-----------|--------|
 |✅|Read and accept the terms of use and activate location tracking when I use this app.|… know that using this app means that my location is automatically tracked for the purpose of academic research.|1|
+|❌|View my tracked movements on a map|… know which movements I made that are shared with the project. … can use this as proof that I was in the field|1|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |✅|Report a human-wildlife interaction (damage) and fill-out the corresponding questionnaire.| … report damage to my belongings that was inflicted by wild animals.  … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
-|❌|View my tracked movements on a map|… know which movements I made that are shared with the project. … can use this as proof that I was in the field|1|
 |❌|View the reported interactions of others on a map|… can apply preventive measures.|2|
 |✅|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
 |✅|View my reported interactions|… so I can look back at the data that I provided.|2|
