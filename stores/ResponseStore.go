@@ -143,3 +143,15 @@ func (s *ResponseStore) GetByExperiment(experimentID string) ([]models.Response,
 	rows, err := s.relationalDB.Query(query, experimentID)
 	return s.process(rows, err)
 }
+
+func (s *ResponseStore) GetByUser(userID string) ([]models.Response, error) {
+	query := s.query + `
+		WHERE i."userID" = $1
+		`
+	rows, err := s.relationalDB.Query(query, userID)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

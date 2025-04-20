@@ -120,3 +120,20 @@ func (o *responseOperations) RegisterGetByExperiment(api huma.API) {
 		return &ResponsesHolder{Body: responses}, nil
 	})
 }
+
+func (o *responseOperations) RegisterGetMine(api huma.API) {
+	name := "Get My Responses"
+	description := "Retrieve my responses."
+	path := "/" + o.Endpoint + "s/me/"
+	scopes := []string{}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *Input) (*ResponsesHolder, error) {
+		responses, err := stores.NewResponseStore(relationalDB).GetByUser(input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &ResponsesHolder{Body: responses}, nil
+	})
+}
