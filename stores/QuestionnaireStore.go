@@ -13,7 +13,7 @@ func NewQuestionnaireStore(db *sql.DB) *QuestionnaireStore {
 	s := QuestionnaireStore{
 		relationalDB: db,
 		query: `
-		SELECT q."ID", q."name", q."identifier", e."ID", e."name", e."start", e."end", t."ID", t."name", t."description", u."ID", u."name"
+		SELECT q."ID" AS "questionnaireID", q."name", q."identifier", e."ID", e."name", e."start", e."end", t."ID", t."name", t."description", u."ID", u."name"
 		FROM "questionnaire" q
 		INNER JOIN "experiment" e ON e."ID" = q."experimentID"
 		INNER JOIN "interactionType" t ON t."ID" = q."interactionTypeID"
@@ -105,24 +105,36 @@ func (s *QuestionnaireStore) GetByExperiment(experimentID string) ([]models.Ques
 }
 
 func (s *QuestionnaireStore) GetRandomByInteraction(interaction *models.Interaction) (*models.Questionnaire, error) {
-	query := s.query + `
-		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
-		WHERE q."interactionTypeID" = $1
-		AND e."start" < $2
-		AND (e."end" IS NULL OR e."end" > $2)
-		AND (l."ID" IS NULL OR l."definition" @> $3)
-		ORDER BY random()
-		LIMIT 1
+	query := `
+		WITH selected AS (
+	` + s.query + `
+			LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
+			WHERE q."interactionTypeID" = $1
+			AND e."start" < $2
+			AND (e."end" IS NULL OR e."end" > $2)
+			AND (l."ID" IS NULL OR l."definition" @> $3)
+			ORDER BY random()
+			LIMIT 1
+		)
+		INSERT INTO "assignment" ("userID", "questionnaireID", "interactionID")
+		SELECT $4, "questionnaireID", $5
+		FROM selected
+		WHERE "questionnaireID" IS NOT NULL
+		RETURNING "questionnaireID"
 		`
-	rows, err := s.relationalDB.Query(query, interaction.Type.ID, interaction.Timestamp, interaction.Location)
-	questionnaires, err := s.process(rows, err)
+	var id string
+	row := s.relationalDB.QueryRow(query, interaction.Type.ID, interaction.Timestamp, interaction.Location, interaction.User.ID, interaction.ID)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	questionnaire, err := s.Get(id)
 	if err != nil {
 		return nil, err
 	}
-	if len(questionnaires) == 0 {
-		return nil, nil
-	}
-	return s.addQuestions(&questionnaires[0])
+	return s.addQuestions(questionnaire)
 }
 
 func (s *QuestionnaireStore) Update(userID string, questionnaireID string, questionnaire *models.QuestionnaireRecord) (*models.Questionnaire, error) {
