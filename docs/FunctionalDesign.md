@@ -54,6 +54,7 @@ I love being in and learning about nature, but feeling safe is important to me. 
 |✅|View my reported interactions|… so I can look back at the data that I provided.|2|
 |✅|View information on wild animal species and how to interact with them.|… learn more about their behaviour, history, reasons for being in this environment, etc. … know how to behave and prevent dangerous situation.|2|
 |✅|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
+|❌|Close my profile|… know that my personal information is disassociated from the other data that my account created in this system.|2|
 |❌|Play an educational game about wild animals.|… , regardless of being a young person, remain interested in wildlife management.|3|
 |❌|Report a maintenance notice.| … help in providing the information to the nature area managers and the problem gets resolved quicker.|4|
 |❌|Watch webcam/nestcam streams.|	… can enjoy nature even from home. … can observe animal sanctuaries even though, as a human, I cannot enter them.|5|
@@ -76,6 +77,7 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |❌|View the reported interactions of others on a map|… can apply preventive measures.|2|
 |✅|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|
+|❌|Close my profile|… know that my personal information is disassociated from the other data that my account created in this system.|2|
 |✅|View my reported interactions|… so I can look back at the data that I provided.|2|
 |❌|View questionnaires that are assigned to me and the answers that I gave|… so I can look back at the data that I provided.|2|
 |✅|Designate (point with radius) an area of interest, i.e. my fields or garden, and receive a message (push) when animals are within this area.|… can take measures to prevent damage to my crops, herds, garden, etc.|4|
