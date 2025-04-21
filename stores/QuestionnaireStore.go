@@ -104,7 +104,7 @@ func (s *QuestionnaireStore) GetByExperiment(experimentID string) ([]models.Ques
 	return s.addQuestionsAll(questionnaires)
 }
 
-func (s *QuestionnaireStore) GetRandomByInteraction(interaction *models.Interaction) (*models.Questionnaire, error) {
+func (s *QuestionnaireStore) AssignRandomToInteraction(interaction *models.Interaction) (*models.Questionnaire, error) {
 	query := `
 		WITH selected AS (
 	` + s.query + `
@@ -116,18 +116,14 @@ func (s *QuestionnaireStore) GetRandomByInteraction(interaction *models.Interact
 			ORDER BY random()
 			LIMIT 1
 		)
-		INSERT INTO "assignment" ("userID", "questionnaireID", "interactionID")
-		SELECT $4, "questionnaireID", $5
-		FROM selected
-		WHERE "questionnaireID" IS NOT NULL
-		RETURNING "questionnaireID"
+		UPDATE "interaction"
+		SET "questionnaireID" = (SELECT "questionnaireID" FROM selected)
+		WHERE "ID" = $4
+		RETURNING (SELECT "questionnaireID" FROM selected);
 		`
 	var id string
-	row := s.relationalDB.QueryRow(query, interaction.Type.ID, interaction.Timestamp, interaction.Location, interaction.User.ID, interaction.ID)
+	row := s.relationalDB.QueryRow(query, interaction.Type.ID, interaction.Timestamp, interaction.Location, interaction.ID)
 	if err := row.Scan(&id); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
 		return nil, err
 	}
 	questionnaire, err := s.Get(id)

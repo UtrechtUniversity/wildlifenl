@@ -12,14 +12,18 @@ func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
 		relationalDB: db,
 		query: `
-		SELECT i."ID", i."timestamp", i."description", i."location", i."moment", i."place", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description", COALESCE(dr."impactType",''), COALESCE(dr."impactValue",0), COALESCE(dr."estimatedDamage",0), COALESCE(dr."estimatedLoss",0), COALESCE(cr."estimatedDamage",0), COALESCE(cr."intensity",''), COALESCE(cr."urgency",''), COALESCE(b."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(b."name",''), COALESCE(b."category",'')FROM "interaction" i
+		SELECT i."ID", i."timestamp", i."description", i."location", i."moment", i."place", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description", COALESCE(dr."impactType",''), COALESCE(dr."impactValue",0), COALESCE(dr."estimatedDamage",0), COALESCE(dr."estimatedLoss",0), COALESCE(cr."estimatedDamage",0), COALESCE(cr."intensity",''), COALESCE(cr."urgency",''), COALESCE(b."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(b."name",''), COALESCE(b."category",''), COALESCE(q."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(q."name",''), COALESCE(q."identifier",''), COALESCE(e."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(e."name",''), COALESCE(e."start",'2000-01-01'), COALESCE(e."end",'2000-01-01'), COALESCE(eu."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(eu."name",'')
+		FROM "interaction" i
 		INNER JOIN "species" s ON s."ID" = i."speciesID"
 		INNER JOIN "user" u ON u."ID" = i."userID"
-		LEFT JOIN "interactionType" t ON t."ID" = i."typeID"
+		INNER JOIN "interactionType" t ON t."ID" = i."typeID"
 		LEFT JOIN "sightingReport" sr ON i."ID" = sr."interactionID" AND i."typeID" = 1
 		LEFT JOIN "damageReport" dr ON i."ID" = dr."interactionID" AND i."typeID" = 2
 		LEFT JOIN "collisionReport" cr ON i."ID" = cr."interactionID" AND i."typeID" = 3
 		LEFT JOIN "belonging" b ON b."ID" = dr."belongingID" AND i."typeID" = 2
+		LEFT JOIN "questionnaire" q ON q."ID" = i."questionnaireID"
+		LEFT JOIN "experiment" e ON e."ID" = q."experimentID"
+		LEFT JOIN "user" eu ON eu."ID" = e."userID"
 		`,
 	}
 	return &s
@@ -35,7 +39,8 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 		var sr models.SightingReport
 		var dr models.DamageReport
 		var cr models.CollisionReport
-		if err := rows.Scan(&i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Moment, &i.Place, &i.Species.ID, &i.Species.Name, &i.Species.CommonName, &i.User.ID, &i.User.Name, &i.Type.ID, &i.Type.Name, &i.Type.Description, &dr.ImpactType, &dr.ImpactValue, &dr.EstimatedDamage, &dr.EstimatedLoss, &cr.EstimatedDamage, &cr.Intensity, &cr.Urgency, &dr.Belonging.ID, &dr.Belonging.Name, &dr.Belonging.Category); err != nil {
+		var q models.Questionnaire
+		if err := rows.Scan(&i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Moment, &i.Place, &i.Species.ID, &i.Species.Name, &i.Species.CommonName, &i.User.ID, &i.User.Name, &i.Type.ID, &i.Type.Name, &i.Type.Description, &dr.ImpactType, &dr.ImpactValue, &dr.EstimatedDamage, &dr.EstimatedLoss, &cr.EstimatedDamage, &cr.Intensity, &cr.Urgency, &dr.Belonging.ID, &dr.Belonging.Name, &dr.Belonging.Category, &q.ID, &q.Name, &q.Identifier, &q.Experiment.ID, &q.Experiment.Name, &q.Experiment.Start, &q.Experiment.End, &q.Experiment.User.ID, &q.Experiment.User.Name); err != nil {
 			return nil, err
 		}
 		if i.Type.ID == 1 {
@@ -56,6 +61,10 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 			}
 			cr.InvolvedAnimals = involvedAnimals
 			i.ReportOfCollision = &cr
+		}
+		if q.ID != "00000000-0000-0000-0000-000000000000" {
+			q.InteractionType = i.Type
+			i.Questionnaire = &q
 		}
 		interactions = append(interactions, i)
 	}
