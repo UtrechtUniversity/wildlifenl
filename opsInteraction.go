@@ -122,7 +122,9 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
-		interaction.Questionnaire = questionnaire
+		if questionnaire != nil {
+			interaction.Questionnaire = questionnaire
+		}
 
 		// Add Interaction -> Create Alarms.
 		if interaction.Type.ID == 1 {

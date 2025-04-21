@@ -119,12 +119,15 @@ func (s *QuestionnaireStore) AssignRandomToInteraction(interaction *models.Inter
 		UPDATE "interaction"
 		SET "questionnaireID" = (SELECT "questionnaireID" FROM selected)
 		WHERE "ID" = $4
-		RETURNING (SELECT "questionnaireID" FROM selected);
+		RETURNING COALESCE((SELECT "questionnaireID" FROM selected),'00000000-0000-0000-0000-000000000000');
 		`
 	var id string
 	row := s.relationalDB.QueryRow(query, interaction.Type.ID, interaction.Timestamp, interaction.Location, interaction.ID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
+	}
+	if id == "00000000-0000-0000-0000-000000000000" {
+		return nil, nil
 	}
 	questionnaire, err := s.Get(id)
 	if err != nil {
