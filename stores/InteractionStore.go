@@ -2,6 +2,8 @@ package stores
 
 import (
 	"database/sql"
+	"strconv"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 )
@@ -177,5 +179,40 @@ func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error
 		ORDER BY i."timestamp" DESC
 		`
 	rows, err := s.relationalDB.Query(query, userID)
+	return s.process(rows, err)
+}
+
+func (s *InteractionStore) GetFiltered(area *models.Circle, before *time.Time, after *time.Time) ([]models.Interaction, error) {
+	query := s.query
+	args := make([]any, 0)
+	whereDone := false
+	if area != nil {
+		and := " AND "
+		if !whereDone {
+			and = " WHERE "
+			whereDone = true
+		}
+		query += and + `$` + strconv.Itoa(len(args)+1) + `::circle @> i."location"`
+		args = append(args, area)
+	}
+	if before != nil {
+		and := " AND "
+		if !whereDone {
+			and = " WHERE "
+			whereDone = true
+		}
+		query += and + `i."moment" < $` + strconv.Itoa(len(args)+1)
+		args = append(args, before)
+	}
+	if after != nil {
+		and := " AND "
+		if !whereDone {
+			and = " WHERE "
+			whereDone = true
+		}
+		query += and + `i."moment" > $` + strconv.Itoa(len(args)+1)
+		args = append(args, after)
+	}
+	rows, err := s.relationalDB.Query(query, args...)
 	return s.process(rows, err)
 }

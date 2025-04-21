@@ -3,6 +3,7 @@ package wildlifenl
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
@@ -15,6 +16,14 @@ type InteractionHolder struct {
 
 type InteractionsHolder struct {
 	Body []models.Interaction `json:"interactions"`
+}
+
+type InteractionQueryInput struct {
+	Latitude  float64   `query:"area_latitude" minimum:"-90" maximum:"90"`
+	Longitude float64   `query:"area_longitude" minimum:"-180" maximum:"180"`
+	Radius    int       `query:"area_radius" minimum:"1"`
+	Before    time.Time `query:"moment_before"`
+	After     time.Time `query:"moment_after"`
 }
 
 type InteractionAddInput struct {
@@ -129,5 +138,43 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 		}
 
 		return &InteractionHolder{Body: interaction}, nil
+	})
+}
+
+func (o *interactionOperations) RegisterQuery(api huma.API) {
+	name := "Query Interactions"
+	description := "Retrieve interactions for a certain area and/or timespan."
+	path := "/" + o.Endpoint + "s/query/"
+	scopes := []string{}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *InteractionQueryInput) (*InteractionsHolder, error) {
+		if input.Radius == 0 && input.Before.Year() == 1 && input.After.Year() == 1 {
+			return nil, huma.Error400BadRequest("Either all values for `area` or `moment_before` or `moment_after` is required.")
+		}
+		var area *models.Circle
+		if input.Radius > 0 {
+			area = &models.Circle{
+				Location: models.Point{
+					Latitude:  input.Latitude,
+					Longitude: input.Longitude,
+				},
+				Radius: float64(input.Radius),
+			}
+		}
+		var before *time.Time
+		if input.Before.Year() > 1 {
+			before = &input.Before
+		}
+		var after *time.Time
+		if input.After.Year() > 1 {
+			after = &input.After
+		}
+		interactions, err := stores.NewInteractionStore(relationalDB).GetFiltered(area, before, after)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &InteractionsHolder{Body: interactions}, nil
 	})
 }
