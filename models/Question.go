@@ -2,7 +2,7 @@ package models
 
 type QuestionRecord struct {
 	ID                    string  `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this question."`
-	Text                  string  `json:"text" doc:"The text of this question."`
+	Text                  string  `json:"text" minLength:"5" doc:"The text of this question."`
 	Description           string  `json:"description" doc:"The further explanation for this questions."`
 	Index                 int     `json:"index" minimum:"1" doc:"The index of this question within the questionnaire. If multiple questions have the same index, the client application should present them to the end user in a randomly shuffled order."`
 	AllowMultipleResponse bool    `json:"allowMultipleResponse" doc:"Whether or not this questions allows for multiple reponses."`
