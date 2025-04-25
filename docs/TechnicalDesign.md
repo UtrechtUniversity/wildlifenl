@@ -121,6 +121,15 @@ Upon a new `Tracking-Reading` being posted, including lat/long, it should be che
 ### From created Alarms -> Create Conveyances
 Whenever a new `Alarm` is created it should be checked whether a `Message` exists with trigger type `alarm` that is for the same `Species` as the animal that triggered the alarm. If the `Message` is associated with an `Experiment` that is bound by a `LivingLab` there should be a spetiotemperal overlap[^3] between the `Zone` that the alarm is for and this `LivingLab`. If so, a new  `Conveyance` must be created that referring to that `Message` and is associated with the `Alarm` and NOT with an `Animal`, and NOT with a `Response`. Any `Conveyance` instances that are created this way and their `Message` should be in the response body of the post request.
 
+## Location Tracking
+The smartphone apps provide functionality on tracking the location of the user. The current way to implement this is as follows.
+
+### WildGids
+The user accepts 'terms and conditions' prior to using the app and actively agrees to be a participant in a study. The app then directly requests permission for `ACCESS_FINE_LOCATION` and `ACCESS_BACKGROUND_LOCATION`. If this permission is not given or is later revoked, the app cannot be used. The app then asks for permission again. As long as the app is running (foreground or background), the location is transmitted. However, to guard the user's privacy, it is possible that the app closes itself if it has not been in the foreground for longer than a certain period of time (for example an hour). And it is possible to show a notification first: "This app is still actively tracking your location, do you want to continue press 'yes', otherwise it closes in 10 seconds" or something similar.
+
+### WildReport
+The user accepts 'terms and conditions' prior to using the app and actively agrees to be a participant in a study. The app can now be used. There is an option for the user to enable 'Location Tracking'. For example, to walk around a field, or for fauna/nature managers to prove they were in the field. The first time this is enabled, the app asks permission for `ACCESS_FINE_LOCATION` and `ACCESS_BACKGROUND_LOCATION`. If this permission is not given, 'Location Tracking' cannot be enabled and remains disabled. If this permission is later revoked, the app will ask for permission again when the user enables 'Location Teacking'. At any time the user can disable 'Location Tracking'.
+
 ---
 
 [^1]: To calculate distances in meters between two points as given in latitude and longitude the conversion 1 meter = 0.00001 degree (either latitude or longitude) is used. This produces a small difference with reality as 1 degree latitude in reality is about 110 km and 1 degree longitude in reality is about 111 km on the equator and reaches zero at the poles, but this simplified conversion greatly increases calculation speeds as the problem can then be expressed in euclidean distance.
