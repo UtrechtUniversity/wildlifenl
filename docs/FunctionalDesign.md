@@ -46,8 +46,8 @@ I love being in and learning about nature, but feeling safe is important to me. 
 |API|Functionality|So that I …|Priority|
 |---|-------------|-----------|--------|
 |✅|Read and accept the 'terms of use' and activate location tracking when I use this app.|… know that using this app means that I am a participant in a research project and my location is automatically tracked for the purpose of academic research.|1|
-|✅|View my tracked movements on a map|… know which movements I made that are shared with the project.|1|
-|✅|View the location of wild animals (collars, camera trap images, etc.)|… can go and see them in real life and perhaps make a photograph. … can avoid them if I do not want to have an interaction with them.|1|
+|✅|View my tracked movements on a map.|… know which movements I made that are shared with the project.|1|
+|✅|View the location of wild animals (collars, camera trap images, etc.).|… can go and see them in real life and perhaps make a photograph. … can avoid them if I do not want to have an interaction with them.|1|
 |✅|Receive a message (push) if an encounter with a wild animal is imminent (distance based).|… know how to act accordingly, or can prevent a dangerous interaction.|1|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|
@@ -71,8 +71,8 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 |API|Functionality|So that I …|Priority|
 |---|-------------|-----------|--------|
 |✅|Read and accept the 'terms of use'.|… know that using this app means that I am a participant in a research project.|1|
-|✅|Activate/deactivate location tracking|… can keep track of my movements in the nature area. … can provide researchers with data on my movements.|1|
-|✅|View my tracked movements on a map|… know which movements I made that are shared with the project. … can use this as proof that I was in the field|1|
+|✅|Activate/deactivate location tracking.|… can keep track of my movements in the nature area. … can provide researchers with data on my movements.|1|
+|✅|View my tracked movements on a map.|… know which movements I made that are shared with the project. … can use this as proof that I was in the field|1|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |✅|Report a human-wildlife interaction (damage) and fill-out the corresponding questionnaire.| … report damage to my belongings that was inflicted by wild animals.  … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
 |✅|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|
@@ -101,7 +101,7 @@ I serve as a manager of nature areas and my responsibility is providing space an
 
 |API|Functionality|So that I …|Priority|
 |---|-------------|-----------|--------|
-|✅|View the location of wild animals (collars, camera trap images, etc.)|	… can protect wildlife sanctuaries or foraging areas against overgrazing or underutilization. … compare the utilization of areas with nature results. … can influence biodiversity in a positive way for example by giving more space.… can estimate the ratio of population size to the damage in the surrounding area, and conclude on the most suitable intervention (with the least impact).|1|
+|✅|View the location of wild animals (collars, camera trap images, etc.).|	… can protect wildlife sanctuaries or foraging areas against overgrazing or underutilization. … compare the utilization of areas with nature results. … can influence biodiversity in a positive way for example by giving more space.… can estimate the ratio of population size to the damage in the surrounding area, and conclude on the most suitable intervention (with the least impact).|1|
 |❌|View the movement of a group of wild animals.|	… can influence vegetation development through additional management. For example, more/less grazing/mowing or placing/removing fences. … see what effect events have on large animals, and can choose more consciously which events to allow and/or organize.|1|
 |✅|Designate (point with radius) an area of interest, and receive a message when animals are within this area.| … can take preventive measures against animals moving into areas that they should not.|1|
 |❌|View reported human-wildlife interactions (from smartphone apps).| … can adjust my management strategy accordingly. … can estimate the impact of the wild animal population.|2|
@@ -116,7 +116,7 @@ My responsibility is to prevent or reduce damage or nuisance caused by certain w
 
 |API|Functionality|So that I …|Priority|
 |---|-------------|-----------|--------|
-|✅|View the location of wild animals (collars, camera trap images, etc.)|	… can apply measures where needed (fences, ecology of fear, culling, etc.)	|1|
+|✅|View the location of wild animals (collars, camera trap images, etc.).|	… can apply measures where needed (fences, ecology of fear, culling, etc.)	|1|
 |❌|View the movement of a group of wild animals.|	… can correlate this to other nature values in the area and can intervene if needed.	|1|
 |✅|Designate (point with radius)  an area of interest, and receive a message (push) when animals are within this area.|	… can take preventive measures against animals moving into areas that they should not.	|1|
 |❌|View the paths that animals take to get into my area of interest.|	… investigate whether a preventive measure is needed, or can apply ecology of fear.	|2|
@@ -133,7 +133,7 @@ My responsibility is to prevent or reduce damage or nuisance caused by certain w
 ### ResearchConnect
 *Being able to access the data from the data platform to use it in my research*
 
-🧑‍🔬 Researcher ||| 💻 Web App
+💻 Web App : 🧑‍🔬 Researcher
  
 Regarding my research, I wish to use applications of WildlifeNL to run experiments in order to gather data that I can use to address my research objectives and/or hypotheses. To do so, I would like to create questionnaires that end-users of the applications can fill-out, and I would like to send push messages to the end-users, hopefully nudging them into certain behaviours. Lastly, I want to access the data platform in a way that allows me to extract complete datasets and/or aggregations that I can use in my own research. The data platform does not need to present the data in aesthetically appealing ways, I just need the raw data. 
 
@@ -150,7 +150,7 @@ Regarding my research, I wish to use applications of WildlifeNL to run experimen
 ### Administration
 *Assign roles to other users and manage the content of the API backend.*
 
-🧑🏻‍💻 Administrator ||| 💻 Web App
+💻 Web App : 🧑🏻‍💻 Administrator
  
 To ensure that the WildifeNL API and its backend contain the correct information and this information is provided to the correct users in the other applications, I can add, edit, and disable data elements. Also, I can assign and revoke roles for other users.
 Note that no specific admin tool will be created, for now the administrators will use the default user interface of the WildlifeNL API.
