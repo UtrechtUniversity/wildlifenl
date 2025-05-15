@@ -112,6 +112,17 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 			return nil, huma.Error400BadRequest("Interaction of TypeID=3 must contain a report of collision")
 		}
 
+		// Sanity check to validate the BelongingID of DamageReport before inserting the new Interaction because InteractionStore.Add cannot do this, see InteractionStore.Add().
+		if input.Body.TypeID == 2 {
+			belonging, err := stores.NewBelongingStore(relationalDB).Get(input.Body.ReportOfDamage.Belonging.ID)
+			if err != nil {
+				return nil, handleError(err)
+			}
+			if belonging == nil {
+				return nil, generateNotFoundByIDError("Belonging", input.Body.ReportOfDamage.Belonging.ID)
+			}
+		}
+
 		interaction, err := stores.NewInteractionStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)

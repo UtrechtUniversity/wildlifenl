@@ -96,7 +96,10 @@ func (s *InteractionStore) GetAll() ([]models.Interaction, error) {
 func (s *InteractionStore) Add(userID string, interaction *models.InteractionRecord) (*models.Interaction, error) {
 	// This query works if sent directly to postgres, but apparently does not when doing so via the
 	// Go connector: pq: cannot insert multiple commands into a prepared statement
-	// So let's do them one by one, which is not so nice....
+	// So let's do them one by one, which is not so nice, and also forces us to do a check for the
+	// existence of belonging before doing the insert of interaction as to not insert an interaction
+	// when there is still an error, see InteractionOperations.
+	//
 	/*
 		query := `
 			DROP TABLE IF EXISTS inserted;
@@ -132,6 +135,7 @@ func (s *InteractionStore) Add(userID string, interaction *models.InteractionRec
 			return nil, err
 		}
 	*/
+
 	query := `
 		INSERT INTO "interaction"("description", "location", "moment", "place", "speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5, $6, $7)
 		RETURNING "ID"
