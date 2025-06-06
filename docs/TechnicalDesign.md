@@ -124,10 +124,10 @@ Whenever a new `Alarm` is created it should be checked whether a `Message` exist
 ## Location Tracking
 The smartphone apps provide functionality on tracking the location of the user. The current way to implement this is as follows.
 
-### WildGids
+### Wild Gids
 The user accepts 'terms and conditions' prior to using the app and actively agrees to be a participant in a study. The app then directly requests permission for `ACCESS_FINE_LOCATION` and `ACCESS_BACKGROUND_LOCATION`. If this permission is not given or is later revoked, the app cannot be used. The app then asks for permission again. As long as the app is running (foreground or background), the location is transmitted. However, to guard the user's privacy, it is possible that the app closes itself if it has not been in the foreground for longer than a certain period of time (for example an hour). And it is possible to show a notification first: "This app is still actively tracking your location, do you want to continue press 'yes', otherwise it closes in 10 seconds" or something similar.
 
-### WildReport
+### Wild Rapport
 The user accepts 'terms and conditions' prior to using the app and actively agrees to be a participant in a study. The app can now be used. There is an option for the user to enable 'Location Tracking'. For example, to walk around a field, or for fauna/nature managers to prove they were in the field. The first time this is enabled, the app asks permission for `ACCESS_FINE_LOCATION` and `ACCESS_BACKGROUND_LOCATION`. If this permission is not given, 'Location Tracking' cannot be enabled and remains disabled. If this permission is later revoked, the app will ask for permission again when the user enables 'Location Teacking'. At any time the user can disable 'Location Tracking'.
 
 ---
