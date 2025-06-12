@@ -36,7 +36,7 @@ To address the objectives of the WildlifeNL project, five end-user applications 
  
 
 
-### Wild Gids
+### WildGids
 *Being able to enjoy human-wildlife interactions and reduce possible negative encounters with wildlife to recreate confidently and well-informed in a living lab*
 
 📱 Smartphone App : 👲 Recreationist, 🧑🏻‍💼 Inhabitant  
@@ -61,7 +61,7 @@ I love being in and learning about nature, but feeling safe is important to me. 
 
 
 
-### Wild Rapport
+### WildRapport
 *I live with wild animals and want to do so in a way that safeguards the well-being of myself and my property but also that of the wild animals.*
 
 📱 Smartphone App : 🧑🏻‍🌾 Agrarian, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager 
@@ -89,7 +89,7 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 
 
  
-### Wild Radar
+### WildRadar
 *Adaptive management of wild animals and human-wildlife interactions for more positive and less negative human-wildlife interactions*
 
 💻 Web App : 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager
@@ -130,7 +130,7 @@ My responsibility is to prevent or reduce damage or nuisance caused by certain w
 
 
 
-### Research Connect
+### ResearchConnect
 *Being able to access the data from the data platform to use it in my research*
 
 💻 Web App : 🧑‍🔬 Researcher
