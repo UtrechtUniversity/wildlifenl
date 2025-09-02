@@ -106,3 +106,17 @@ func (s *ProfileStore) Update(profileID string, profile *models.ProfileRecord) (
 	}
 	return s.Get(id)
 }
+
+func (s *ProfileStore) Delete(profileID string) error {
+	query := `
+		UPDATE "user" SET "name" = $1, "email" = $2
+		WHERE "ID" = $1
+		RETURNING "ID"
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, profileID, profileID+"@wildlifenl.nl")
+	if err := row.Scan(&id); err != nil {
+		return err
+	}
+	return nil
+}

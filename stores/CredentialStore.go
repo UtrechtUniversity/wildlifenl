@@ -87,3 +87,12 @@ func (s *CredentialStore) Create(appName, userName, email string) (*models.Crede
 	credential.Scopes = scopes
 	return &credential, nil
 }
+
+func (s *CredentialStore) Destroy(email string) error {
+	query := `
+		DELETE FROM "credential"
+		WHERE "email" = $1
+	`
+	_, err := s.relationalDB.Exec(query, email)
+	return err
+}

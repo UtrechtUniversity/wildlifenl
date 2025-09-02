@@ -105,3 +105,23 @@ func (o *profileOperations) RegisterUpdateMine(api huma.API) {
 		return &ProfileHolder{Body: me}, nil
 	})
 }
+
+func (o *profileOperations) RegisterDeleteMine(api huma.API) {
+	name := "Delete My Profile"
+	description := "Delete the profile for the current user."
+	path := "/" + o.Endpoint + "/me/"
+	scopes := []string{}
+	method := http.MethodDelete
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *Input) (*struct{}, error) {
+		flushSession(input.credential.UserID)
+		if err := stores.NewCredentialStore(relationalDB).Destroy(input.credential.Email); err != nil {
+			return nil, handleError(err)
+		}
+		if err := stores.NewProfileStore(relationalDB).Delete(input.credential.UserID); err != nil {
+			return nil, handleError(err)
+		}
+		return nil, nil
+	})
+}
