@@ -88,34 +88,34 @@ Note that this application presents a slightly different user interface and set 
 #### Nature Area Manager
 I serve as a manager of nature areas and my responsibility is providing space and developing habitat for wild animals but also for humans to recreate. Within this role, I am responsible for human-wildlife interactions in my areas, where I aim to reduce negative interactions and impacts on wildlife and humans present within these areas. I am also a neighbour, e.g. with adjacent agricultural lands or villages, and in that context responsible for maintaining respectful relations with these neighbours. Since human-wildlife interactions often cross the boundaries of my areas, I also need to work with my neighbours to manage these interactions. I manage wildlife and their habitat for the benefit of biodiversity, incl. the wildlife, but also people inside and around my areas. This means I also need to manage people. I offer education and guided tours. Additionally, I survey the flora and fauna, providing advice for nature management. I may be specialized in public engagement, management, ecology, or supervision.
 
-|API|Functionality|So that I …|Priority|
-|---|-------------|-----------|--------|
-|✅|View the location of wild animals (collars, camera trap images, etc.).|	… can protect wildlife sanctuaries or foraging areas against overgrazing or underutilization. … compare the utilization of areas with nature results. … can influence biodiversity in a positive way for example by giving more space.… can estimate the ratio of population size to the damage in the surrounding area, and conclude on the most suitable intervention (with the least impact).|1|
-|❌|View the movement of a group of wild animals.|	… can influence vegetation development through additional management. For example, more/less grazing/mowing or placing/removing fences. … see what effect events have on large animals, and can choose more consciously which events to allow and/or organize.|1|
-|✅|Designate (point with radius) an area of interest, and receive a message when animals are within this area.| … can take preventive measures against animals moving into areas that they should not.|1|
-|❌|View reported human-wildlife interactions (from smartphone apps).| … can adjust my management strategy accordingly. … can estimate the impact of the wild animal population.|2|
-|❌|View the number of humans counted in a certain area during a defined period.|… can organize recreation in a way that has the least negative impact on the wildlife. … can inform recreationists on how to behave in the vicinity of wild animals.	|2|
-|❌|View the tracked locations of humans.|	… can see where recreationists leave the paths and can intervene in order to protect wildlife sanctuaries.	|3|
-|❌|View reported maintenance notices i.e. fences etc.|	… can resolve the problem.	|4|
-|❌|Get insight in the behaviour of a wild animal at a certain moment in time.|	… can estimate which part of the population get preyed on by wolves and can adjust stock to the target stock.	|5|
-|❌|View interactions between animals.|	… can optimize my management by using different ratios of grazers, of applying fauna management clustering for the benefit of other species … know the effects of the presence of wild boar and/or wolves.	|5|
+|#|Functionality|So that I …|Priority|API|
+|-|-------------|-----------|--------|---|
+|N1|View the location of wild animals (collars, camera trap images, etc.).|	… can protect wildlife sanctuaries or foraging areas against overgrazing or underutilization. … compare the utilization of areas with nature results. … can influence biodiversity in a positive way for example by giving more space.… can estimate the ratio of population size to the damage in the surrounding area, and conclude on the most suitable intervention (with the least impact).|1|✅|
+|N2|View the movement of a group of wild animals.|	… can influence vegetation development through additional management. For example, more/less grazing/mowing or placing/removing fences. … see what effect events have on large animals, and can choose more consciously which events to allow and/or organize.|1|❌|
+|N3|Designate (point with radius) an area of interest, and receive a message when animals are within this area.| … can take preventive measures against animals moving into areas that they should not.|1|✅|
+|N4|View reported human-wildlife interactions (from smartphone apps).| … can adjust my management strategy accordingly. … can estimate the impact of the wild animal population.|2|❌|
+|N5|View the number of humans counted in a certain area during a defined period.|… can organize recreation in a way that has the least negative impact on the wildlife. … can inform recreationists on how to behave in the vicinity of wild animals.	|2|❌|
+|N6|View the tracked locations of humans.|	… can see where recreationists leave the paths and can intervene in order to protect wildlife sanctuaries.	|3|❌|
+|N7|View reported maintenance notices i.e. fences etc.|	… can resolve the problem.	|4|❌|
+|N8|Get insight in the behaviour of a wild animal at a certain moment in time.|	… can estimate which part of the population get preyed on by wolves and can adjust stock to the target stock.	|5|❌|
+|N9|View interactions between animals.|	… can optimize my management by using different ratios of grazers, of applying fauna management clustering for the benefit of other species … know the effects of the presence of wild boar and/or wolves.	|5|❌|
 
 #### Wildlife Manager
 My responsibility is to prevent or reduce damage or nuisance caused by certain wild animals while at the same time safeguarding, and sometimes promoting, the well-being of animals and their populations. With other wildlife managers, I am part of  a Wildbeheereenheid (Wildlife Management Unit), which works together with a Faunabeheereenheid at the provincial level. Our tasks may include the monitoring of wild animal populations and of the damage they cause, managing the numbers and behaviour of wild animals to prevent them to cause damage, ensuring management is conducted responsibly, and focusing on improving wildlife habitat and biodiversity.
 
-|API|Functionality|So that I …|Priority|
-|---|-------------|-----------|--------|
-|✅|View the location of wild animals (collars, camera trap images, etc.).|	… can apply measures where needed (fences, ecology of fear, culling, etc.)	|1|
-|❌|View the movement of a group of wild animals.|	… can correlate this to other nature values in the area and can intervene if needed.	|1|
-|✅|Designate (point with radius)  an area of interest, and receive a message (push) when animals are within this area.|	… can take preventive measures against animals moving into areas that they should not.	|1|
-|❌|View the paths that animals take to get into my area of interest.|	… investigate whether a preventive measure is needed, or can apply ecology of fear.	|2|
-|❌|View reported human-wildlife interactions (from smartphone apps).|	… get insight in how interactions with large wild animals (i.e. deer) are experienced, ultimately helping me adjust my management strategy. … can estimate the property damage impact of the presence of wild animals.	|2|
-|❌|View the number of humans counted in a certain area during a defined period.|	… infer the spatial reaction of wild animals on the presence of hunters and/or recreationists with or without pets (dog).	|3|
-|❌|View the number of wild animals counted (per species) in a certain area during a defined period.|	… infer the spatial reaction of wild animals on the presence of hunters and/or recreationists with or without pets (dog).	|3|
-|❌|Activate an existing animal behaviour influencing device (i.e. repellent).|	… can apply ecology of fear and/or culling more effectively.	|3|
-|❌|View food availability for wild animals in certain areas.|	… know where animals are likely going to move to or from and can estimate where they are going for reproduction.	|5|
-|❌|View the population sizes of wild animals.|	… can change my management strategy accordingly in order to maintain the populations as well as prevent damage.	|5|
-|❌|Report the population sizes of wild animals.|	… can change my management strategy accordingly in order to maintain the populations as well as prevent damage.	|5|
+|#|Functionality|So that I …|Priority|API|
+|-|-------------|-----------|--------|---|
+|W1|View the location of wild animals (collars, camera trap images, etc.).|	… can apply measures where needed (fences, ecology of fear, culling, etc.)	|1|✅|
+|W2|View the movement of a group of wild animals.|	… can correlate this to other nature values in the area and can intervene if needed.	|1|❌|
+|W3|Designate (point with radius)  an area of interest, and receive a message (push) when animals are within this area.|	… can take preventive measures against animals moving into areas that they should not.	|1|✅|
+|W4|View the paths that animals take to get into my area of interest.|	… investigate whether a preventive measure is needed, or can apply ecology of fear.	|2|❌|
+|W5|View reported human-wildlife interactions (from smartphone apps).|	… get insight in how interactions with large wild animals (i.e. deer) are experienced, ultimately helping me adjust my management strategy. … can estimate the property damage impact of the presence of wild animals.	|2|❌|
+|W6|View the number of humans counted in a certain area during a defined period.|	… infer the spatial reaction of wild animals on the presence of hunters and/or recreationists with or without pets (dog).	|3|❌|
+|W7|View the number of wild animals counted (per species) in a certain area during a defined period.|	… infer the spatial reaction of wild animals on the presence of hunters and/or recreationists with or without pets (dog).	|3|❌|
+|W8|Activate an existing animal behaviour influencing device (i.e. repellent).|	… can apply ecology of fear and/or culling more effectively.	|3|❌|
+|W9|View food availability for wild animals in certain areas.|	… know where animals are likely going to move to or from and can estimate where they are going for reproduction.	|5|❌|
+|W10|View the population sizes of wild animals.|	… can change my management strategy accordingly in order to maintain the populations as well as prevent damage.	|5|❌|
+|W11|Report the population sizes of wild animals.|	… can change my management strategy accordingly in order to maintain the populations as well as prevent damage.	|5|❌|
 
 
 
@@ -126,13 +126,13 @@ My responsibility is to prevent or reduce damage or nuisance caused by certain w
  
 Regarding my research, I wish to use applications of WildlifeNL to run experiments in order to gather data that I can use to address my research objectives and/or hypotheses. To do so, I would like to create questionnaires that end-users of the applications can fill-out, and I would like to send push messages to the end-users, hopefully nudging them into certain behaviours. Lastly, I want to access the data platform in a way that allows me to extract complete datasets and/or aggregations that I can use in my own research. The data platform does not need to present the data in aesthetically appealing ways, I just need the raw data. 
 
-|API|Functionality|So that I …|Priority|
-|---|-------------|-----------|--------|
-|✅|Create an experiment.|	… can address my research questions and find evidence for any hypothesis that I have.	|1|
-|✅|Create and assign a questionnaire.|	… can gather data from the end-users.	|1|
-|✅|Create and assign messages.|	… can inform the end users and perhaps nudge them into a certain behaviour.	|1|
-|✅|Download data that is collected by the WildlifeNL project in a raw format.|	… can use this data in my research.|1|
-|❌|Download data that is collected by the WildlifeNL project, providing filters like start and end date, or for specific users or animals, and/or in aggregations.|	… can use this data in my research.	|2|
+|#|Functionality|So that I …|Priority|API|
+|-|-------------|-----------|--------|---|
+|C1|Create an experiment.|	… can address my research questions and find evidence for any hypothesis that I have.|1|✅|
+|C2|Create and assign a questionnaire.|	… can gather data from the end-users.|1|✅|
+|C3|Create and assign messages.| … can inform the end users and perhaps nudge them into a certain behaviour.	|1|✅|
+|C4|Download data that is collected by the WildlifeNL project in a raw format.|	… can use this data in my research.|1|✅|
+|C5|Download data that is collected by the WildlifeNL project, providing filters like start and end date, or for specific users or animals, and/or in aggregations.| … can use this data in my research.	|2|❌|
 
 
  
@@ -144,12 +144,12 @@ Regarding my research, I wish to use applications of WildlifeNL to run experimen
 To ensure that the WildifeNL API and its backend contain the correct information and this information is provided to the correct users in the other applications, I can add, edit, and disable data elements. Also, I can assign and revoke roles for other users.
 Note that no specific admin tool will be created, for now the administrators will use the default user interface of the WildlifeNL API.
 
-|API|Functionality|So that I …|Priority|
-|---|-------------|-----------|--------|
-|✅|Assign or revoke user roles for other users.|	… can manage authorisation.	|1|
-|✅|Manage (add, edit, disable?) the animal species in the system.|	… ensure the correct information on animal species is available for the other applications.	|1|
-|✅|Manage (add, edit, disable?) the belonging types that can be used in damage reports in the system.|… ensure the correct information on belongings is available for the other applications.	|1|
-|✅|Manage (add, edit, disable?) the living labs in the system.|	… ensure the correct information on living labs is available for the other applications.	|2|
+|#|Functionality|So that I …|Priority|API|
+|-|-------------|-----------|--------|---|
+|A1|Assign or revoke user roles for other users.|	… can manage authorisation.	|1|✅|
+|A2|Manage (add, edit, disable?) the animal species in the system.|	… ensure the correct information on animal species is available for the other applications.	|1|✅|
+|A3|Manage (add, edit, disable?) the belonging types that can be used in damage reports in the system.|… ensure the correct information on belongings is available for the other applications.	|1|✅|
+|A4|Manage (add, edit, disable?) the living labs in the system.|	… ensure the correct information on living labs is available for the other applications.	|2|✅|
 
  
 ## Data Platform
