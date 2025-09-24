@@ -66,15 +66,16 @@ I want to be better aware of the wild animals around me so that I can enjoy the 
 |R4|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|✅|
 |R5|Report a human-wildlife interaction (damage) and fill-out the corresponding questionnaire.| … report damage to my belongings that was inflicted by wild animals.  … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|✅|
 |R6|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|1|✅|
-|R7|View the reported interactions of others on a map|… can apply preventive measures.|2|✅|
-|R8|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|✅|
-|R9|Close my profile|… know that my personal information is disassociated from the other data that my account created in this system.|2|✅|
-|R10|View my reported interactions|… so I can look back at the data that I provided.|2|✅|
-|R11|View questionnaires that are assigned to me and the answers that I gave|… so I can look back at the data that I provided.|2|✅|
-|R12|Designate (point with radius) an area of interest, i.e. my fields or garden, and receive a message (push) when animals are within this area.|… can take measures to prevent damage to my crops, herds, garden, etc.|4|✅|
-|R13|View the location where wild animals cross the roads.|	… can avoid these places or be more attentive and improve traffic safety.|4|❌|
-|R14|Report a maintenance notice.|	… help in providing the information to the nature area managers and the problem gets resolved quicker.|4|❌|
-|R15|Receive a message if an animal disease is reported in my neighbourhood.|… take preventive measures to protect my herd or pet.|5|❌|
+|R7|View the location of wild animals (collars, camera trap images, etc.).|… know where animals are and potentially have interactions with humans … know where animals are so I can provide care.|1|✅|
+|R8|View the reported interactions of others on a map|… can apply preventive measures.|2|✅|
+|R9|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|✅|
+|R10|Close my profile|… know that my personal information is disassociated from the other data that my account created in this system.|2|✅|
+|R11|View my reported interactions|… so I can look back at the data that I provided.|2|✅|
+|R12|View questionnaires that are assigned to me and the answers that I gave|… so I can look back at the data that I provided.|2|✅|
+|R13|Designate (point with radius) an area of interest, i.e. my fields or garden, and receive a message (push) when animals are within this area.|… can take measures to prevent damage to my crops, herds, garden, etc.|4|✅|
+|R14|View the location where wild animals cross the roads.|	… can avoid these places or be more attentive and improve traffic safety.|4|❌|
+|R15|Report a maintenance notice.|	… help in providing the information to the nature area managers and the problem gets resolved quicker.|4|❌|
+|R16|Receive a message if an animal disease is reported in my neighbourhood.|… take preventive measures to protect my herd or pet.|5|❌|
 
 
  
