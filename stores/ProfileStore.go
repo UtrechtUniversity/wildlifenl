@@ -13,7 +13,7 @@ func NewProfileStore(db *sql.DB) *ProfileStore {
 	s := ProfileStore{
 		relationalDB: db,
 		query: `
-		SELECT u."ID", u."name", u."email", u."location", u."locationTimestamp", u."dateOfBirth", u."gender", u."postcode", u."description", COALESCE(r."ID", 0), COALESCE(r."name", '')
+		SELECT u."ID", u."name", u."email", u."location", u."locationTimestamp", u."dateOfBirth", u."gender", u."postcode", u."description", u."recreationAppTandC", u."reportAppTandC", COALESCE(r."ID", 0), COALESCE(r."name", '')
 		FROM "user" u
 		LEFT JOIN "user_role" x ON x."userID" = u."ID"
 		LEFT JOIN "role" r ON r."ID" = x."roleID"
@@ -38,8 +38,10 @@ func (s *ProfileStore) process(rows *sql.Rows, err error) ([]models.Profile, err
 		var gender *string
 		var postcode *string
 		var description *string
+		var recreationAppTandC bool
+		var reportAppTandC bool
 		var r models.Role
-		if err := rows.Scan(&id, &name, &email, &location, &locationTimestamp, &dateOfBirth, &gender, &postcode, &description, &r.ID, &r.Name); err != nil {
+		if err := rows.Scan(&id, &name, &email, &location, &locationTimestamp, &dateOfBirth, &gender, &postcode, &description, &recreationAppTandC, &reportAppTandC, &r.ID, &r.Name); err != nil {
 			return nil, err
 		}
 		if p.ID != id {
@@ -56,6 +58,8 @@ func (s *ProfileStore) process(rows *sql.Rows, err error) ([]models.Profile, err
 			p.Gender = gender
 			p.Postcode = postcode
 			p.Description = description
+			p.RecreationAppTandC = recreationAppTandC
+			p.ReportAppTandC = reportAppTandC
 		}
 		if r.ID > 0 {
 			p.Roles = append(p.Roles, r)
@@ -92,12 +96,12 @@ func (s *ProfileStore) GetAll() ([]models.Profile, error) {
 
 func (s *ProfileStore) Update(profileID string, profile *models.ProfileRecord) (*models.Profile, error) {
 	query := `
-		UPDATE "user" SET "name" = $2, "dateOfBirth" = $3, "gender" = $4, "postcode" = $5, "description" = $6
+		UPDATE "user" SET "name" = $2, "dateOfBirth" = $3, "gender" = $4, "postcode" = $5, "description" = $6, "recreationAppTandC" = $7, "reportAppTandC" = $8
 		WHERE "ID" = $1
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, profileID, profile.Name, profile.DateOfBirth, profile.Gender, profile.Postcode, profile.Description)
+	row := s.relationalDB.QueryRow(query, profileID, profile.Name, profile.DateOfBirth, profile.Gender, profile.Postcode, profile.Description, profile.RecreationAppTandC, profile.ReportAppTandC)
 	if err := row.Scan(&id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
