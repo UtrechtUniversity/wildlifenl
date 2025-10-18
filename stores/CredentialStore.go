@@ -45,6 +45,7 @@ func (s *CredentialStore) Get(token string) (*models.Credential, error) {
 }
 
 func (s *CredentialStore) Create(appName, userName, email string) (*models.Credential, error) {
+	// Tolerate interaction with "user" table and "user_role" tables here because these operation are specific to creating valid credentials and should not be called at any other moment.
 	query := `
 		INSERT INTO "user"("name", "email") VALUES($1, LOWER($2)) 
 		ON CONFLICT("email") DO UPDATE SET "email" = LOWER($2) 
