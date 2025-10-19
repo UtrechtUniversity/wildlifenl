@@ -3,9 +3,12 @@ package stores
 import (
 	"context"
 	"database/sql"
+	"sort"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/timeseries"
+	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 )
 
@@ -22,6 +25,46 @@ func NewTrackingReadingStore(relationalDB *sql.DB, timeseriesDB *timeseries.Time
 		`,
 	}
 	return &s
+}
+
+func (s *TrackingReadingStore) process(records *api.QueryTableResult) ([]models.TrackingReading, error) {
+	readings := make(map[string]map[time.Time]*models.TrackingReading)
+	for records.Next() {
+		r := records.Record()
+		userID, ok := r.Values()["userID"].(string)
+		if !ok {
+			continue
+		}
+		sensor, ok := readings[userID]
+		if !ok {
+			sensor = make(map[time.Time]*models.TrackingReading)
+			readings[userID] = sensor
+		}
+		reading, ok := sensor[r.Time()]
+		if !ok {
+			reading = &models.TrackingReading{}
+			sensor[r.Time()] = reading
+		}
+		switch r.Field() {
+		case "latitude":
+			reading.Location.Latitude = r.Value().(float64)
+		case "longitude":
+			reading.Location.Longitude = r.Value().(float64)
+		}
+	}
+	if err := records.Err(); err != nil {
+		return nil, err
+	}
+	results := make([]models.TrackingReading, 0)
+	for userID, timedReading := range readings {
+		for time, reading := range timedReading {
+			reading.UserID = userID
+			reading.Timestamp = time
+			results = append(results, *reading)
+		}
+	}
+	sort.Slice(results, func(i, j int) bool { return results[i].Timestamp.After(results[j].Timestamp) })
+	return results, nil
 }
 
 func (s *TrackingReadingStore) Add(userID string, trackingReading *models.TrackingReadingRecord) (*models.TrackingReading, error) {
@@ -49,25 +92,10 @@ func (s *TrackingReadingStore) GetForUser(userID string) ([]models.TrackingReadi
 		|> filter(fn: (r) => r.userID == "` + userID + `")
 	`
 	reader := s.timeseriesDB.Reader()
-	result, err := reader.Query(context.Background(), query)
+	records, err := reader.Query(context.Background(), query)
 	if err != nil {
 		return nil, err
 	}
-	defer result.Close()
-	trackingReadings := make([]models.TrackingReading, 0)
-	for result.Next() {
-		record := result.Record()
-		var trackingReading models.TrackingReading
-		trackingReading.Timestamp = record.Time()
-		trackingReading.UserID = record.ValueByKey("userID").(string)
-		trackingReading.Location = models.Point{
-			Latitude:  record.ValueByKey("latitude").(float64),
-			Longitude: record.ValueByKey("longitude").(float64),
-		}
-		trackingReadings = append(trackingReadings, trackingReading)
-	}
-	if result.Err() != nil {
-		return nil, err
-	}
-	return trackingReadings, nil
+	defer records.Close()
+	return s.process(records)
 }
