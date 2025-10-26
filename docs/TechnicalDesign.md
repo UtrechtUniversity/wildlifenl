@@ -5,6 +5,21 @@
 ## Introduction
 This technical design provides an overview of the implementation details for the WildlifeNL API backend and data storage solutions. It defines the entities and logic involved.
 
+## Roles and access scopes
+Access to certain API endpoints is limited to those accounts that have the required credential scopes. Based on the role of the user, scopes are assigned by the Adminitrators. It is possible for the same account to have multiple scopes assigned.
+
+|Role|Scope|
+|----|-----|
+|👲 Recreationist|[none]|
+|🧑🏻‍💼 Inhabitant|[none]|
+|🧑‍🌾 Land User|`land-user`|
+|🧝🏻 Nature Area Manager|`nature-area-manager`|
+|🧑🏻‍🔧 Wildlife Manager|`wildlife-manager`|
+|🧑‍🔬 Researcher|`researcher`|
+|🧑🏻‍💻 Administrator|`administrator`|
+
+Additionally, the scope `data-system` exists for accounts that are meant to be used by automated systems that provide data ingest and the scope `herd-manager` exists but is currently not used.
+
 ## Entities
 
 The `wildlifenl` API discloses access to the following entities using end-points that have the same name.
