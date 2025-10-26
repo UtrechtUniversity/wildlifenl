@@ -19,11 +19,11 @@ type InteractionsHolder struct {
 }
 
 type InteractionQueryInput struct {
-	Latitude  float64   `query:"area_latitude" minimum:"-90" maximum:"90"`
-	Longitude float64   `query:"area_longitude" minimum:"-180" maximum:"180"`
-	Radius    int       `query:"area_radius" minimum:"1"`
-	Before    time.Time `query:"moment_before"`
-	After     time.Time `query:"moment_after"`
+	Latitude  float64   `query:"area_latitude" minimum:"-90" maximum:"90" doc:"The latitude of the point that defines the centre of the area in which the interaction happened."`
+	Longitude float64   `query:"area_longitude" minimum:"-180" maximum:"180" doc:"The longitude of the point that defines the centre of the area in which the interaction happened."`
+	Radius    int       `query:"area_radius" minimum:"1" doc:"The radius of the area as defined by its centre point, in which the interaction happened."`
+	Before    time.Time `query:"moment_before" doc:"The moment in time before which the interaction happened."`
+	After     time.Time `query:"moment_after" doc:"The moment in time after which the interaction happened."`
 }
 
 type InteractionAddInput struct {
