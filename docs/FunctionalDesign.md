@@ -11,7 +11,7 @@ In the workshop regarding the WildlifeNL user stories, 7 different roles were de
 
 - 👲 Recreationist
 - 🧑🏻‍💼 Inhabitant
-- 🧑‍🌾 Agrarian
+- 🧑‍🌾 Land User
 - 🧝🏻 Nature Area Manager
 - 🧑🏻‍🔧 Wildlife Manager
 - 🧑‍🔬 Researcher
@@ -21,7 +21,7 @@ In the workshop regarding the WildlifeNL user stories, 7 different roles were de
 To address the objectives of the WildlifeNL project, five end-user applications have been defined and functionalities, collected from User Stories, have been added to each application. Note that functionalities with a priority of 4 or lower have been added for archiving purposes but will not receive any resources for implementation yet. Two applications are aimed at mobile use using a smartphone or tablet, whereas the others are aimed at large screen use in a web browser on a laptop/desktop, but also functions, albeit less comfortable, in a mobile web-browser on a smartphone or tablet. All applications share data via the WildlifeNL API (see chapter Architecture). An Administrator role is defined, but no application will be created yet for this role. Current administrators will use the default user interface of the Wildlife API to activate functionalities assigned to their role.
 
 - 👲 Recreationist, 🧑🏻‍💼 Inhabitant -> 📱 WildGids (smartphone)
-- 🧑‍🌾 Agrarian, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager ->📱 WildRapport (smartphone)
+- 🧑‍🌾 Land User, 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager ->📱 WildRapport (smartphone)
 - 🧝🏻 Nature Area Manager, 🧑🏻‍🔧 Wildlife Manager -> 💻 WildRadar (web browser)
 - 🧑‍🔬 Researcher -> 💻 ResearchConnect (web browser)
 - 🧑🏻‍💻 Administrator -> 💻 Administration (web browser)
@@ -33,21 +33,21 @@ To address the objectives of the WildlifeNL project, five end-user applications 
    
 I love being in and learning about nature, but feeling safe is important to me. Learning about the wild animals around me increases my positive nature experience. Knowing how to behave around wild animals or how to interact, or not interact, with them makes me feel more secure. I enjoy the freedom to choose activities like running, cycling, horseback riding, or walking. Sometimes I like being alone in nature, other times with my family and dog, or in a larger group. It is helpful to know where wild animals are so I can plan my route accordingly. Occasionally, I find it exciting to take photos of wildlife, but I want to make sure that it is appropriate or at the right time. I find it useful to register interactions I have with wild animals as this supports researchers, and if I spot something broken, I wish to report it for maintenance. Getting a notification with information on how to behave when I am approaching a potentially dangerous animal gives me peace of mind and reduces the probability of me performing undesirable behaviour (e.g., behaviour that leads to conflict with the wild animal or that negatively affects the welfare of the wild animal). 
 
-|#|Functionality|So that I …|Priority|API|
-|-|-------------|-----------|--------|---|
-|G1|Read and accept the 'terms of use' and activate location tracking when I use this app.|… know that using this app means that I am a participant in a research project and my location is automatically tracked for the purpose of academic research.|1|✅|
-|G2|View my tracked movements on a map.|… know which movements I made that are shared with the project.|1|✅|
-|G3|View the location of wild animals (collars, camera trap images, etc.).|… can go and see them in real life and perhaps make a photograph. … can avoid them if I do not want to have an interaction with them.|1|✅|
-|G4|Receive a message (push) if an encounter with a wild animal is imminent (distance based).|… know how to act accordingly, or can prevent a dangerous interaction.|1|✅|
-|G5|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|✅|
-|G6|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|✅|
-|G7|View my reported interactions|… so I can look back at the data that I provided.|2|✅|
-|G8|View information on wild animal species and how to interact with them.|… learn more about their behaviour, history, reasons for being in this environment, etc. … know how to behave and prevent dangerous situation.|2|✅|
-|G9|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|✅|
-|G10|Close my profile|… know that my personal information is disassociated from the other data that my account created in this system.|2|✅|
-|G11|Play an educational game about wild animals.|… , regardless of being a young person, remain interested in wildlife management.|3|❌|
-|G12|Report a maintenance notice.| … help in providing the information to the nature area managers and the problem gets resolved quicker.|4|❌|
-|G13|Watch webcam/nestcam streams.|	… can enjoy nature even from home. … can observe animal sanctuaries even though, as a human, I cannot enter them.|5|❌|
+|#|Role|Functionality|So that I …|Priority|API|
+|-|----|-------------|-----------|--------|---|
+|G1|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|Read and accept the 'terms of use' and activate location tracking when I use this app.|… know that using this app means that I am a participant in a research project and my location is automatically tracked for the purpose of academic research.|1|✅|
+|G2|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|View my tracked movements on a map.|… know which movements I made that are shared with the project.|1|✅|
+|G3|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|View the location of wild animals (collars, camera trap images, etc.).|… can go and see them in real life and perhaps make a photograph. … can avoid them if I do not want to have an interaction with them.|1|✅|
+|G4|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|Receive a message (push) if an encounter with a wild animal is imminent (distance based).|… know how to act accordingly, or can prevent a dangerous interaction.|1|✅|
+|G5|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|Report a human-wildlife interaction, including the status of the animal(s) involved (sighting) and fill-out the corresponding questionnaire.|	… help researchers and managers regarding presence information of wild animals. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|✅|
+|G6|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|Report a human-wildlife interaction, including the status of the animal(s) involved (animal-vehicle-collision) and fill-out the corresponding questionnaire.|… report a wild animal-vehicle collision. … help researchers by providing information on how I experience different human-wildlife interactions and get advice based on the answers that I gave.|2|✅|
+|G7|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|View my reported interactions|… so I can look back at the data that I provided.|2|✅|
+|G8|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|View information on wild animal species and how to interact with them.|… learn more about their behaviour, history, reasons for being in this environment, etc. … know how to behave and prevent dangerous situation.|2|✅|
+|G9|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|✅|
+|G10|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|Close my profile|… know that my personal information is disassociated from the other data that my account created in this system.|2|✅|
+|G11|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|Play an educational game about wild animals.|… , regardless of being a young person, remain interested in wildlife management.|3|❌|
+|G12|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|Report a maintenance notice.| … help in providing the information to the nature area managers and the problem gets resolved quicker.|4|❌|
+|G13|👲 Recreationist<br/> 🧑🏻‍💼 Inhabitant|Watch webcam/nestcam streams.|	… can enjoy nature even from home. … can observe animal sanctuaries even though, as a human, I cannot enter them.|5|❌|
 
 
 
