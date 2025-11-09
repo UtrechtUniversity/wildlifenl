@@ -66,20 +66,3 @@ func (o *userOperations) RegisterAdd(api huma.API) {
 		return &UserHolder{Body: user}, nil
 	})
 }
-
-func (o *userOperations) RegisterGetAll(api huma.API) {
-	name := "Get all Users [deprecated]"
-	description := "Retrieve all users. - Note that this end-point is deprecated and will be removed in the near future."
-	path := "/" + o.Endpoint + "s/"
-	scopes := []string{}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*UsersHolder, error) {
-		users, err := stores.NewUserStore(relationalDB).GetAll()
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &UsersHolder{Body: users}, nil
-	})
-}

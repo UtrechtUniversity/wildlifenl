@@ -23,23 +23,6 @@ func newConveyanceOperations() *conveyanceOperations {
 	return &conveyanceOperations{Endpoint: "conveyance"}
 }
 
-func (o *conveyanceOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Conveyances [deprecated]"
-	description := "Retrieve all conveyances. DEPRECATED"
-	path := "/" + o.Endpoint + "s/"
-	scopes := []string{"researcher"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*ConveyancesHolder, error) {
-		conveyances, err := stores.NewConveyanceStore(relationalDB).GetAll()
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &ConveyancesHolder{Body: conveyances}, nil
-	})
-}
-
 func (o *conveyanceOperations) RegisterGetMine(api huma.API) {
 	name := "Get My Conveyances"
 	description := "Retrieve my conveyances."
