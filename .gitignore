@@ -1,2 +1,2 @@
 .vscode
-cmd/*.exe
+cmd/*.exe*
