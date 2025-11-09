@@ -21,6 +21,11 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+const (
+	appName        = "WildlifeNL"
+	appDescription = "This is the WildlifeNL API. Before you can start making calls to the provided end-points you should acquire a bearer token. To do so, make a POST request at /auth/ providing the required fields including a valid email address. A validation code will be send to that email address. Then, make a PUT request at /auth/ providing the same email address and the validation code. The response will include a field named \"token\" containing your bearer token. Use this bearer token in the header of any future calls you make."
+)
+
 var (
 	relationalDB *sql.DB
 	timeseriesDB *timeseries.Timeseries

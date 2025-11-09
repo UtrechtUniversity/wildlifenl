@@ -1,11 +1,36 @@
 package wildlifenl
 
 import (
+	"bytes"
 	"log"
-	"strings"
+	"text/template"
+	"time"
+
+	_ "embed"
 
 	"github.com/go-mail/mail"
 )
+
+const (
+	emailSubject = "Aanmelden bij WildlifeNL"
+)
+
+var (
+	//go:embed templates/email.go.tmpl
+	emailTemplateFS string
+	emailTemplate   *template.Template
+)
+
+func init() {
+	emailTemplate = template.Must(template.New("email").Parse(emailTemplateFS))
+}
+
+type mailData struct {
+	AppName     string
+	DisplayName string
+	Code        string
+	Year        int
+}
 
 type Mailer struct {
 	config *Configuration
@@ -31,10 +56,17 @@ func (e *Mailer) SendCode(appName, displayName, email, code string) error {
 		log.Println("Code for", email, "is:", code)
 		return nil
 	}
-	body := emailBody
-	body = strings.ReplaceAll(body, "{appName}", appName)
-	body = strings.ReplaceAll(body, "{displayName}", displayName)
-	body = strings.ReplaceAll(body, "{code}", code)
+	var bodyBuffer bytes.Buffer
+	err := emailTemplate.Execute(&bodyBuffer, mailData{
+		AppName:     appName,
+		DisplayName: displayName,
+		Code:        code,
+		Year:        time.Now().Year(),
+	})
+	if err != nil {
+		return err
+	}
+	body := bodyBuffer.String()
 	m := mail.NewMessage()
 	m.SetHeader("From", e.config.EmailFrom)
 	m.SetHeader("To", email)
