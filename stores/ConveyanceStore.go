@@ -155,7 +155,7 @@ func (s *ConveyanceStore) AddForTrackingReading(trackingReading *models.Tracking
 			INNER JOIN "experiment" e ON e."ID" = m."experimentID"
 			INNER JOIN "user" u ON u."ID" = $1
 			LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
-			WHERE extract(epoch FROM u."locationTimestamp" - n."locationTimestamp") / 60 > m."encounterMinutes" 
+			WHERE ABS(extract(epoch FROM u."locationTimestamp" - n."locationTimestamp")) / 60 < m."encounterMinutes" 
 			AND CIRCLE(n."location", CAST(m."encounterMeters" AS FLOAT) / 10000) @> u."location"
 			AND e."start" < u."locationTimestamp"
 			AND (e."end" IS NULL OR e."end" > u."locationTimestamp")
