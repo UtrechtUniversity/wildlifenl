@@ -46,9 +46,10 @@ I love being in and learning about nature, but feeling safe is important to me. 
 |G9|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|Update my profile (username, date of birth, postcode, etc.)|… help researchers by providing context information.|2|✅|
 |G10|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|Close my profile|… know that my personal information is disassociated from the other data that my account created in this system.|2|✅|
 |G11|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|View animal detections and reported interactions of others on a map|… can inform myself about others having human-animal interactions.|2|✅|
-|G12|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|Play an educational game about wild animals.|… , regardless of being a young person, remain interested in wildlife management.|3|❌|
-|G13|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|Report a maintenance notice.| … help in providing the information to the nature area managers and the problem gets resolved quicker.|4|❌|
-|G14|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|Watch webcam/nestcam streams.|	… can enjoy nature even from home. … can observe animal sanctuaries even though, as a human, I cannot enter them.|5|❌|
+|G12|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|View questionnaires that are assigned to me and the answers that I gave|… so I can look back at the data that I provided.|2|✅|
+|G13|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|Play an educational game about wild animals.|… , regardless of being a young person, remain interested in wildlife management.|3|❌|
+|G14|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|Report a maintenance notice.| … help in providing the information to the nature area managers and the problem gets resolved quicker.|4|❌|
+|G15|👲&nbsp;Recreationist<br/>🧑🏻‍💼&nbsp;Inhabitant|Watch webcam/nestcam streams.|	… can enjoy nature even from home. … can observe animal sanctuaries even though, as a human, I cannot enter them.|5|❌|
 
 
 
