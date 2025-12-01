@@ -1,4 +1,4 @@
-# WildlifeNL App tests – Landholder
+# WildlifeNL App tests – Recreationist
 Today you are recreationist using the WildlifeNL WildGids app. We are running this app against a TEST environment with simulated animals, so there will only be human-wildlife interactions that are artificially created by us. All locations are within the test living lab area Botanische Tuinen in Utrecht. If you notice an issue, bug or inconvenience when performing the test scenarios below, please write them down so we can later provide them to the development team. Note that aside from the 'Logging in' feature, all features are marked with codes in brackets ([ ]) that match the user story codes in the Functional Design. You can look-up the expected behaviour of the app and the purpose of the functionality this way. Additionally, it is possible that the screens that are mentioned in single quotes in these test scenarios have a somewhat different Dutch name in the app. Please login with your email address either from Utrecht University or Fontys University of Applied Sciences.
 <br/>
 
