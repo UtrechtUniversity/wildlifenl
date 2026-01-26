@@ -12,7 +12,7 @@ func NewAlarmStore(db *sql.DB) *AlarmStore {
 	s := AlarmStore{
 		relationalDB: db,
 		query: `
-		SELECT a."ID", a."timestamp", z."ID", z."deactivated", z."name", z."description", z."area", s."ID", s."name", s."commonName", u."ID", u."name", COALESCE(i."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(i."timestamp", '2000-01-01'), COALESCE(i."description",''), COALESCE(i."location",'(0,0)'), COALESCE(t."ID",0), COALESCE(t."name",''), COALESCE(t."description",''), COALESCE(x."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(x."name",''), COALESCE(d."ID",0), COALESCE(d."location", '(0,0)'), COALESCE(d."timestamp",'2000-01-01'), COALESCE(d."sensorID",''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(n."location",'(0,0)'), COALESCE(c."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(c."timestamp",'2000-01-01'), COALESCE(m."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(m."name",''), COALESCE(m."severity",0), COALESCE(m."text",''), COALESCE(m."trigger",''), COALESCE(e."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(e."name",''), COALESCE(e."description",''), COALESCE(e."start",'2000-01-01'), COALESCE(e."end",'2000-01-01'), COALESCE(y."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(y."name",'')
+		SELECT a."ID", a."timestamp", z."ID", z."deactivated", z."name", z."description", z."area", s."ID", s."name", s."commonName", u."ID", u."name", COALESCE(i."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(i."timestamp", '2000-01-01'), COALESCE(i."description",''), COALESCE(i."location",'(0,0)'), COALESCE(t."ID",0), COALESCE(t."name",''), COALESCE(t."description",''), COALESCE(x."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(x."name",''), COALESCE(d."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(d."location", '(0,0)'), COALESCE(d."timestamp",'2000-01-01'), COALESCE(d."sensorID",''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(n."location",'(0,0)'), COALESCE(c."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(c."timestamp",'2000-01-01'), COALESCE(m."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(m."name",''), COALESCE(m."severity",0), COALESCE(m."text",''), COALESCE(m."trigger",''), COALESCE(e."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(e."name",''), COALESCE(e."description",''), COALESCE(e."start",'2000-01-01'), COALESCE(e."end",'2000-01-01'), COALESCE(y."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(y."name",'')
 		FROM "alarm" a
 		INNER JOIN "zone" z ON a."zoneID" = z."ID"
 		INNER JOIN "user" u ON u."ID" = z."userID"
@@ -56,7 +56,7 @@ func (s *AlarmStore) process(rows *sql.Rows, err error) ([]models.Alarm, error) 
 				i.Species = s
 				alarm.Interaction = &i
 			}
-			if d.ID > 0 {
+			if d.ID != "00000000-0000-0000-0000-000000000000" {
 				d.Species = s
 				alarm.Detection = &d
 			}

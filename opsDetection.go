@@ -46,7 +46,7 @@ func (o *detectionOperations) RegisterGetAll(api huma.API) {
 
 func (o *detectionOperations) RegisterAdd(api huma.API) {
 	name := "Add Detection"
-	description := "Add a new detection."
+	description := "Add a new detection.<br/><br/><i>Note that all animals in a detection need to be of the same species. If a single sensor event in the external system identified animals of different species, add multiple detections for that single event here.</i>"
 	path := "/" + o.Endpoint + "/"
 	scopes := []string{"data-system"}
 	method := http.MethodPost
