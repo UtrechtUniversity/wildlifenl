@@ -14,9 +14,10 @@ func NewDetectionStore(db *sql.DB) *DetectionStore {
 	s := DetectionStore{
 		relationalDB: db,
 		query: `
-		SELECT d."ID", d."location", d."timestamp", d."sensorID", d."sensorType", d."uri", s."ID", s."name", s."commonName"
+		SELECT d."ID", d."location", d."timestamp", d."sensorID", d."sensorType", d."uri", s."ID", s."name", s."commonName", u."ID", u."name"
 		FROM "detection" d
 		INNER JOIN "species" s ON s."ID" = d."speciesID"
+		INNER JOIN "user" u ON u."ID" = d."userID"
 		`,
 	}
 	return &s
@@ -29,7 +30,7 @@ func (s *DetectionStore) process(rows *sql.Rows, err error) ([]models.Detection,
 	detections := make([]models.Detection, 0)
 	for rows.Next() {
 		var d models.Detection
-		if err := rows.Scan(&d.ID, &d.Location, &d.Timestamp, &d.SensorID, &d.SensorType, &d.URI, &d.Species.ID, &d.Species.Name, &d.Species.CommonName); err != nil {
+		if err := rows.Scan(&d.ID, &d.Location, &d.Timestamp, &d.SensorID, &d.SensorType, &d.URI, &d.Species.ID, &d.Species.Name, &d.Species.CommonName, &d.User.ID, &d.User.Name); err != nil {
 			return nil, err
 		}
 		a, err := NewDetectionAnimalStore(s.relationalDB).GetAllForDetection(d.ID) // Potential performance issue, as it is being called inside a loop.
@@ -65,13 +66,13 @@ func (s *DetectionStore) GetAll() ([]models.Detection, error) {
 	return s.process(rows, err)
 }
 
-func (s *DetectionStore) Add(detection models.DetectionRecord) (*models.Detection, error) {
+func (s *DetectionStore) Add(userID string, detection models.DetectionRecord) (*models.Detection, error) {
 	query := `
-	INSERT INTO "detection"("location", "timestamp", "sensorID", "sensorType", "uri", "speciesID") VALUES($1, $2, $3, $4, $5, $6)
+	INSERT INTO "detection"("userID", "location", "timestamp", "sensorID", "sensorType", "uri", "speciesID") VALUES($1, $2, $3, $4, $5, $6, $7)
 	RETURNING "ID"
 `
 	var id string
-	row := s.relationalDB.QueryRow(query, detection.Location, detection.Timestamp, detection.SensorID, detection.SensorType, detection.URI, detection.SpeciesID)
+	row := s.relationalDB.QueryRow(query, userID, detection.Location, detection.Timestamp, detection.SensorID, detection.SensorType, detection.URI, detection.SpeciesID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
