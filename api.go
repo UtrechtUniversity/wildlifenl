@@ -39,7 +39,7 @@ func Start(config *Configuration) error {
 		return fmt.Errorf("could not initialize Relational database: %w", err)
 	}
 	if err := initializeTimeseriesDB(config); err != nil {
-		return fmt.Errorf("could not initiliaze Timeseries database: %w", err)
+		return fmt.Errorf("could not initialize Timeseries database: %w", err)
 	}
 	if err := initializeMailer(config); err != nil {
 		return fmt.Errorf("could not initialize Mailer service: %w", err)
