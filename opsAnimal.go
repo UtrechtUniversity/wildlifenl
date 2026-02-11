@@ -53,7 +53,7 @@ func (o *animalOperations) RegisterGetAll(api huma.API) {
 	name := "Get All Animals"
 	description := "Retrieve all animals."
 	path := "/" + o.Endpoint + "s/"
-	scopes := []string{"wildlife-manager", "herd-manager", "nature-area-manager"}
+	scopes := []string{"researcher"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
@@ -80,5 +80,23 @@ func (o *animalOperations) RegisterAdd(api huma.API) {
 			return nil, handleError(err)
 		}
 		return &AnimalHolder{Body: species}, nil
+	})
+}
+
+func (o *animalOperations) RegisterGetFilter(api huma.API) {
+	name := "Get Animals By Filter"
+	description := "Retrieve animals within a spatiotemporal span."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"nature-area-manager", "wildlife-manager", "herd-manager"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *SpatiotemporalInput) (*AnimalsHolder, error) {
+		area := models.Circle{Location: models.Point{Latitude: input.Latitude, Longitude: input.Longitude}, Radius: float64(input.Radius)}
+		animals, err := stores.NewAnimalStore(relationalDB, timeseriesDB).GetFiltered(&area, &input.Start, &input.End)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &AnimalsHolder{Body: animals}, nil
 	})
 }

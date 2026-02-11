@@ -100,7 +100,7 @@ func (s *AnimalStore) UpdateLocation(sensorID string, location models.Point, tim
 	return s.Get(*id)
 }
 
-func (s *AnimalStore) GetFiltered(area *models.Circle, before *time.Time, after *time.Time) ([]models.Animal, error) {
+func (s *AnimalStore) GetFiltered(area *models.Circle, isAfter *time.Time, isBefore *time.Time) ([]models.Animal, error) {
 	query := s.query
 	args := make([]any, 0)
 	whereDone := false
@@ -113,23 +113,23 @@ func (s *AnimalStore) GetFiltered(area *models.Circle, before *time.Time, after 
 		query += and + `$` + strconv.Itoa(len(args)+1) + `::circle @> a."location"`
 		args = append(args, area)
 	}
-	if before != nil {
-		and := " AND "
-		if !whereDone {
-			and = " WHERE "
-			whereDone = true
-		}
-		query += and + `a."locationTimestamp" < $` + strconv.Itoa(len(args)+1)
-		args = append(args, before)
-	}
-	if after != nil {
+	if isAfter != nil {
 		and := " AND "
 		if !whereDone {
 			and = " WHERE "
 			whereDone = true
 		}
 		query += and + `a."locationTimestamp" > $` + strconv.Itoa(len(args)+1)
-		args = append(args, after)
+		args = append(args, isAfter)
+	}
+	if isBefore != nil {
+		and := " AND "
+		if !whereDone {
+			and = " WHERE "
+			whereDone = true
+		}
+		query += and + `a."locationTimestamp" < $` + strconv.Itoa(len(args)+1)
+		args = append(args, isBefore)
 	}
 	rows, err := s.relationalDB.Query(query, args...)
 	return s.process(rows, err)

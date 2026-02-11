@@ -48,7 +48,7 @@ func (o *vicinityOperations) RegisterGetMine(api huma.API) {
 			before := time.Now()
 			after := before.Add(-time.Duration(hours) * time.Hour)
 
-			animals, err := stores.NewAnimalStore(relationalDB, timeseriesDB).GetFiltered(&area, &before, &after)
+			animals, err := stores.NewAnimalStore(relationalDB, timeseriesDB).GetFiltered(&area, &after, &before)
 			if err != nil {
 				return nil, handleError(err)
 			}
