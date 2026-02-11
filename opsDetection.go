@@ -28,8 +28,8 @@ func newDetectionOperations() *detectionOperations {
 	return &detectionOperations{Endpoint: "detection"}
 }
 
-func (o *detectionOperations) RegisterGet(api huma.API) {
-	name := "Get Detections"
+func (o *detectionOperations) RegisterGetFilter(api huma.API) {
+	name := "Get Detections By Filter"
 	description := "Retrieve detections within a spatiotemporal span."
 	path := "/" + o.Endpoint + "/"
 	scopes := []string{"nature-area-manager", "wildlife-manager", "herd-manager"}
