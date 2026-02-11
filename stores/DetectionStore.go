@@ -82,7 +82,7 @@ func (s *DetectionStore) Add(userID string, detection models.DetectionRecord) (*
 	return s.Get(id)
 }
 
-func (s *DetectionStore) GetFiltered(area *models.Circle, before *time.Time, after *time.Time) ([]models.Detection, error) {
+func (s *DetectionStore) GetFiltered(area *models.Circle, startedAfter *time.Time, endedBefore *time.Time) ([]models.Detection, error) {
 	query := s.query
 	args := make([]any, 0)
 	whereDone := false
@@ -95,23 +95,23 @@ func (s *DetectionStore) GetFiltered(area *models.Circle, before *time.Time, aft
 		query += and + `$` + strconv.Itoa(len(args)+1) + `::circle @> d."location"`
 		args = append(args, area)
 	}
-	if before != nil {
+	if startedAfter != nil {
 		and := " AND "
 		if !whereDone {
 			and = " WHERE "
 			whereDone = true
 		}
-		query += and + `d."timestamp" < $` + strconv.Itoa(len(args)+1)
-		args = append(args, before)
+		query += and + `d."start" > $` + strconv.Itoa(len(args)+1)
+		args = append(args, startedAfter)
 	}
-	if after != nil {
+	if endedBefore != nil {
 		and := " AND "
 		if !whereDone {
 			and = " WHERE "
 			whereDone = true
 		}
-		query += and + `d."timestamp" > $` + strconv.Itoa(len(args)+1)
-		args = append(args, after)
+		query += and + `d."end" < $` + strconv.Itoa(len(args)+1)
+		args = append(args, endedBefore)
 	}
 	rows, err := s.relationalDB.Query(query, args...)
 	return s.process(rows, err)

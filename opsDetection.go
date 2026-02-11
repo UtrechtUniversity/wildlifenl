@@ -28,16 +28,17 @@ func newDetectionOperations() *detectionOperations {
 	return &detectionOperations{Endpoint: "detection"}
 }
 
-func (o *detectionOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Detections"
-	description := "Retrieve all detections."
-	path := "/" + o.Endpoint + "s/"
-	scopes := []string{"researcher"}
+func (o *detectionOperations) RegisterGet(api huma.API) {
+	name := "Get Detections"
+	description := "Retrieve detections within a spatiotemporal span."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"nature-area-manager", "wildlife-manager", "herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*DetectionsHolder, error) {
-		detections, err := stores.NewDetectionStore(relationalDB).GetAll()
+	}, func(ctx context.Context, input *SpatiotemporalInput) (*DetectionsHolder, error) {
+		area := models.Circle{Location: models.Point{Latitude: input.Latitude, Longitude: input.Longitude}, Radius: float64(input.Radius)}
+		detections, err := stores.NewDetectionStore(relationalDB).GetFiltered(&area, &input.Start, &input.End)
 		if err != nil {
 			return nil, handleError(err)
 		}
