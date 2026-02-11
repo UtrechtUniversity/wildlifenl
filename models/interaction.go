@@ -7,7 +7,7 @@ type InteractionRecord struct {
 	Description       string           `json:"description" doc:"The description of this interaction."`
 	SpeciesID         string           `json:"speciesID,omitempty" format:"uuid" writeOnly:"true" required:"true" doc:"The ID of the species involved in this interaction."`
 	Location          Point            `json:"location" doc:"The location where this interaction was reported."`
-	Moment            time.Time        `json:"moment" doc:"The moment this interaction happened."`
+	Moment            time.Time        `json:"moment" format:"date-time" doc:"The moment this interaction happened."`
 	Place             Point            `json:"place" doc:"The place where this interaction happened."`
 	TypeID            int              `json:"typeID,omitempty" minimum:"1" writeOnly:"true" required:"true" doc:"The ID of the interaction type for this interaction."`
 	ReportOfSighting  *SightingReport  `json:"reportOfSighting,omitempty" doc:"Report of the animal sightings. Only used for interactions of TypeID 1"`
