@@ -54,7 +54,7 @@ func (o *vicinityOperations) RegisterGetMine(api huma.API) {
 			}
 			vicinity.Animals = animals
 
-			interactions, err := stores.NewInteractionStore(relationalDB).GetFiltered(&area, &before, &after)
+			interactions, err := stores.NewInteractionStore(relationalDB).GetFiltered(&area, &after, &before)
 			if err != nil {
 				return nil, handleError(err)
 			}

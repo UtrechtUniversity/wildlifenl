@@ -142,3 +142,21 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 		return &InteractionHolder{Body: interaction}, nil
 	})
 }
+
+func (o *interactionOperations) RegisterGetFilter(api huma.API) {
+	name := "Get Interactions By Filter"
+	description := "Retrieve interactions within a spatiotemporal span."
+	path := "/" + o.Endpoint + "/"
+	scopes := []string{"nature-area-manager", "wildlife-manager", "herd-manager"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *SpatiotemporalInput) (*InteractionsHolder, error) {
+		area := models.Circle{Location: models.Point{Latitude: input.Latitude, Longitude: input.Longitude}, Radius: float64(input.Radius)}
+		interactions, err := stores.NewInteractionStore(relationalDB).GetFiltered(&area, &input.Start, &input.End)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &InteractionsHolder{Body: interactions}, nil
+	})
+}

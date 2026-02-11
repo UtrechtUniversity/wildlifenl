@@ -185,7 +185,7 @@ func (s *InteractionStore) GetByUser(userID string) ([]models.Interaction, error
 	return s.process(rows, err)
 }
 
-func (s *InteractionStore) GetFiltered(area *models.Circle, before *time.Time, after *time.Time) ([]models.Interaction, error) {
+func (s *InteractionStore) GetFiltered(area *models.Circle, isAfter *time.Time, isBefore *time.Time) ([]models.Interaction, error) {
 	query := s.query
 	args := make([]any, 0)
 	whereDone := false
@@ -198,23 +198,23 @@ func (s *InteractionStore) GetFiltered(area *models.Circle, before *time.Time, a
 		query += and + `$` + strconv.Itoa(len(args)+1) + `::circle @> i."location"`
 		args = append(args, area)
 	}
-	if before != nil {
-		and := " AND "
-		if !whereDone {
-			and = " WHERE "
-			whereDone = true
-		}
-		query += and + `i."moment" < $` + strconv.Itoa(len(args)+1)
-		args = append(args, before)
-	}
-	if after != nil {
+	if isAfter != nil {
 		and := " AND "
 		if !whereDone {
 			and = " WHERE "
 			whereDone = true
 		}
 		query += and + `i."moment" > $` + strconv.Itoa(len(args)+1)
-		args = append(args, after)
+		args = append(args, isAfter)
+	}
+	if isBefore != nil {
+		and := " AND "
+		if !whereDone {
+			and = " WHERE "
+			whereDone = true
+		}
+		query += and + `i."moment" < $` + strconv.Itoa(len(args)+1)
+		args = append(args, isBefore)
 	}
 	rows, err := s.relationalDB.Query(query, args...)
 	return s.process(rows, err)
