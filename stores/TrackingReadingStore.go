@@ -99,3 +99,18 @@ func (s *TrackingReadingStore) GetForUser(userID string) ([]models.TrackingReadi
 	defer records.Close()
 	return s.process(records)
 }
+
+func (s *TrackingReadingStore) GetForTimespan(start time.Time, end time.Time) ([]models.TrackingReading, error) {
+	query := `
+	from(bucket: "humans")
+		|> range(start: ` + start.Format(time.RFC3339) + `, stop: ` + end.Format(time.RFC3339) + `)
+		|> filter(fn: (r) => r._measurement == "human")
+	`
+	reader := s.timeseriesDB.Reader()
+	records, err := reader.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+	defer records.Close()
+	return s.process(records)
+}
