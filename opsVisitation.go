@@ -40,6 +40,9 @@ func (o *visitationOperations) RegisterGetForLivingLab(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *VisitationInput) (*VisitationHolder, error) {
+		if !input.Start.Before(input.End) {
+			return nil, huma.Error400BadRequest("'start' must be before 'end'")
+		}
 		livingLab, err := stores.NewLivingLabStore(relationalDB).Get(input.LivingLabID)
 		if err != nil {
 			return nil, handleError(err)
@@ -102,10 +105,13 @@ func (o *visitationOperations) RegisterGetForLivingLab(api huma.API) {
 			}
 		}
 
-		visitation := models.Visitation{}
+		visitation := models.Visitation{
+			LivingLab: livingLab,
+			Cells:     make([]models.VisitationCell, 0),
+		}
 		for _, c := range cells {
 			centroidWGS := project.Point(orb.Point{c.centroidX, c.centroidY}, project.Mercator.ToWGS84)
-			visitation = append(visitation, models.VisitationCell{
+			visitation.Cells = append(visitation.Cells, models.VisitationCell{
 				Centroid: models.Point{Latitude: centroidWGS[1], Longitude: centroidWGS[0]},
 				Count:    c.count,
 			})
