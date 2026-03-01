@@ -22,13 +22,19 @@ type LivingLabAddInput struct {
 	Body *models.LivingLab `json:"livinglab"`
 }
 
-type livinglabOperations Operations
-
-func newLivingLabOperations() *livinglabOperations {
-	return &livinglabOperations{Endpoint: "livinglab"}
+type LivingLabUpdateInput struct {
+	Input
+	ID   string            `path:"id" format:"uuid" doc:"The ID of the living lab to be updated."`
+	Body *models.LivingLab `json:"livinglab"`
 }
 
-func (o *livinglabOperations) RegisterGet(api huma.API) {
+type livingLabOperations Operations
+
+func newLivingLabOperations() *livingLabOperations {
+	return &livingLabOperations{Endpoint: "livinglab"}
+}
+
+func (o *livingLabOperations) RegisterGet(api huma.API) {
 	name := "Get LivingLab By ID"
 	description := "Retrieve a specific living lab by ID."
 	path := "/" + o.Endpoint + "/{id}"
@@ -37,21 +43,21 @@ func (o *livinglabOperations) RegisterGet(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" format:"uuid" doc:"The ID of the livinglab."`
+		ID string `path:"id" format:"uuid" doc:"The ID of the living lab."`
 	}) (*LivingLabHolder, error) {
-		livinglab, err := stores.NewLivingLabStore(relationalDB).Get(input.ID)
+		livingLab, err := stores.NewLivingLabStore(relationalDB).Get(input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}
-		if livinglab == nil {
+		if livingLab == nil {
 			return nil, generateNotFoundByIDError(o.Endpoint, input.ID)
 		}
-		return &LivingLabHolder{Body: livinglab}, nil
+		return &LivingLabHolder{Body: livingLab}, nil
 	})
 }
 
-func (o *livinglabOperations) RegisterGetAll(api huma.API) {
-	name := "Get all LivingLabs"
+func (o *livingLabOperations) RegisterGetAll(api huma.API) {
+	name := "Get All LivingLabs"
 	description := "Retrieve all living labs."
 	path := "/" + o.Endpoint + "s/"
 	scopes := []string{}
@@ -59,15 +65,15 @@ func (o *livinglabOperations) RegisterGetAll(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *struct{}) (output *LivingLabsHolder, err error) {
-		livinglabs, err := stores.NewLivingLabStore(relationalDB).GetAll()
+		livingLabs, err := stores.NewLivingLabStore(relationalDB).GetAll()
 		if err != nil {
 			return nil, handleError(err)
 		}
-		return &LivingLabsHolder{Body: livinglabs}, nil
+		return &LivingLabsHolder{Body: livingLabs}, nil
 	})
 }
 
-func (o *livinglabOperations) RegisterAdd(api huma.API) {
+func (o *livingLabOperations) RegisterAdd(api huma.API) {
 	name := "Add New LivingLab"
 	description := "Submit a new living lab."
 	path := "/" + o.Endpoint + "/"
@@ -77,12 +83,32 @@ func (o *livinglabOperations) RegisterAdd(api huma.API) {
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *LivingLabAddInput) (*LivingLabHolder, error) {
 		if len(input.Body.Definition) < 3 {
-			return nil, huma.Error400BadRequest("definition should contain 3 or more points")
+			return nil, huma.Error400BadRequest("definition must contain 3 or more points")
 		}
 		livinglab, err := stores.NewLivingLabStore(relationalDB).Add(input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
 		return &LivingLabHolder{Body: livinglab}, nil
+	})
+}
+
+func (o *livingLabOperations) RegisterUpdate(api huma.API) {
+	name := "Update LivingLab"
+	description := "Update an existing living lab."
+	path := "/" + o.Endpoint + "/{id}"
+	scopes := []string{"administrator"}
+	method := http.MethodPut
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *LivingLabUpdateInput) (*LivingLabHolder, error) {
+		if len(input.Body.Definition) < 3 {
+			return nil, huma.Error400BadRequest("definition must contain 3 or more points")
+		}
+		livingLab, err := stores.NewLivingLabStore(relationalDB).Update(input.ID, input.Body)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &LivingLabHolder{Body: livingLab}, nil
 	})
 }

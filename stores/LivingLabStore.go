@@ -23,22 +23,22 @@ func (s *LivingLabStore) process(rows *sql.Rows, err error) ([]models.LivingLab,
 	if err != nil {
 		return nil, err
 	}
-	livinglabs := make([]models.LivingLab, 0)
+	livingLabs := make([]models.LivingLab, 0)
 	for rows.Next() {
-		var livinglab models.LivingLab
-		if err := rows.Scan(&livinglab.ID, &livinglab.Name, &livinglab.Definition); err != nil {
+		var livingLab models.LivingLab
+		if err := rows.Scan(&livingLab.ID, &livingLab.Name, &livingLab.Definition); err != nil {
 			return nil, err
 		}
-		livinglabs = append(livinglabs, livinglab)
+		livingLabs = append(livingLabs, livingLab)
 	}
-	return livinglabs, nil
+	return livingLabs, nil
 }
 
-func (s *LivingLabStore) Get(livinglabID string) (*models.LivingLab, error) {
+func (s *LivingLabStore) Get(livingLabID string) (*models.LivingLab, error) {
 	query := s.query + `
 		WHERE l."ID" = $1
 		`
-	rows, err := s.relationalDB.Query(query, livinglabID)
+	rows, err := s.relationalDB.Query(query, livingLabID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -54,14 +54,31 @@ func (s *LivingLabStore) GetAll() ([]models.LivingLab, error) {
 	return s.process(rows, err)
 }
 
-func (s *LivingLabStore) Add(livinglab *models.LivingLab) (*models.LivingLab, error) {
+func (s *LivingLabStore) Add(livingLab *models.LivingLab) (*models.LivingLab, error) {
 	query := `
 		INSERT INTO "livingLab"("name", "definition") VALUES($1, $2)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, livinglab.Name, livinglab.Definition)
+	row := s.relationalDB.QueryRow(query, livingLab.Name, livingLab.Definition)
 	if err := row.Scan(&id); err != nil {
+		return nil, err
+	}
+	return s.Get(id)
+}
+
+func (s *LivingLabStore) Update(livingLabID string, livingLab *models.LivingLab) (*models.LivingLab, error) {
+	query := `
+		UPDATE "livingLab" SET "name" = $2, "definition" = $3
+		WHERE "ID" = $1
+		RETURNING "ID"
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, livingLabID, livingLab.Name, livingLab.Definition)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return s.Get(id)
