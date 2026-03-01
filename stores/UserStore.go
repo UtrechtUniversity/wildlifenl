@@ -53,11 +53,6 @@ func (s *UserStore) Get(userID string) (*models.User, error) {
 	return &result[0], nil
 }
 
-func (s *UserStore) GetAll() ([]models.User, error) {
-	rows, err := s.relationalDB.Query(s.query)
-	return s.process(rows, err)
-}
-
 func (s *UserStore) UpdateLocation(userID string, location models.Point, timestamp time.Time) (*models.User, error) {
 	query := `
 		UPDATE "user"

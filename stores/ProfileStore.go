@@ -88,6 +88,9 @@ func (s *ProfileStore) Get(userID string) (*models.Profile, error) {
 
 func (s *ProfileStore) GetAll() ([]models.Profile, error) {
 	query := s.query + `
+		WHERE u."ID"::TEXT || '@wildlifenl.nl' IS DISTINCT FROM u."email"
+	` // Closed accounts have an email equal to their ID + @wildlifenl.nl, this excludes closed accounts.
+	query += `
 		ORDER BY u."ID"
 	`
 	rows, err := s.relationalDB.Query(query)
