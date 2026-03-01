@@ -3,6 +3,7 @@ package wildlifenl
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
@@ -37,6 +38,9 @@ func (o *trackingReadingOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *TrackingReadingAddInput) (*TrackingReadingHolder, error) {
+		if !input.Body.Timestamp.Before(time.Now()) {
+			return nil, huma.Error400BadRequest("timestamp must be before now " + time.Now().Format(time.RFC3339))
+		}
 		trackingReading, err := stores.NewTrackingReadingStore(relationalDB, timeseriesDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
