@@ -3,6 +3,7 @@ package wildlifenl
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
@@ -83,6 +84,9 @@ func (o *questionnaireOperations) RegisterAdd(api huma.API) {
 		}
 		if experiment.ID == "" {
 			return nil, generateNotFoundForThisUserError("experiment", input.Body.ExperimentID)
+		}
+		if experiment.Start.Before(time.Now()) {
+			return nil, huma.Error400BadRequest("cannot add questionnaire to an experiment that already started")
 		}
 		questionnaire, err := stores.NewQuestionnaireStore(relationalDB).Add(input.Body)
 		if err != nil {

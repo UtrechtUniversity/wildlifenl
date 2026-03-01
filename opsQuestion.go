@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"regexp"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
@@ -84,6 +85,9 @@ func (o *questionOperations) RegisterAdd(api huma.API) {
 		}
 		if questionnaire.ID == "" {
 			return nil, generateNotFoundForThisUserError("questionnaire", input.Body.QuestionnaireID)
+		}
+		if questionnaire.Experiment.Start.Before(time.Now()) {
+			return nil, huma.Error400BadRequest("cannot add a question to an experiment that already started")
 		}
 		question, err := stores.NewQuestionStore(relationalDB).Add(input.Body)
 		if err != nil {

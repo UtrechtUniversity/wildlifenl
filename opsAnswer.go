@@ -3,6 +3,7 @@ package wildlifenl
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
@@ -72,6 +73,7 @@ func (o *answerOperations) RegisterAdd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
+		var questionnaire models.Questionnaire
 		var question models.Question
 		var nextQuestion models.Question
 		for _, r := range questionnaires {
@@ -82,10 +84,14 @@ func (o *answerOperations) RegisterAdd(api huma.API) {
 				if input.Body.NextQuestionID != nil && q.ID == *input.Body.NextQuestionID {
 					nextQuestion = q
 				}
+				questionnaire = r
 			}
 		}
 		if question.ID == "" {
 			return nil, generateNotFoundForThisUserError("question", input.Body.QuestionID)
+		}
+		if questionnaire.Experiment.Start.Before(time.Now()) {
+			return nil, huma.Error400BadRequest("cannot add an answer to an experiment that already started")
 		}
 		if input.Body.NextQuestionID != nil {
 			if nextQuestion.ID == "" {
