@@ -115,6 +115,16 @@ func (o *profileOperations) RegisterDeleteMine(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *Input) (*struct{}, error) {
+		experimentsStore := stores.NewExperimentStore(relationalDB)
+		experiments, err := experimentsStore.GetByUser(input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		for _, e := range experiments {
+			if _, err := experimentsStore.EndNow(input.credential.UserID, e.ID); err != nil {
+				return nil, handleError(err)
+			}
+		}
 		flushSession(input.credential.UserID)
 		if err := stores.NewCredentialStore(relationalDB).Destroy(input.credential.Email); err != nil {
 			return nil, handleError(err)
