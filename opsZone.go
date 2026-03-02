@@ -42,7 +42,7 @@ func newZoneOperations() *zoneOperations {
 }
 
 func (o *zoneOperations) RegisterGet(api huma.API) {
-	name := "Get Zone By ID"
+	name := "Get Zone By ID [deprecated]"
 	description := "Retrieve a specific zone by ID."
 	path := "/" + o.Endpoint + "/{id}"
 	scopes := []string{"administrator"}
@@ -61,7 +61,7 @@ func (o *zoneOperations) RegisterGet(api huma.API) {
 }
 
 func (o *zoneOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Zones"
+	name := "Get All Zones [deprecated]"
 	description := "Retrieve all zones."
 	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"administrator", "researcher"}
@@ -81,16 +81,19 @@ func (o *zoneOperations) RegisterAdd(api huma.API) {
 	name := "Add Zone"
 	description := "Add a new zone."
 	path := "/" + o.Endpoint + "/"
-	scopes := []string{}
+	scopes := []string{"land-user", "wildlife-manager"}
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *ZoneAddInput) (*ZoneHolder, error) {
-		species, err := stores.NewZoneStore(relationalDB).Add(input.credential.UserID, input.Body)
+		if len(input.Body.Definition) < 3 {
+			return nil, huma.Error400BadRequest("definition must contain 3 or more points")
+		}
+		zone, err := stores.NewZoneStore(relationalDB).Add(input.credential.UserID, input.Body)
 		if err != nil {
 			return nil, handleError(err)
 		}
-		return &ZoneHolder{Body: species}, nil
+		return &ZoneHolder{Body: zone}, nil
 	})
 }
 
@@ -98,7 +101,7 @@ func (o *zoneOperations) RegisterGetMine(api huma.API) {
 	name := "Get My Zones"
 	description := "Retrieve my zones."
 	path := "/" + o.Endpoint + "s/me/"
-	scopes := []string{}
+	scopes := []string{"land-user", "wildlife-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
@@ -115,7 +118,7 @@ func (o *zoneOperations) RegisterAddSpeciesToZone(api huma.API) {
 	name := "Add a Species to a Zone"
 	description := "Add a species for which this zone should create alarms."
 	path := "/" + o.Endpoint + "/species/"
-	scopes := []string{}
+	scopes := []string{"land-user", "wildlife-manager"}
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
@@ -132,7 +135,7 @@ func (o *zoneOperations) RegisterRemoveSpeciesFromZone(api huma.API) {
 	name := "Remove a Species from a Zone"
 	description := "Remove a species for which this zone should create alarms."
 	path := "/" + o.Endpoint + "/species/"
-	scopes := []string{}
+	scopes := []string{"land-user", "wildlife-manager"}
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
@@ -149,27 +152,17 @@ func (o *zoneOperations) RegisterDeactivate(api huma.API) {
 	name := "Deactivate Zone"
 	description := "Deactivate a zone."
 	path := "/" + o.Endpoint + "/{id}"
-	scopes := []string{}
+	scopes := []string{"land-user", "wildlife-manager"}
 	method := http.MethodDelete
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *ZoneDeactivateInput) (*ZoneHolder, error) {
-		store := stores.NewZoneStore(relationalDB)
-		var zone models.Zone
-		zones, err := store.GetByUser(input.credential.UserID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		for _, z := range zones {
-			if z.ID == input.ID {
-				zone = z
-				break
-			}
-		}
-		if zone.ID == "" {
+		zoneStore := stores.NewZoneStore(relationalDB)
+		zone, err := zoneStore.Get(input.ID)
+		if zone.User.ID != input.credential.UserID {
 			return nil, generateNotFoundForThisUserError(o.Endpoint, input.ID)
 		}
-		result, err := stores.NewZoneStore(relationalDB).Deactivate(zone.ID)
+		result, err := zoneStore.Deactivate(zone.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}

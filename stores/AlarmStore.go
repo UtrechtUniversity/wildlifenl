@@ -12,7 +12,7 @@ func NewAlarmStore(db *sql.DB) *AlarmStore {
 	s := AlarmStore{
 		relationalDB: db,
 		query: `
-		SELECT a."ID", a."timestamp", z."ID", z."deactivated", z."name", z."description", z."area", s."ID", s."name", s."commonName", u."ID", u."name", COALESCE(i."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(i."timestamp", '2000-01-01'), COALESCE(i."description",''), COALESCE(i."location",'(0,0)'), COALESCE(t."ID",0), COALESCE(t."name",''), COALESCE(t."description",''), COALESCE(x."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(x."name",''), COALESCE(d."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(d."location", '(0,0)'), COALESCE(d."start",'2000-01-01'), COALESCE(d."end",'2000-01-01'), COALESCE(d."deploymentID",''), COALESCE(d."sensorType",''), COALESCE(d."uri",''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(n."location",'(0,0)'), COALESCE(c."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(c."timestamp",'2000-01-01'), COALESCE(m."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(m."name",''), COALESCE(m."severity",0), COALESCE(m."text",''), COALESCE(m."trigger",''), COALESCE(e."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(e."name",''), COALESCE(e."description",''), COALESCE(e."start",'2000-01-01'), COALESCE(e."end",'2000-01-01'), COALESCE(y."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(y."name",'')
+		SELECT a."ID", a."timestamp", z."ID", z."deactivated", z."name", z."description", z."definition", s."ID", s."name", s."commonName", u."ID", u."name", COALESCE(i."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(i."timestamp", '2000-01-01'), COALESCE(i."description",''), COALESCE(i."location",'(0,0)'), COALESCE(t."ID",0), COALESCE(t."name",''), COALESCE(t."description",''), COALESCE(x."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(x."name",''), COALESCE(d."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(d."location", '(0,0)'), COALESCE(d."start",'2000-01-01'), COALESCE(d."end",'2000-01-01'), COALESCE(d."deploymentID",''), COALESCE(d."sensorType",''), COALESCE(d."uri",''), COALESCE(du."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(du."name",''), COALESCE(n."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(n."name",''), COALESCE(n."location",'(0,0)'), COALESCE(c."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(c."timestamp",'2000-01-01'), COALESCE(m."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(m."name",''), COALESCE(m."severity",0), COALESCE(m."text",''), COALESCE(m."trigger",''), COALESCE(e."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(e."name",''), COALESCE(e."description",''), COALESCE(e."start",'2000-01-01'), COALESCE(e."end",'2000-01-01'), COALESCE(y."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(y."name",'')
 		FROM "alarm" a
 		INNER JOIN "zone" z ON a."zoneID" = z."ID"
 		INNER JOIN "user" u ON u."ID" = z."userID"
@@ -20,6 +20,7 @@ func NewAlarmStore(db *sql.DB) *AlarmStore {
 		LEFT JOIN "interactionType" t ON t."ID" = i."typeID"
 		LEFT JOIN "user" x ON x."ID" = i."userID"
 		LEFT JOIN "detection" d ON a."detectionID" = d."ID"
+		LEFT JOIN "user" du ON du."ID" = d."userID" 
 		LEFT JOIN "animal" n ON a."animalID" = n."ID"
 		INNER JOIN "species" s ON s."ID" = COALESCE(i."speciesID", d."speciesID", n."speciesID")
 		LEFT JOIN "conveyance" c ON c."alarmID" = a."ID"
@@ -44,7 +45,7 @@ func (s *AlarmStore) process(rows *sql.Rows, err error) ([]models.Alarm, error) 
 		var n models.Animal
 		var s models.Species
 		var c models.Conveyance
-		if err := rows.Scan(&a.ID, &a.Timestamp, &a.Zone.ID, &a.Zone.Deactivated, &a.Zone.Name, &a.Zone.Description, &a.Zone.Area, &s.ID, &s.Name, &s.CommonName, &a.Zone.User.ID, &a.Zone.User.Name, &i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Type.ID, &i.Type.Name, &i.Type.Description, &i.User.ID, &i.User.Name, &d.ID, &d.Location, &d.Start, &d.End, &d.DeploymentID, &d.SensorType, &d.URI, &n.ID, &n.Name, &n.Location, &c.ID, &c.Timestamp, &c.Message.ID, &c.Message.Name, &c.Message.Severity, &c.Message.Text, &c.Message.Trigger, &c.Message.Experiment.ID, &c.Message.Experiment.Name, &c.Message.Experiment.Description, &c.Message.Experiment.Start, &c.Message.Experiment.End, &c.Message.Experiment.User.ID, &c.Message.Experiment.User.Name); err != nil {
+		if err := rows.Scan(&a.ID, &a.Timestamp, &a.Zone.ID, &a.Zone.Deactivated, &a.Zone.Name, &a.Zone.Description, &a.Zone.Definition, &s.ID, &s.Name, &s.CommonName, &a.Zone.User.ID, &a.Zone.User.Name, &i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Type.ID, &i.Type.Name, &i.Type.Description, &i.User.ID, &i.User.Name, &d.ID, &d.Location, &d.Start, &d.End, &d.DeploymentID, &d.SensorType, &d.URI, &d.User.ID, &d.User.Name, &n.ID, &n.Name, &n.Location, &c.ID, &c.Timestamp, &c.Message.ID, &c.Message.Name, &c.Message.Severity, &c.Message.Text, &c.Message.Trigger, &c.Message.Experiment.ID, &c.Message.Experiment.Name, &c.Message.Experiment.Description, &c.Message.Experiment.Start, &c.Message.Experiment.End, &c.Message.Experiment.User.ID, &c.Message.Experiment.User.Name); err != nil {
 			return nil, err
 		}
 		if alarm.ID != a.ID {
@@ -113,10 +114,8 @@ func (s *AlarmStore) AddAllFromDetection(detection *models.Detection) ([]string,
 		INSERT INTO "alarm"("zoneID", "detectionID")
 		SELECT z."ID", d."ID"
 		FROM "zone" z
-		INNER JOIN "user" u ON u."ID" = z."userID"
 		LEFT JOIN "zone_species" x ON x."zoneID" = z."ID"
-		LEFT JOIN "species" s ON s."ID" = x."speciesID"
-		LEFT JOIN "detection" d ON z."area" @> d."location" AND d."speciesID" = s."ID"
+		LEFT JOIN "detection" d ON z."definition" @> d."location" AND d."speciesID" = x."speciesID"
 		WHERE d."ID" = $1
 		AND z."deactivated" IS NULL
 		AND z."created" < d."start"
@@ -145,7 +144,7 @@ func (s *AlarmStore) AddAllFromInteraction(interaction *models.Interaction) ([]s
 		INNER JOIN "user" u ON u."ID" = z."userID"
 		LEFT JOIN "zone_species" x ON x."zoneID" = z."ID"
 		LEFT JOIN "species" s ON s."ID" = x."speciesID"
-		LEFT JOIN "interaction" i ON z."area" @> i."location" AND i."speciesID" = s."ID"
+		LEFT JOIN "interaction" i ON z."definition" @> i."location" AND i."speciesID" = s."ID"
 		WHERE i."ID" = $1
 		AND z."deactivated" IS NULL
 		AND z."created" < i."timestamp"
@@ -174,7 +173,7 @@ func (s *AlarmStore) AddAllFromAnimal(animal *models.Animal) ([]string, error) {
 		INNER JOIN "user" u ON u."ID" = z."userID"
 		LEFT JOIN "zone_species" x ON x."zoneID" = z."ID"
 		LEFT JOIN "species" s ON s."ID" = x."speciesID"
-		LEFT JOIN "animal" n ON z."area" @> n."location" AND n."speciesID" = s."ID"
+		LEFT JOIN "animal" n ON z."definition" @> n."location" AND n."speciesID" = s."ID"
 		WHERE n."ID" = $1
 		AND z."deactivated" IS NULL
 		AND z."created" < n."locationTimestamp"

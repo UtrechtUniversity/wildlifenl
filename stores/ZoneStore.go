@@ -13,7 +13,7 @@ func NewZoneStore(db *sql.DB) *ZoneStore {
 	s := ZoneStore{
 		relationalDB: db,
 		query: `
-		SELECT z."ID", z."deactivated", z."created", z."name", z."description", z."area", u."ID", u."name", COALESCE(s."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonName",'')
+		SELECT z."ID", z."deactivated", z."created", z."name", z."description", z."definition", u."ID", u."name", COALESCE(s."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(s."name",''), COALESCE(s."commonName",'')
 		FROM "zone" z
 		INNER JOIN "user" u ON u."ID" = z."userID"
 		LEFT JOIN "zone_species" x ON x."zoneID" = z."ID"
@@ -34,11 +34,11 @@ func (s *ZoneStore) process(rows *sql.Rows, err error) ([]models.Zone, error) {
 	var zoneDeactivated *time.Time
 	var zoneName string
 	var zoneDescription string
-	var zoneArea models.Circle
+	var zoneDefinition models.Polygon
 	for rows.Next() {
 		var user models.User
 		var species models.Species
-		if err := rows.Scan(&zoneID, &zoneDeactivated, &zoneCreated, &zoneName, &zoneDescription, &zoneArea, &user.ID, &user.Name, &species.ID, &species.Name, &species.CommonName); err != nil {
+		if err := rows.Scan(&zoneID, &zoneDeactivated, &zoneCreated, &zoneName, &zoneDescription, &zoneDefinition, &user.ID, &user.Name, &species.ID, &species.Name, &species.CommonName); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
@@ -53,7 +53,7 @@ func (s *ZoneStore) process(rows *sql.Rows, err error) ([]models.Zone, error) {
 		zone.Created = zoneCreated
 		zone.Name = zoneName
 		zone.Description = zoneDescription
-		zone.Area = zoneArea
+		zone.Definition = zoneDefinition
 		zone.User = user
 		if species.ID != "00000000-0000-0000-0000-000000000000" {
 			zone.Species = append(zone.Species, species)
@@ -87,11 +87,11 @@ func (s *ZoneStore) GetAll() ([]models.Zone, error) {
 
 func (s *ZoneStore) Add(userID string, zone *models.ZoneRecord) (*models.Zone, error) {
 	query := `
-		INSERT INTO "zone"("name", "description", "area", "userID") VALUES($1, $2, $3, $4)
+		INSERT INTO "zone"("name", "description", "definition", "userID") VALUES($1, $2, $3, $4)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, zone.Name, zone.Description, zone.Area, userID)
+	row := s.relationalDB.QueryRow(query, zone.Name, zone.Description, zone.Definition, userID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
