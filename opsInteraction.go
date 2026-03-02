@@ -126,19 +126,19 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 			interaction.Questionnaire = questionnaire
 		}
 
-		// Add Interaction -> Create Alarms.
-		if interaction.Type.ID == 1 {
-			ids, err := stores.NewAlarmStore(relationalDB).AddAllFromInteraction(interaction)
-			if err != nil {
-				return nil, handleError(err)
-			}
-
-			// From created Alarms -> Create Conveyances
-			if err := stores.NewConveyanceStore(relationalDB).AddForAlarmIDs(ids); err != nil {
-				return nil, handleError(err)
+		if time.Since(interaction.Moment) < time.Hour {
+			// Add Interaction -> Create Alarms.
+			if interaction.Type.ID == 1 {
+				ids, err := stores.NewAlarmStore(relationalDB).AddAllFromInteraction(interaction)
+				if err != nil {
+					return nil, handleError(err)
+				}
+				// From created Alarms -> Create Conveyances
+				if err := stores.NewConveyanceStore(relationalDB).AddForAlarmIDs(ids); err != nil {
+					return nil, handleError(err)
+				}
 			}
 		}
-
 		return &InteractionHolder{Body: interaction}, nil
 	})
 }

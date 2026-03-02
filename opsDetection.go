@@ -3,6 +3,7 @@ package wildlifenl
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
@@ -59,18 +60,17 @@ func (o *detectionOperations) RegisterAdd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
-
-		// Add Detection -> Create Alarms.
-		ids, err := stores.NewAlarmStore(relationalDB).AddAllFromDetection(detection)
-		if err != nil {
-			return nil, handleError(err)
+		if time.Since(detection.Start) < time.Hour {
+			// Add Detection -> Create Alarms.
+			ids, err := stores.NewAlarmStore(relationalDB).AddAllFromDetection(detection)
+			if err != nil {
+				return nil, handleError(err)
+			}
+			// From created Alarms -> Create Conveyances
+			if err := stores.NewConveyanceStore(relationalDB).AddForAlarmIDs(ids); err != nil {
+				return nil, handleError(err)
+			}
 		}
-
-		// From created Alarms -> Create Conveyances
-		if err := stores.NewConveyanceStore(relationalDB).AddForAlarmIDs(ids); err != nil {
-			return nil, handleError(err)
-		}
-
 		return &DetectionHolder{Body: detection}, nil
 	})
 }
