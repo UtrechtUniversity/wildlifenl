@@ -80,7 +80,7 @@ func (o *animalOperations) RegisterGetFilter(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
-		animals := make([]models.Animal, len(results))
+		animals := make([]models.Animal, 0)
 		for _, r := range results {
 			deployments, err := stores.NewBorneSensorDeploymentStore(relationalDB, timeseriesDB).GetByAnimal(r.ID, input.Start, input.End)
 			if err != nil {

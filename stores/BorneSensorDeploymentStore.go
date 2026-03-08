@@ -71,7 +71,7 @@ func (s *BorneSensorDeploymentStore) GetByAnimal(animalID string, start time.Tim
 	if err != nil {
 		return nil, err
 	}
-	borneSensorDeployments := make([]models.BorneSensorDeployment, len(results))
+	borneSensorDeployments := make([]models.BorneSensorDeployment, 0)
 	for _, r := range results {
 		readings, err := NewBorneSensorReadingStore(s.relationalDB, s.timeseriesDB).GetAllBySensorID(r.SensorID, start, end)
 		if err != nil {
@@ -82,13 +82,6 @@ func (s *BorneSensorDeploymentStore) GetByAnimal(animalID string, start time.Tim
 	}
 	return borneSensorDeployments, nil
 }
-
-/*
-func (s *BorneSensorDeploymentStore) GetAll() ([]models.BorneSensorDeployment, error) {
-	rows, err := s.relationalDB.Query(s.query)
-	return s.process(rows, err)
-}
-*/
 
 func (s *BorneSensorDeploymentStore) Add(borneSensorDeployment *models.BorneSensorDeploymentRecord) (*models.BorneSensorDeployment, error) {
 	query := `

@@ -129,25 +129,3 @@ func (s *AnimalStore) GetFiltered(area *models.Circle, isAfter *time.Time, isBef
 	rows, err := s.relationalDB.Query(query, args...)
 	return s.process(rows, err)
 }
-
-/*
-func (s *AnimalStore) getBorneSensorReadingsForAnimal(animalID string) ([]models.BorneSensorReading, error) {
-	deployments, err := NewBorneSensorDeploymentStore(s.relationalDB).GetByAnimal(animalID)
-	if err != nil {
-		return nil, err
-	}
-	readings := make([]models.BorneSensorReading, 0)
-	for _, d := range deployments {
-		end := time.Now()
-		if d.End != nil {
-			end = *d.End
-		}
-		r, err := NewBorneSensorReadingStore(s.relationalDB, s.timeseriesDB).GetAllBySensorID(d.SensorID, d.Start, end)
-		if err != nil {
-			return nil, err
-		}
-		readings = append(readings, r...)
-	}
-	return readings, nil
-}
-*/
