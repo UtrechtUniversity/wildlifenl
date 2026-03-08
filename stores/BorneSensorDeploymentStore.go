@@ -57,6 +57,18 @@ func (s *BorneSensorDeploymentStore) Get(sensorID string, animalID string) (*mod
 	return &result[0], nil
 }
 
+func (s *BorneSensorDeploymentStore) GetByAnimal(animalID string) ([]models.BorneSensorDeployment, error) {
+	query := s.query + `
+		AND d."animalID" = $1
+	`
+	rows, err := s.relationalDB.Query(query, animalID)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (s *BorneSensorDeploymentStore) GetAll() ([]models.BorneSensorDeployment, error) {
 	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)

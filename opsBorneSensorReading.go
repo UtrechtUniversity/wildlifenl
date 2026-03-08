@@ -39,7 +39,9 @@ func (o *borneSensorReadingOperations) RegisterGetAllBySensor(api huma.API) {
 	}, func(ctx context.Context, input *struct {
 		ID string `path:"id" doc:"The ID of the sensor to retrieve borne-sensor readings for."`
 	}) (*BorneSensorReadingsHolder, error) {
-		borneSensorReadings, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).GetAllBySensorID(input.ID)
+		start := time.Unix(0, 0)
+		end := time.Now()
+		borneSensorReadings, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).GetAllBySensorID(input.ID, start, end)
 		if err != nil {
 			return nil, handleError(err)
 		}

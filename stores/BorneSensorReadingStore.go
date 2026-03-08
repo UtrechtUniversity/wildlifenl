@@ -20,31 +20,9 @@ func NewBorneSensorReadingStore(relationalDB *sql.DB, timeseriesDB *timeseries.T
 		timeseriesDB: timeseriesDB,
 		query: `
 			from(bucket: "animals")
-        	|> range(start: -360d)
 		`,
 	}
 	return &s
-}
-
-func (s *BorneSensorReadingStore) GetAll() ([]models.BorneSensorReading, error) {
-	reader := s.timeseriesDB.Reader()
-	records, err := reader.Query(context.Background(), s.query)
-	if err != nil {
-		return nil, err
-	}
-	return s.process(records)
-}
-
-func (s *BorneSensorReadingStore) GetAllBySensorID(sensorID string) ([]models.BorneSensorReading, error) {
-	query := s.query + `
-		|> filter(fn: (r) => r["sensorID"] == "` + sensorID + `")
-	`
-	reader := s.timeseriesDB.Reader()
-	records, err := reader.Query(context.Background(), query)
-	if err != nil {
-		return nil, err
-	}
-	return s.process(records)
 }
 
 func (s *BorneSensorReadingStore) process(records *api.QueryTableResult) ([]models.BorneSensorReading, error) {
@@ -158,4 +136,17 @@ func (s *BorneSensorReadingStore) Add(userID string, borneSensorReading *models.
 		}
 	}
 	return nil, nil
+}
+
+func (s *BorneSensorReadingStore) GetAllBySensorID(sensorID string, start time.Time, end time.Time) ([]models.BorneSensorReading, error) {
+	query := s.query + `
+		|> range(start: time(v: "` + start.Format(time.RFC3339) + `"), end: time(v: "` + end.Format(time.RFC3339) + `"))
+		|> filter(fn: (r) => r["sensorID"] == "` + sensorID + `")
+	`
+	reader := s.timeseriesDB.Reader()
+	records, err := reader.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+	return s.process(records)
 }

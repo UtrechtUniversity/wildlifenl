@@ -54,12 +54,13 @@ func (s *AnimalStore) Get(animalID string) (*models.Animal, error) {
 	if len(result) != 1 {
 		return nil, nil
 	}
-	return &result[0], nil
-}
-
-func (s *AnimalStore) GetAll() ([]models.Animal, error) {
-	rows, err := s.relationalDB.Query(s.query)
-	return s.process(rows, err)
+	animal := &result[0]
+	borneSensorReadings, err := s.getBorneSensorReadingsForAnimal(animal.ID)
+	if err != nil {
+		return nil, err
+	}
+	animal.BorneSensorReadings = borneSensorReadings
+	return animal, nil
 }
 
 func (s *AnimalStore) Add(animal *models.AnimalRecord) (*models.Animal, error) {
@@ -132,5 +133,38 @@ func (s *AnimalStore) GetFiltered(area *models.Circle, isAfter *time.Time, isBef
 		args = append(args, isBefore)
 	}
 	rows, err := s.relationalDB.Query(query, args...)
-	return s.process(rows, err)
+	results, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	animals := make([]models.Animal, len(results))
+	for _, a := range results {
+		borneSensorReadings, err := s.getBorneSensorReadingsForAnimal(a.ID)
+		if err != nil {
+			return nil, err
+		}
+		a.BorneSensorReadings = borneSensorReadings
+		animals = append(animals, a)
+	}
+	return animals, nil
+}
+
+func (s *AnimalStore) getBorneSensorReadingsForAnimal(animalID string) ([]models.BorneSensorReading, error) {
+	deployments, err := NewBorneSensorDeploymentStore(s.relationalDB).GetByAnimal(animalID)
+	if err != nil {
+		return nil, err
+	}
+	readings := make([]models.BorneSensorReading, 0)
+	for _, d := range deployments {
+		end := time.Now()
+		if d.End != nil {
+			end = *d.End
+		}
+		r, err := NewBorneSensorReadingStore(s.relationalDB, s.timeseriesDB).GetAllBySensorID(d.SensorID, d.Start, end)
+		if err != nil {
+			return nil, err
+		}
+		readings = append(readings, r...)
+	}
+	return readings, nil
 }
