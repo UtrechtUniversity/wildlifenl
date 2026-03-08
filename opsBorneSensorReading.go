@@ -28,23 +28,6 @@ func newBorneSensorReadingOperations() *borneSensorReadingOperations {
 	return &o
 }
 
-func (o *borneSensorReadingOperations) RegisterGetAll(api huma.API) {
-	name := "Get All BorneSensorReadings"
-	description := "Retrieve all borne sensor reading of the last year."
-	path := "/" + o.Endpoint + "s/"
-	scopes := []string{"herd-manager"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*BorneSensorReadingsHolder, error) {
-		borneSensorReadings, err := stores.NewBorneSensorReadingStore(relationalDB, timeseriesDB).GetAll()
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &BorneSensorReadingsHolder{Body: borneSensorReadings}, nil
-	})
-}
-
 func (o *borneSensorReadingOperations) RegisterGetAllBySensor(api huma.API) {
 	name := "Get BorneSensorReadings By Sensor"
 	description := "Retrieve all borne-sensor readings for a specific sensor."
