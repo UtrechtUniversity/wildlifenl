@@ -49,23 +49,6 @@ func (o *animalOperations) RegisterGet(api huma.API) {
 	})
 }
 
-func (o *animalOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Animals"
-	description := "Retrieve all animals."
-	path := "/" + o.Endpoint + "s/"
-	scopes := []string{"researcher"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*AnimalsHolder, error) {
-		interactions, err := stores.NewAnimalStore(relationalDB, timeseriesDB).GetAll()
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &AnimalsHolder{Body: interactions}, nil
-	})
-}
-
 func (o *animalOperations) RegisterAdd(api huma.API) {
 	name := "Add Animal"
 	description := "Add a new animal."

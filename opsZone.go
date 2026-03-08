@@ -41,42 +41,6 @@ func newZoneOperations() *zoneOperations {
 	return &zoneOperations{Endpoint: "zone"}
 }
 
-func (o *zoneOperations) RegisterGet(api huma.API) {
-	name := "Get Zone By ID [deprecated]"
-	description := "Retrieve a specific zone by ID."
-	path := "/" + o.Endpoint + "/{id}"
-	scopes := []string{"administrator"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct {
-		ID string `path:"id" doc:"The ID of this zone." format:"uuid"`
-	}) (*ZoneHolder, error) {
-		zone, err := stores.NewZoneStore(relationalDB).Get(input.ID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &ZoneHolder{Body: zone}, nil
-	})
-}
-
-func (o *zoneOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Zones [deprecated]"
-	description := "Retrieve all zones."
-	path := "/" + o.Endpoint + "s/"
-	scopes := []string{"administrator", "researcher"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*ZonesHolder, error) {
-		zones, err := stores.NewZoneStore(relationalDB).GetAll()
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &ZonesHolder{Body: zones}, nil
-	})
-}
-
 func (o *zoneOperations) RegisterAdd(api huma.API) {
 	name := "Add Zone"
 	description := "Add a new zone."
