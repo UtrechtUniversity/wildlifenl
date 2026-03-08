@@ -140,7 +140,7 @@ func (s *BorneSensorReadingStore) Add(userID string, borneSensorReading *models.
 
 func (s *BorneSensorReadingStore) GetAllBySensorID(sensorID string, start time.Time, end time.Time) ([]models.BorneSensorReading, error) {
 	query := s.query + `
-		|> range(start: time(v: "` + start.Format(time.RFC3339) + `"), end: time(v: "` + end.Format(time.RFC3339) + `"))
+		|> range(start: time(v: "` + start.Format(time.RFC3339) + `"), stop: time(v: "` + end.Format(time.RFC3339) + `"))
 		|> filter(fn: (r) => r["sensorID"] == "` + sensorID + `")
 	`
 	reader := s.timeseriesDB.Reader()
