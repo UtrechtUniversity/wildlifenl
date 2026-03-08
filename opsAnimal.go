@@ -76,9 +76,18 @@ func (o *animalOperations) RegisterGetFilter(api huma.API) {
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *SpatiotemporalInput) (*AnimalsHolder, error) {
 		area := models.Circle{Location: models.Point{Latitude: input.Latitude, Longitude: input.Longitude}, Radius: float64(input.Radius)}
-		animals, err := stores.NewAnimalStore(relationalDB, timeseriesDB).GetFiltered(&area, &input.Start, &input.End)
+		results, err := stores.NewAnimalStore(relationalDB, timeseriesDB).GetFiltered(&area, &input.Start, &input.End)
 		if err != nil {
 			return nil, handleError(err)
+		}
+		animals := make([]models.Animal, len(results))
+		for _, r := range results {
+			deployments, err := stores.NewBorneSensorDeploymentStore(relationalDB, timeseriesDB).GetByAnimal(r.ID, input.Start, input.End)
+			if err != nil {
+				return nil, handleError(err)
+			}
+			r.BorneSensorDeployments = deployments
+			animals = append(animals, r)
 		}
 		return &AnimalsHolder{Body: animals}, nil
 	})

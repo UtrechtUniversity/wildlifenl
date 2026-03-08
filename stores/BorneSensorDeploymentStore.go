@@ -2,21 +2,23 @@ package stores
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
+	"github.com/UtrechtUniversity/wildlifenl/timeseries"
 )
 
 type BorneSensorDeploymentStore Store
 
-func NewBorneSensorDeploymentStore(relationalDB *sql.DB) *BorneSensorDeploymentStore {
+func NewBorneSensorDeploymentStore(relationalDB *sql.DB, timeseriesDB *timeseries.Timeseries) *BorneSensorDeploymentStore {
 	s := BorneSensorDeploymentStore{
 		relationalDB: relationalDB,
+		timeseriesDB: timeseriesDB,
 		query: `
 			SELECT d."sensorID", d."start", d."end", a."ID", a."name", a."location", s."ID", s."name", s."commonName"
 			FROM "borneSensorDeployment" d
 			INNER JOIN "animal" a ON a."ID" = d."animalID"
 			INNER JOIN "species" s ON s."ID" = a."speciesID"
-			WHERE d."end" IS NULL
 		`,
 	}
 	return &s
@@ -43,6 +45,7 @@ func (s *BorneSensorDeploymentStore) process(rows *sql.Rows, err error) ([]model
 
 func (s *BorneSensorDeploymentStore) Get(sensorID string, animalID string) (*models.BorneSensorDeployment, error) {
 	query := s.query + `
+		WHERE d."end" IS NULL
 		AND d."sensorID" = $1
 		AND d."animalID" = $2
 	`
@@ -57,22 +60,35 @@ func (s *BorneSensorDeploymentStore) Get(sensorID string, animalID string) (*mod
 	return &result[0], nil
 }
 
-func (s *BorneSensorDeploymentStore) GetByAnimal(animalID string) ([]models.BorneSensorDeployment, error) {
+func (s *BorneSensorDeploymentStore) GetByAnimal(animalID string, start time.Time, end time.Time) ([]models.BorneSensorDeployment, error) {
 	query := s.query + `
 		AND d."animalID" = $1
+		WHERE ("end" IS NULL OR "end" >= $2)
+		AND "start" <= $3
 	`
-	rows, err := s.relationalDB.Query(query, animalID)
-	result, err := s.process(rows, err)
+	rows, err := s.relationalDB.Query(query, animalID, start, end)
+	results, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	borneSensorDeployments := make([]models.BorneSensorDeployment, len(results))
+	for _, r := range results {
+		readings, err := NewBorneSensorReadingStore(s.relationalDB, s.timeseriesDB).GetAllBySensorID(r.SensorID, start, end)
+		if err != nil {
+			return nil, err
+		}
+		r.BorneSensorReadings = readings
+		borneSensorDeployments = append(borneSensorDeployments, r)
+	}
+	return borneSensorDeployments, nil
 }
 
+/*
 func (s *BorneSensorDeploymentStore) GetAll() ([]models.BorneSensorDeployment, error) {
 	rows, err := s.relationalDB.Query(s.query)
 	return s.process(rows, err)
 }
+*/
 
 func (s *BorneSensorDeploymentStore) Add(borneSensorDeployment *models.BorneSensorDeploymentRecord) (*models.BorneSensorDeployment, error) {
 	query := `

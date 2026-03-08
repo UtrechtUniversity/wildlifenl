@@ -11,5 +11,6 @@ type BorneSensorDeploymentRecord struct {
 
 type BorneSensorDeployment struct {
 	BorneSensorDeploymentRecord
-	Animal Animal `json:"animal" doc:"The animal that bears this sensor."`
+	Animal              Animal               `json:"animal" doc:"The animal that bears this sensor."`
+	BorneSensorReadings []BorneSensorReading `json:"borneSensorReadings,omitempty" readOnly:"true" doc:"The borneSensorReadings associated with this deployment."`
 }

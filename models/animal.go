@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type AnimalRecord struct {
 	ID        string `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this animal."`
@@ -10,8 +12,8 @@ type AnimalRecord struct {
 
 type Animal struct {
 	AnimalRecord
-	Species             Species              `json:"species" doc:"The species of this animal"`
-	Location            *Point               `json:"location,omitempty" readOnly:"true" doc:"The current location of this animal"`
-	LocationTimestamp   *time.Time           `json:"locationTimestamp,omitempty" format:"date-time" readOnly:"true" doc:"The moment that this animal's location was last updated."`
-	BorneSensorReadings []BorneSensorReading `json:"borneSensorReadings,omitempty" readOnly:"true" doc:"The borneSensorReadings associated with this animal. Could be limited to only the most recent readings."`
+	Species                Species                 `json:"species" doc:"The species of this animal"`
+	Location               *Point                  `json:"location,omitempty" readOnly:"true" doc:"The current location of this animal"`
+	LocationTimestamp      *time.Time              `json:"locationTimestamp,omitempty" format:"date-time" readOnly:"true" doc:"The moment that this animal's location was last updated."`
+	BorneSensorDeployments []BorneSensorDeployment `json:"borneSensorDeployments,omitempty" readOnly:"true" doc:"The deployments of borne sensors associated with this animal. Will be empty if no time span is provided."`
 }

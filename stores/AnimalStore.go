@@ -54,13 +54,7 @@ func (s *AnimalStore) Get(animalID string) (*models.Animal, error) {
 	if len(result) != 1 {
 		return nil, nil
 	}
-	animal := &result[0]
-	borneSensorReadings, err := s.getBorneSensorReadingsForAnimal(animal.ID)
-	if err != nil {
-		return nil, err
-	}
-	animal.BorneSensorReadings = borneSensorReadings
-	return animal, nil
+	return &result[0], nil
 }
 
 func (s *AnimalStore) Add(animal *models.AnimalRecord) (*models.Animal, error) {
@@ -133,22 +127,10 @@ func (s *AnimalStore) GetFiltered(area *models.Circle, isAfter *time.Time, isBef
 		args = append(args, isBefore)
 	}
 	rows, err := s.relationalDB.Query(query, args...)
-	results, err := s.process(rows, err)
-	if err != nil {
-		return nil, err
-	}
-	animals := make([]models.Animal, len(results))
-	for _, a := range results {
-		borneSensorReadings, err := s.getBorneSensorReadingsForAnimal(a.ID)
-		if err != nil {
-			return nil, err
-		}
-		a.BorneSensorReadings = borneSensorReadings
-		animals = append(animals, a)
-	}
-	return animals, nil
+	return s.process(rows, err)
 }
 
+/*
 func (s *AnimalStore) getBorneSensorReadingsForAnimal(animalID string) ([]models.BorneSensorReading, error) {
 	deployments, err := NewBorneSensorDeploymentStore(s.relationalDB).GetByAnimal(animalID)
 	if err != nil {
@@ -168,3 +150,4 @@ func (s *AnimalStore) getBorneSensorReadingsForAnimal(animalID string) ([]models
 	}
 	return readings, nil
 }
+*/
