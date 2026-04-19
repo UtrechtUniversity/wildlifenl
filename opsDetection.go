@@ -32,7 +32,7 @@ func newDetectionOperations() *detectionOperations {
 func (o *detectionOperations) RegisterGetFilter(api huma.API) {
 	name := "Get Detections By Filter"
 	description := "Retrieve detections within a spatiotemporal span."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"nature-area-manager", "wildlife-manager", "herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
