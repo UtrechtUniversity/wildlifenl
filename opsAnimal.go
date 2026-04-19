@@ -69,7 +69,7 @@ func (o *animalOperations) RegisterAdd(api huma.API) {
 func (o *animalOperations) RegisterGetFilter(api huma.API) {
 	name := "Get Animals By Filter"
 	description := "Retrieve animals within a spatiotemporal span."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"nature-area-manager", "wildlife-manager", "herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
