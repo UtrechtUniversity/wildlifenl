@@ -53,6 +53,37 @@ func (o *trackingReadingOperations) RegisterAdd(api huma.API) {
 		}
 		trackingReading.Conveyance = conveyance
 
+		const radius int = 250
+		const hours int = 48
+
+		area := models.Circle{
+			Location: models.Point{
+				Latitude:  trackingReading.Location.Latitude,
+				Longitude: trackingReading.Location.Longitude,
+			},
+			Radius: float64(radius),
+		}
+		before := time.Now()
+		after := before.Add(-time.Duration(hours) * time.Hour)
+
+		animals, err := stores.NewAnimalStore(relationalDB, timeseriesDB).GetFiltered(&area, &after, &before)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		trackingReading.Animals = animals
+
+		interactions, err := stores.NewInteractionStore(relationalDB).GetFiltered(&area, &after, &before)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		trackingReading.Interactions = interactions
+
+		detections, err := stores.NewDetectionStore(relationalDB).GetFiltered(&area, &after, &before)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		trackingReading.Detections = detections
+
 		return &TrackingReadingHolder{Body: trackingReading}, nil
 	})
 }

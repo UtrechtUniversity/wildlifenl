@@ -10,5 +10,8 @@ type TrackingReadingRecord struct {
 
 type TrackingReading struct {
 	TrackingReadingRecord
-	Conveyance *Conveyance `json:"conveyance,omitempty" doc:"The optional conveyance of a message that should be displayed to the user."`
+	Conveyance   *Conveyance   `json:"conveyance,omitempty" doc:"The optional conveyance of a message that should be displayed to the user."`
+	Animals      []Animal      `json:"animals" doc:"The animals in the vicinity of this tracking reading."`
+	Detections   []Detection   `json:"detections" doc:"The detections in the vicinity of this tracking reading."`
+	Interactions []Interaction `json:"interactions" doc:"The interactions in the vicinity of this tracking reading."`
 }
