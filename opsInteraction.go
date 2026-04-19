@@ -146,7 +146,7 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 func (o *interactionOperations) RegisterGetFilter(api huma.API) {
 	name := "Get Interactions By Filter"
 	description := "Retrieve interactions within a spatiotemporal span."
-	path := "/" + o.Endpoint + "/"
+	path := "/" + o.Endpoint + "s/"
 	scopes := []string{"nature-area-manager", "wildlife-manager", "herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
