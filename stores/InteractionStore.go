@@ -14,7 +14,7 @@ func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
 		relationalDB: db,
 		query: `
-		SELECT i."ID", i."timestamp", i."description", i."location", i."moment", i."place", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description", COALESCE(dr."belonging",''), COALESCE(dr."impactType",''), COALESCE(dr."impactValue",0), COALESCE(dr."estimatedDamage",0), COALESCE(dr."estimatedLoss",0), COALESCE(cr."estimatedDamage",0), COALESCE(cr."severity",''), COALESCE(q."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(q."name",''), COALESCE(q."identifier",''), COALESCE(e."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(e."name",''), COALESCE(e."start",'2000-01-01'), COALESCE(e."end",'2000-01-01'), COALESCE(eu."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(eu."name",'')
+		SELECT i."ID", i."timestamp", i."description", i."location", i."moment", i."place", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description", COALESCE(dr."belonging",''), COALESCE(dr."perceivedLoss", ''), COALESCE(dr."preventiveMeasures", 0::boolean), COALESCE(dr."preventiveMeasuresDescription",''), COALESCE(cr."estimatedDamage",0), COALESCE(cr."severity",''), COALESCE(q."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(q."name",''), COALESCE(q."identifier",''), COALESCE(e."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(e."name",''), COALESCE(e."start",'2000-01-01'), COALESCE(e."end",'2000-01-01'), COALESCE(eu."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(eu."name",'')
 		FROM "interaction" i
 		INNER JOIN "species" s ON s."ID" = i."speciesID"
 		INNER JOIN "user" u ON u."ID" = i."userID"
@@ -41,7 +41,7 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 		var dr models.DamageReport
 		var cr models.CollisionReport
 		var q models.Questionnaire
-		if err := rows.Scan(&i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Moment, &i.Place, &i.Species.ID, &i.Species.Name, &i.Species.CommonName, &i.User.ID, &i.User.Name, &i.Type.ID, &i.Type.Name, &i.Type.Description, &dr.Belonging, &dr.ImpactType, &dr.ImpactValue, &dr.EstimatedDamage, &dr.EstimatedLoss, &cr.EstimatedDamage, &cr.Severity, &q.ID, &q.Name, &q.Identifier, &q.Experiment.ID, &q.Experiment.Name, &q.Experiment.Start, &q.Experiment.End, &q.Experiment.User.ID, &q.Experiment.User.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Moment, &i.Place, &i.Species.ID, &i.Species.Name, &i.Species.CommonName, &i.User.ID, &i.User.Name, &i.Type.ID, &i.Type.Name, &i.Type.Description, &dr.Belonging, &dr.PerceivedLoss, &dr.PreventiveMeasures, &dr.PreventiveMeasuresDescription, &cr.EstimatedDamage, &cr.Severity, &q.ID, &q.Name, &q.Identifier, &q.Experiment.ID, &q.Experiment.Name, &q.Experiment.Start, &q.Experiment.End, &q.Experiment.User.ID, &q.Experiment.User.Name); err != nil {
 			return nil, err
 		}
 		if i.Type.ID == 1 {
@@ -157,9 +157,9 @@ func (s *InteractionStore) Add(userID string, interaction *models.InteractionRec
 		}
 	case 2:
 		query = `
-			INSERT INTO "damageReport" ("interactionID", "belonging", "impactType", "impactValue", "estimatedDamage", "estimatedLoss") VALUES ($1, $2, $3, $4, $5, $6)
+			INSERT INTO "damageReport" ("interactionID", "belonging", "perceivedLoss", "preventiveMeasures", "preventiveMeasuresDescription") VALUES ($1, $2, $3, $4, $5)
 		`
-		if _, err := s.relationalDB.Exec(query, id, interaction.ReportOfDamage.Belonging, interaction.ReportOfDamage.ImpactType, interaction.ReportOfDamage.ImpactValue, interaction.ReportOfDamage.EstimatedDamage, interaction.ReportOfDamage.EstimatedLoss); err != nil {
+		if _, err := s.relationalDB.Exec(query, id, interaction.ReportOfDamage.Belonging, interaction.ReportOfDamage.PerceivedLoss, interaction.ReportOfDamage.PreventiveMeasures, interaction.ReportOfDamage.PreventiveMeasuresDescription); err != nil {
 			return nil, err
 		}
 	case 3:

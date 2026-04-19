@@ -1,9 +1,8 @@
 package models
 
 type DamageReport struct {
-	Belonging       string `json:"belonging" doc:"The belonging that was damaged."`
-	ImpactType      string `json:"impactType" enum:"square-meters,units" doc:"The type of the impact of this damage report."`
-	ImpactValue     int    `json:"impactValue" minimum:"1" doc:"The value of the impact of this damage report."`
-	EstimatedDamage int    `json:"estimatedDamage" minimum:"0" doc:"The estimated value in Euros (€) of the damage."`
-	EstimatedLoss   int    `json:"estimatedLoss" minimum:"0" doc:"The estimated economical loss in Euros (€) as incurred by the damage."`
+	Belonging                     string `json:"belonging" doc:"The belonging that was damaged."`
+	PerceivedLoss                 string `json:"estimatedLoss" enum:"unknown,0-250,250-500,500-1000,1000-2000,2000-5000,5000+" doc:"The perceived economical loss in Euros (€) as incurred by the damage."`
+	PreventiveMeasures            bool   `json:"preventiveMeasures" doc:"Whether preventive measures were installed or not."`
+	PreventiveMeasuresDescription string `json:"preventiveMeasuresDescription" doc:"The description of the installed preventive measures."`
 }
