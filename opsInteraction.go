@@ -59,23 +59,6 @@ func (o *interactionOperations) RegisterGet(api huma.API) {
 	})
 }
 
-func (o *interactionOperations) RegisterGetAll(api huma.API) {
-	name := "Get All Interactions"
-	description := "Retrieve all interactions."
-	path := "/" + o.Endpoint + "s/"
-	scopes := []string{"researcher"}
-	method := http.MethodGet
-	huma.Register(api, huma.Operation{
-		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*InteractionsHolder, error) {
-		interactions, err := stores.NewInteractionStore(relationalDB).GetAll()
-		if err != nil {
-			return nil, handleError(err)
-		}
-		return &InteractionsHolder{Body: interactions}, nil
-	})
-}
-
 func (o *interactionOperations) RegisterGetMine(api huma.API) {
 	name := "Get My Interactions"
 	description := "Retrieve my interactions."
