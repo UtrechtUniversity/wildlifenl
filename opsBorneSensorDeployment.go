@@ -30,6 +30,23 @@ func newBorneSensorDeploymentOperations() *borneSensorDeploymentOperations {
 	return &o
 }
 
+func (o *borneSensorDeploymentOperations) RegisterGetActive(api huma.API) {
+	name := "Get Active BorneSensorDeployments"
+	description := "Get all active borne-sensor deployments."
+	path := "/" + o.Endpoint + "/active/"
+	scopes := []string{"herd-manager"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct{}) (*BorneSensorDeploymentsHolder, error) {
+		borneSensorDeployment, err := stores.NewBorneSensorDeploymentStore(relationalDB, timeseriesDB).GetActive()
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &BorneSensorDeploymentsHolder{Body: borneSensorDeployment}, nil
+	})
+}
+
 func (o *borneSensorDeploymentOperations) RegisterAdd(api huma.API) {
 	name := "Add BorneSensorDeployment"
 	description := "Submit a new deployment for a borne sensor. If an existing deployment is found for the same sensorID, that deployment's end timestamp will be set to the start timestamp of the new deployment."
