@@ -71,6 +71,7 @@ func Start(config *Configuration) error {
 	huma.AutoRegister(api, newAuthOperations())
 	huma.AutoRegister(api, newBorneSensorDeploymentOperations())
 	huma.AutoRegister(api, newBorneSensorReadingOperations())
+	huma.AutoRegister(api, newContactOperations())
 	huma.AutoRegister(api, newConveyanceOperations())
 	huma.AutoRegister(api, newDetectionOperations())
 	huma.AutoRegister(api, newExperimentOperations())

@@ -1,0 +1,10 @@
+CREATE TABLE "contact" (
+	"ID" UUID NOT NULL DEFAULT gen_random_uuid(),
+	"userID" UUID NOT NULL,
+	"borneSensorDeploymentID" UUID NOT NULL,
+	"start" TIMESTAMPTZ NOT NULL DEFAULT now(),
+	"end" TIMESTAMPTZ NULL,
+	PRIMARY KEY ("ID"),
+	CONSTRAINT "FK__user" FOREIGN KEY ("userID") REFERENCES "user" ("ID") ON UPDATE RESTRICT ON DELETE RESTRICT,
+	CONSTRAINT "FK__borneSensorDeployment" FOREIGN KEY ("borneSensorDeploymentID") REFERENCES "borneSensorDeployment" ("ID") ON UPDATE RESTRICT ON DELETE RESTRICT
+);

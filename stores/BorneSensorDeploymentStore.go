@@ -15,7 +15,7 @@ func NewBorneSensorDeploymentStore(relationalDB *sql.DB, timeseriesDB *timeserie
 		relationalDB: relationalDB,
 		timeseriesDB: timeseriesDB,
 		query: `
-			SELECT d."sensorID", d."start", d."end", a."ID", a."name", a."location", s."ID", s."name", s."commonName"
+			SELECT d."sensorID", d."contactHardwareAddress", d."start", d."end", a."ID", a."name", a."location", s."ID", s."name", s."commonName"
 			FROM "borneSensorDeployment" d
 			INNER JOIN "animal" a ON a."ID" = d."animalID"
 			INNER JOIN "species" s ON s."ID" = a."speciesID"
@@ -33,7 +33,7 @@ func (s *BorneSensorDeploymentStore) process(rows *sql.Rows, err error) ([]model
 		var borneSensorDeployment models.BorneSensorDeployment
 		var animal models.Animal
 		var species models.Species
-		if err := rows.Scan(&borneSensorDeployment.SensorID, &borneSensorDeployment.Start, &borneSensorDeployment.End, &animal.ID, &animal.Name, &animal.Location, &species.ID, &species.Name, &species.CommonName); err != nil {
+		if err := rows.Scan(&borneSensorDeployment.SensorID, &borneSensorDeployment.ContactHardwareAddress, &borneSensorDeployment.Start, &borneSensorDeployment.End, &animal.ID, &animal.Name, &animal.Location, &species.ID, &species.Name, &species.CommonName); err != nil {
 			return nil, err
 		}
 		animal.Species = species
@@ -93,12 +93,12 @@ func (s *BorneSensorDeploymentStore) Add(borneSensorDeployment *models.BorneSens
 		return nil, err
 	}
 	query = `
-		INSERT INTO "borneSensorDeployment"("animalID", "sensorID", "start") VALUES($1, $2, $3)
+		INSERT INTO "borneSensorDeployment"("animalID", "sensorID", "contactHardwareAddress", "start") VALUES($1, $2, $3, $4)
 		RETURNING "sensorID", "animalID"
 	`
 	var sensorID string
 	var animalID string
-	row := s.relationalDB.QueryRow(query, borneSensorDeployment.AnimalID, borneSensorDeployment.SensorID, borneSensorDeployment.Start)
+	row := s.relationalDB.QueryRow(query, borneSensorDeployment.AnimalID, borneSensorDeployment.SensorID, borneSensorDeployment.ContactHardwareAddress, borneSensorDeployment.Start)
 	if err := row.Scan(&sensorID, &animalID); err != nil {
 		return nil, err
 	}
