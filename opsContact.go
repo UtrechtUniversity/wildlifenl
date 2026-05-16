@@ -23,6 +23,10 @@ type ContactEndInput struct {
 	}
 }
 
+type ContactHolder struct {
+	Body *models.Contact `json:"contact"`
+}
+
 type ContactsHolder struct {
 	Body []models.Contact `json:"contacts"`
 }
@@ -41,7 +45,7 @@ func (o *contactOperations) RegisterStart(api huma.API) {
 	method := http.MethodPost
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *ContactStartInput) (*models.Contact, error) {
+	}, func(ctx context.Context, input *ContactStartInput) (*ContactHolder, error) {
 		store := stores.NewContactStore(relationalDB)
 		ok, err := store.NotExists(input.credential.UserID, input.Body.ContactHardwareAddress)
 		if err != nil {
@@ -60,7 +64,7 @@ func (o *contactOperations) RegisterStart(api huma.API) {
 
 		// TODO: Add conveyances here.
 
-		return contact, nil
+		return &ContactHolder{Body: contact}, nil
 	})
 }
 
@@ -72,7 +76,7 @@ func (o *contactOperations) RegisterEnd(api huma.API) {
 	method := http.MethodPut
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *ContactEndInput) (*models.Contact, error) {
+	}, func(ctx context.Context, input *ContactEndInput) (*ContactHolder, error) {
 		store := stores.NewContactStore(relationalDB)
 		ok, err := store.Exists(input.credential.UserID, input.Body.ContactID)
 		if err != nil {
@@ -85,7 +89,7 @@ func (o *contactOperations) RegisterEnd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
-		return contact, nil
+		return &ContactHolder{Body: contact}, nil
 	})
 }
 
