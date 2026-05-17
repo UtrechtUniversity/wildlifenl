@@ -30,6 +30,7 @@ var (
 	relationalDB *sql.DB
 	timeseriesDB *timeseries.Timeseries
 	mailer       *Mailer
+	notifier     *Notifier
 	sessions     *cache.Cache
 	authRequests *cache.Cache
 )
@@ -43,6 +44,9 @@ func Start(config *Configuration) error {
 	}
 	if err := initializeMailer(config); err != nil {
 		return fmt.Errorf("could not initialize Mailer service: %w", err)
+	}
+	if err := initializeNotifier(config); err != nil {
+		return fmt.Errorf("could not initialize Firebase notification service: %w", err)
 	}
 	if err := timeseriesDB.CreateBucketIfNotExists("animals"); err != nil {
 		return fmt.Errorf("could not create Timeseries bucket: %w", err)
@@ -115,6 +119,15 @@ func initializeTimeseriesDB(config *Configuration) error {
 func initializeMailer(config *Configuration) error {
 	mailer = newMailer(config)
 	return mailer.Ping()
+}
+
+func initializeNotifier(config *Configuration) error {
+	n, err := newNotifier(config.FirebaseCredentials)
+	if err != nil {
+		return err
+	}
+	notifier = n
+	return nil
 }
 
 func NewMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context)) {

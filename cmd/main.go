@@ -114,6 +114,12 @@ func main() {
 		log.Fatal("environment variable ADMIN_EMAIL_ADDRESS cannot be empty")
 	}
 
+	firebaseCredentials := os.Getenv("FIREBASE_CREDENTIALS_JSON")
+	if firebaseCredentials == "" {
+		log.Fatal("environment variable FIREBASE_CREDENTIALS_JSON cannot be empty")
+	}
+	config.FirebaseCredentials = []byte(firebaseCredentials)
+
 	if err := migrateDatabase(config); err != nil {
 		log.Fatal("Database migration error:", err)
 	}

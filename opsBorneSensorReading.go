@@ -64,12 +64,15 @@ func (o *borneSensorReadingOperations) RegisterAdd(api huma.API) {
 		}
 		if animal != nil && time.Since(*animal.LocationTimestamp) > time.Hour {
 			// Add Borne-Sensor-Reading -> Create Alarms.
-			ids, err := stores.NewAlarmStore(relationalDB).AddAllFromAnimal(animal)
+			alarmIDs, err := stores.NewAlarmStore(relationalDB).AddAllFromAnimal(animal)
 			if err != nil {
 				return nil, handleError(err)
 			}
+			if err := notifier.SendAlarms(alarmIDs); err != nil {
+				return nil, handleError(err)
+			}
 			// From created Alarms -> Create Conveyances
-			if err := stores.NewConveyanceStore(relationalDB).AddForAlarmIDs(ids); err != nil {
+			if err := stores.NewConveyanceStore(relationalDB).AddForAlarmIDs(alarmIDs); err != nil {
 				return nil, handleError(err)
 			}
 		}

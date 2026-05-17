@@ -77,7 +77,7 @@ func (s *AlarmStore) process(rows *sql.Rows, err error) ([]models.Alarm, error) 
 	return alarms, nil
 }
 
-func (s *AlarmStore) Get(alarmID int) (*models.Alarm, error) {
+func (s *AlarmStore) Get(alarmID string) (*models.Alarm, error) {
 	query := s.query + `
 		WHERE a."ID" = $1
 	`

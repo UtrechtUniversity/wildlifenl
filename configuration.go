@@ -20,4 +20,5 @@ type Configuration struct {
 	EmailUser                       string
 	EmailPassword                   string
 	AdminEmailAddress               string
+	FirebaseCredentials             []byte
 }

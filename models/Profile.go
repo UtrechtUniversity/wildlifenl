@@ -12,6 +12,7 @@ type ProfileRecord struct {
 	NatureVisitAvgWeeklyFrequency int     `json:"natureVisitAvgWeeklyFrequency" doc:"The average weekly frequency this user visits nature."`
 	RecreationAppTandC            bool    `json:"recreationAppTerms" doc:"Reports whether this user accepted the terms and conditions for the use of the recreation app."`
 	ReportAppTandC                bool    `json:"reportAppTerms" doc:"Reports whether this user accepted the terms and conditions for the use of the report app."`
+	FirebaseCloudMessagingToken   *string `json:"firebaseCloudMessagingToken" doc:"The Firebase Cloud Messaging Token of the client application for this user."`
 }
 
 type Profile struct {
