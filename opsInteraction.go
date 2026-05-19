@@ -2,7 +2,6 @@ package wildlifenl
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"time"
 
@@ -117,7 +116,6 @@ func (o *interactionOperations) RegisterAdd(api huma.API) {
 				if err != nil {
 					return nil, handleError(err)
 				}
-				log.Println("Going to send notifications for:", alarmIDs) // TEMP
 				if err := notifier.SendAlarms(alarmIDs); err != nil {
 					return nil, handleError(err)
 				}
