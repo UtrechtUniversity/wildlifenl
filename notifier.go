@@ -2,7 +2,7 @@ package wildlifenl
 
 import (
 	"context"
-	"time"
+	"log"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
@@ -34,9 +34,10 @@ func (n *Notifier) send(token string, data map[string]string) error {
 		APNS:    &messaging.APNSConfig{Headers: map[string]string{"apns-priority": "10"}},
 		Webpush: &messaging.WebpushConfig{Headers: map[string]string{"Urgency": "high"}},
 	}
-	context, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	_, err = client.Send(context, message)
+	//context, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//defer cancel()
+	result, err := client.Send(context.Background(), message)
+	log.Println("Result for notofication:", result) // TEMP
 	return err
 }
 
@@ -44,17 +45,21 @@ func (n *Notifier) SendAlarms(alarmIDs []string) error {
 	alarmStore := stores.NewAlarmStore(relationalDB)
 	profileStore := stores.NewProfileStore(relationalDB)
 	for _, alarmID := range alarmIDs {
+		log.Println("Notifications for:", alarmID) // TEMP
 		alarm, err := alarmStore.Get(alarmID)
 		if err != nil {
 			return err
 		}
+		log.Println("Notifications for alarm:", alarm) // TEMP
 		profile, err := profileStore.Get(alarm.Zone.User.ID)
 		if err != nil {
 			return err
 		}
+		log.Println("Notifications for profile:", profile) // TEMP
 		if profile.FirebaseCloudMessagingToken == nil {
 			continue
 		}
+		log.Println("Notifications for token:", *profile.FirebaseCloudMessagingToken) // TEMP
 		if err := n.send(*profile.FirebaseCloudMessagingToken, map[string]string{"alarmID": alarmID}); err != nil {
 			return err
 		}
