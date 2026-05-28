@@ -1,5 +1,5 @@
 # WildlifeNL App tests – Landholder
-Today you are landholder, for example an agrarian, using the WildlifeNL WildRapport app. We are running this app against a TEST environment with simulated animals, so there will only be human-wildlife interactions that are artificially created by us. All locations are within the test living lab area Botanische Tuinen in Utrecht. If you notice an issue, bug or inconvenience when performing the test scenarios below, please write them down so we can later provide them to the development team. Note that aside from the 'Logging in' feature, all features are marked with codes in brackets ([ ]) that match the user story codes in the Functional Design. You can look-up the expected behaviour of the app and the purpose of the functionality this way. Additionally, it is possible that the screens that are mentioned in single quotes in these test scenarios have a somewhat different Dutch name in the app. Please login with your email address either from Utrecht University or Fontys University of Applied Sciences.
+Today you are landholder, for example an agrarian, using the WildlifeNL WildRapport app. We are running this app against a TEST environment with simulated animals, so there will only be human-wildlife interactions that are artificially created by us. All locations are within the test living lab area Stadswandelpark Eindhoven. If you notice an issue, bug or inconvenience when performing the test scenarios below, please write them down so we can later provide them to the development team. Note that aside from the 'Logging in' feature, all features are marked with codes in brackets ([ ]) that match the user story codes in the Functional Design. You can look-up the expected behaviour of the app and the purpose of the functionality this way. Additionally, it is possible that the screens that are mentioned in single quotes in these test scenarios have a somewhat different Dutch name in the app. Please login with your email address either from Utrecht University or Fontys University of Applied Sciences.
 <br/>
 
 ## Feature: Logging in
@@ -32,6 +32,7 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 |`WHEN`| you provide the validation code as received by email |
 |`THEN`| the app navigates beyond the 'login screen'. |
 ---
+<br/>
 
 ## Feature: Read and accept Terms & Conditions [R1]
 
@@ -57,7 +58,7 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 
 | R2.1 | Successfully activate location sharing |
 |:-:|:-|
-|`GIVEN`| you are on the 'main menu screen' |
+|`GIVEN`| you are on the 'main screen' |
 |`AND`| you did __NOT__ activate location sharing previously |
 |`WHEN`| you navigate to the 'settings screen' |
 |`AND`| activate location sharing |
@@ -68,7 +69,7 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 
 | R2.2 | Successfully deactivate location sharing |
 |:-:|:-|
-|`GIVEN`| you are on the 'main menu screen' |
+|`GIVEN`| you are on the 'main screen' |
 |`AND`| you activated location sharing previously |
 |`WHEN`| you navigate to the 'settings screen' |
 |`AND`| deactivate location sharing |
@@ -81,10 +82,10 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 
 | R3.1 | Successfully view tracked movements |
 |:-:|:-|
-|`GIVEN`| you are on the 'main menu screen' |
+|`GIVEN`| you are on the 'main screen' |
 |`AND`| you activated location sharing previously |
 |`AND`| you have moved around for at least 5 minutes since then |
-|`WHEN`| you navigate to the 'view my movements screen' |
+|`WHEN`| you activate the 'view my movements' function |
 |`THEN`| the app shows your previously tracked movements on a map. |
 ---
 <br/>
@@ -114,9 +115,10 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 |:-:|:-|
 |`GIVEN`| you are on the 'report property damage screen' |
 |`WHEN`| you selected animal species 'Wolf' |
-|`AND`| you specified "mijn kippen" as damaged belonging |
-|`AND`| you specified "eenheden" as type and 5 as value |
-|`AND`| you specified 500 euros as damage value and 6500 as estimated loss |
+|`AND`| you specified "kippen" as damaged belonging |
+|`AND`| you specified € 500 - 1000 as estimated loss |
+|`AND`| you specified having used "preventieve maatregelen" |
+|`AND`| you described the "preventieve maatregelen" as "een hek om het kippenhok" |
 |`AND`| you specified as date+time yesterday 4:45
 |`AND`| you picked your current location |
 |`AND`| you wrote "Landholder R5.1" as comment |
@@ -136,7 +138,7 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 |`WHEN`| you selected animal species 'Ree' |
 |`AND`| you specified one adolescent female animal |
 |`AND`| you specified 4000 euros as estimated damage value |
-|`AND`| you specified MEDIUM intensity and LOW urgency |
+|`AND`| you specified MEDIUM severity |
 |`AND`| you specified the current date+time |
 |`AND`| you picked a location about 25 meters from where you are now |
 |`AND`| you wrote "Landholder R6.1" as comment |
@@ -152,7 +154,7 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 
 | R11.1 | Successfully list previously added interactions |
 |:-:|:-|
-|`GIVEN`| you are on the 'main menu screen' |
+|`GIVEN`| you are on the 'main screen' |
 |`WHEN`| you navigate to the 'view my interactions screen' |
 |`THEN`| the interactions you just successfully reported for R3, R4 and R5 are displayed with all provided information visible. |
 ---
@@ -186,7 +188,7 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 
 | R7.1 | Successfully view vicinity |
 |:-:|:-|
-|`GIVEN`| you are on the 'main menu screen' |
+|`GIVEN`| you are on the 'main screen' |
 |`WHEN`| you navigate to the 'view vicinity screen' (map) |
 |`THEN`| a view of your vicinity including animals, detections and interactions is shown |
 |`AND`| you can move the view around |
@@ -222,7 +224,8 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 |`AND`| you provide a date-of-birth |
 |`AND`| you provide a gender |
 |`AND`| you provide a postcode |
-|`AND`| you provide a description |
+|`AND`| you provide a nature visit frequency of 2 per week |
+|`AND`| you provide a short description of the shoes you are wearing now as notes |
 |`AND`| you submit the form |
 |`THEN`| the app successfully submits this information  |
 |`AND`| shows the exact information as provided on the 'profile screen'. |
@@ -233,7 +236,7 @@ Today you are landholder, for example an agrarian, using the WildlifeNL WildRapp
 
 | R11.1 | Successfully view questionnaires |
 |:-:|:-|
-|`GIVEN`| you are on the 'main menu screen' |
+|`GIVEN`| you are on the 'main screen' |
 |`WHEN`| you navigate to the 'questionnaires screen' |
 |`THEN`| a list of questionnaires that were previously assigned to you is shown.  |
 ---
