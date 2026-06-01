@@ -14,7 +14,7 @@ func NewInteractionStore(db *sql.DB) *InteractionStore {
 	s := InteractionStore{
 		relationalDB: db,
 		query: `
-		SELECT i."ID", i."timestamp", i."description", i."location", i."moment", i."place", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description", COALESCE(sr."humanActivity", ''), COALESCE(sr."humanActivityOther", ''), COALESCE(sr."perceivedAnimalActivity", ''), COALESCE(sr."perceivedAnimalActivityOther", ''), COALESCE(dr."belonging",''), COALESCE(dr."perceivedLoss", ''), COALESCE(dr."preventiveMeasures", 0::boolean), COALESCE(dr."preventiveMeasuresDescription",''), COALESCE(cr."estimatedDamage",0), COALESCE(cr."severity",''), COALESCE(q."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(q."name",''), COALESCE(q."identifier",''), COALESCE(e."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(e."name",''), COALESCE(e."start",'2000-01-01'), COALESCE(e."end",'2000-01-01'), COALESCE(eu."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(eu."name",'')
+		SELECT i."ID", i."timestamp", i."notes", i."location", i."moment", i."place", s."ID", s."name", s."commonName", u."ID", u."name", t."ID", t."name", t."description", COALESCE(sr."humanActivity", ''), COALESCE(sr."humanActivityOther", ''), COALESCE(sr."perceivedAnimalActivity", ''), COALESCE(sr."perceivedAnimalActivityOther", ''), COALESCE(dr."belonging",''), COALESCE(dr."perceivedLoss", ''), COALESCE(dr."preventiveMeasures", 0::boolean), COALESCE(dr."preventiveMeasuresDescription",''), COALESCE(cr."estimatedDamage",0), COALESCE(cr."severity",''), COALESCE(q."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(q."name",''), COALESCE(q."identifier",''), COALESCE(e."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(e."name",''), COALESCE(e."start",'2000-01-01'), COALESCE(e."end",'2000-01-01'), COALESCE(eu."ID",'00000000-0000-0000-0000-000000000000'), COALESCE(eu."name",'')
 		FROM "interaction" i
 		INNER JOIN "species" s ON s."ID" = i."speciesID"
 		INNER JOIN "user" u ON u."ID" = i."userID"
@@ -41,7 +41,7 @@ func (s *InteractionStore) process(rows *sql.Rows, err error) ([]models.Interact
 		var dr models.DamageReport
 		var cr models.CollisionReport
 		var q models.Questionnaire
-		if err := rows.Scan(&i.ID, &i.Timestamp, &i.Description, &i.Location, &i.Moment, &i.Place, &i.Species.ID, &i.Species.Name, &i.Species.CommonName, &i.User.ID, &i.User.Name, &i.Type.ID, &i.Type.Name, &i.Type.Description, &sr.HumanActivity, &sr.HumanActivityOther, &sr.PerceivedAnimalActivity, &sr.PerceivedAnimalActivityOther, &dr.Belonging, &dr.PerceivedLoss, &dr.PreventiveMeasures, &dr.PreventiveMeasuresDescription, &cr.EstimatedDamage, &cr.Severity, &q.ID, &q.Name, &q.Identifier, &q.Experiment.ID, &q.Experiment.Name, &q.Experiment.Start, &q.Experiment.End, &q.Experiment.User.ID, &q.Experiment.User.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.Timestamp, &i.Notes, &i.Location, &i.Moment, &i.Place, &i.Species.ID, &i.Species.Name, &i.Species.CommonName, &i.User.ID, &i.User.Name, &i.Type.ID, &i.Type.Name, &i.Type.Description, &sr.HumanActivity, &sr.HumanActivityOther, &sr.PerceivedAnimalActivity, &sr.PerceivedAnimalActivityOther, &dr.Belonging, &dr.PerceivedLoss, &dr.PreventiveMeasures, &dr.PreventiveMeasuresDescription, &cr.EstimatedDamage, &cr.Severity, &q.ID, &q.Name, &q.Identifier, &q.Experiment.ID, &q.Experiment.Name, &q.Experiment.Start, &q.Experiment.End, &q.Experiment.User.ID, &q.Experiment.User.Name); err != nil {
 			return nil, err
 		}
 		if i.Type.ID == 1 {
@@ -93,54 +93,12 @@ func (s *InteractionStore) GetAll() ([]models.Interaction, error) {
 }
 
 func (s *InteractionStore) Add(userID string, interaction *models.InteractionRecord) (*models.Interaction, error) {
-	// This query works if sent directly to postgres, but apparently does not when doing so via the
-	// Go connector: pq: cannot insert multiple commands into a prepared statement
-	// So let's do them one by one, which is not so nice, and also forces us to do a check for the
-	// existence of belonging before doing the insert of interaction as to not insert an interaction
-	// when there is still an error, see InteractionOperations.
-	//
-	/*
-		query := `
-			DROP TABLE IF EXISTS inserted;
-			CREATE TEMP TABLE inserted ("ID" UUID, "typeID" INT);
-			WITH "insert" as (
-				INSERT INTO "interaction"("description", "location", "moment", "speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5, $6)
-				RETURNING "ID", "typeID"
-			)
-			INSERT INTO inserted
-			SELECT "ID", "typeID"
-			FROM "insert";
-			INSERT INTO "sightingReport" ("interactionID")
-			SELECT "ID" FROM "inserted" WHERE "typeID" = 1;
-			INSERT INTO "damageReport" ("interactionID", "belongingID", "impactType", "impactValue", "estimatedDamage", "estimatedLoss")
-			SELECT "ID", $7, $8, $9, $10, $11 FROM inserted WHERE "typeID" = 2;
-			INSERT INTO "collisionReport" ("interactionID", "estimatedDamage", "intensity", "urgency")
-			SELECT "ID", $12, $13, $14 FROM inserted WHERE "typeID" = 3;
-			SELECT "ID" FROM inserted;
-			DROP TABLE inserted;
-		`
-		if interaction.ReportOfSighting == nil {
-			interaction.ReportOfSighting = &models.SightingReport{}
-		}
-		if interaction.ReportOfDamage == nil {
-			interaction.ReportOfDamage = &models.DamageReport{}
-		}
-		if interaction.ReportOfCollision == nil {
-			interaction.ReportOfCollision = &models.CollisionReport{}
-		}
-		var id string
-		row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.Moment, interaction.SpeciesID, userID, interaction.TypeID, interaction.ReportOfDamage.Belonging.ID, interaction.ReportOfDamage.ImpactType, interaction.ReportOfDamage.ImpactValue, interaction.ReportOfDamage.EstimatedDamage, interaction.ReportOfDamage.EstimatedLoss, interaction.ReportOfCollision.EstimatedDamage, interaction.ReportOfCollision.Intensity, interaction.ReportOfCollision.Urgency)
-		if err := row.Scan(&id); err != nil {
-			return nil, err
-		}
-	*/
-
 	query := `
-		INSERT INTO "interaction"("description", "location", "moment", "place", "speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5, $6, $7)
+		INSERT INTO "interaction"("notes", "location", "moment", "place", "speciesID", "userID", "typeID") VALUES($1, $2, $3, $4, $5, $6, $7)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, interaction.Description, interaction.Location, interaction.Moment, interaction.Place, interaction.SpeciesID, userID, interaction.TypeID)
+	row := s.relationalDB.QueryRow(query, interaction.Notes, interaction.Location, interaction.Moment, interaction.Place, interaction.SpeciesID, userID, interaction.TypeID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

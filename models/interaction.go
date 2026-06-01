@@ -4,12 +4,12 @@ import "time"
 
 type InteractionRecord struct {
 	ID                string           `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this interaction."`
-	Description       string           `json:"description" doc:"The description of this interaction."`
 	SpeciesID         string           `json:"speciesID,omitempty" format:"uuid" writeOnly:"true" required:"true" doc:"The ID of the species involved in this interaction."`
 	Location          Point            `json:"location" doc:"The location where this interaction was reported."`
 	Moment            time.Time        `json:"moment" format:"date-time" doc:"The moment this interaction happened."`
 	Place             Point            `json:"place" doc:"The place where this interaction happened."`
 	TypeID            int              `json:"typeID,omitempty" minimum:"1" writeOnly:"true" required:"true" doc:"The ID of the interaction type for this interaction."`
+	Notes             *string          `json:"notes,omitempty" doc:"The notes as given by the user for this interaction."`
 	ReportOfSighting  *SightingReport  `json:"reportOfSighting,omitempty" doc:"Report of the animal sightings. Only used for interactions of TypeID 1"`
 	ReportOfDamage    *DamageReport    `json:"reportOfDamage,omitempty" doc:"Report of the inflicted damage. Only used for interactions of TypeID 2"`
 	ReportOfCollision *CollisionReport `json:"reportOfCollision,omitempty" doc:"Report of the animal-vehicle-collision. Only used for interactions of TypeID 3"`
