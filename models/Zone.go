@@ -3,11 +3,10 @@ package models
 import "time"
 
 type ZoneRecord struct {
-	ID          string    `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this Zone."`
-	Created     time.Time `json:"created" readOnly:"true" doc:"The moment this zone was created."`
-	Name        string    `json:"name" minLength:"2" doc:"The name of this Zone."`
-	Description string    `json:"description" minLength:"5" doc:"The description for this Zone."`
-	Definition  Polygon   `json:"definition" doc:"The geographic definition that defines this Zone."`
+	ID         string    `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this Zone."`
+	Created    time.Time `json:"created" readOnly:"true" doc:"The moment this zone was created."`
+	Name       string    `json:"name" minLength:"2" doc:"The name of this Zone."`
+	Definition Polygon   `json:"definition" doc:"The geographic definition that defines this Zone."`
 }
 
 type Zone struct {
