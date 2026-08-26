@@ -190,8 +190,9 @@ func authenticate(displayNameApp, email string) error {
 		userName: userName,
 		email:    email,
 		code:     code,
+		attempts: 0,
 	}
-	authRequests.SetDefault(email, authenticationRequest)
+	authRequests.SetDefault(email, &authenticationRequest)
 	return nil
 }
 
@@ -200,8 +201,12 @@ func authorize(email, code string) (*models.Credential, error) {
 	if !ok {
 		return nil, nil
 	}
-	authenticationRequest := c.(AuthenticationRequest)
+	authenticationRequest := c.(*AuthenticationRequest)
 	if authenticationRequest.code != code {
+		authenticationRequest.attempts += 1
+		if authenticationRequest.attempts >= 3 {
+			authRequests.Delete(email)
+		}
 		return nil, nil
 	}
 	account, err := stores.NewCredentialStore(relationalDB).Create(authenticationRequest.appName, authenticationRequest.userName, authenticationRequest.email)

@@ -5,4 +5,5 @@ type AuthenticationRequest struct {
 	userName string
 	email    string
 	code     string
+	attempts int
 }
