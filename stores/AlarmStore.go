@@ -133,6 +133,9 @@ func (s *AlarmStore) AddAllFromDetection(detection *models.Detection) ([]string,
 		}
 		ids = append(ids, id)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return ids, nil
 }
 
@@ -161,6 +164,9 @@ func (s *AlarmStore) AddAllFromInteraction(interaction *models.Interaction) ([]s
 			return nil, err
 		}
 		ids = append(ids, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return ids, nil
 }

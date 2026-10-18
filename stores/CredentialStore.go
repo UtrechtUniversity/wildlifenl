@@ -38,6 +38,9 @@ func (s *CredentialStore) Get(token string) (*models.Credential, error) {
 		rows.Scan(&credential.UserID, &credential.Token, &credential.Email, &credential.LastLogon, &role)
 		credential.Scopes = append(credential.Scopes, role)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	if credential.UserID == "" {
 		return nil, nil
 	}
