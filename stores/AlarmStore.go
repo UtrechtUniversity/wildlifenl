@@ -191,5 +191,8 @@ func (s *AlarmStore) AddAllFromAnimal(animal *models.Animal) ([]string, error) {
 		}
 		ids = append(ids, id)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return ids, nil
 }

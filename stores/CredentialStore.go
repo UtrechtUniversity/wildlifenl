@@ -73,6 +73,9 @@ func (s *CredentialStore) Create(appName, userName, email string) (*models.Crede
 		rows.Scan(&role)
 		scopes = append(scopes, role)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	query = `
 		INSERT INTO "credential"("email", "appName", "lastLogon")
 		VALUES ($1, $2, NOW())
