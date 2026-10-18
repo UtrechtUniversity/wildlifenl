@@ -13,7 +13,7 @@ func NewQuestionnaireStore(db *sql.DB) *QuestionnaireStore {
 	s := QuestionnaireStore{
 		relationalDB: db,
 		query: `
-		SELECT q."ID" AS "questionnaireID", q."name", q."identifier", e."ID", e."name", e."start", e."end", t."ID", t."name", t."description", u."ID", u."name"
+		SELECT q."ID" AS "questionnaireID", q."name", q."identifier", e."notifyAfter", e."ID", e."name", e."start", e."end", t."ID", t."name", t."description", u."ID", u."name"
 		FROM "questionnaire" q
 		INNER JOIN "experiment" e ON e."ID" = q."experimentID"
 		INNER JOIN "interactionType" t ON t."ID" = q."interactionTypeID"
@@ -29,20 +29,20 @@ func (s *QuestionnaireStore) process(rows *sql.Rows, err error) ([]models.Questi
 	}
 	questionnaires := make([]models.Questionnaire, 0)
 	for rows.Next() {
-		var questionnaire models.Questionnaire
-		var experiment models.Experiment
-		var interactionType models.InteractionType
-		var user models.User
-		if err := rows.Scan(&questionnaire.ID, &questionnaire.Name, &questionnaire.Identifier, &experiment.ID, &experiment.Name, &experiment.Start, &experiment.End, &interactionType.ID, &interactionType.Name, &interactionType.Description, &user.ID, &user.Name); err != nil {
+		var q models.Questionnaire
+		var e models.Experiment
+		var it models.InteractionType
+		var u models.User
+		if err := rows.Scan(&q.ID, &q.Name, &q.Identifier, &q.NotifyAfter, &e.ID, &e.Name, &e.Start, &e.End, &it.ID, &it.Name, &it.Description, &u.ID, &u.Name); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
 			return nil, err
 		}
-		experiment.User = user
-		questionnaire.Experiment = experiment
-		questionnaire.InteractionType = interactionType
-		questionnaires = append(questionnaires, questionnaire)
+		e.User = u
+		q.Experiment = e
+		q.InteractionType = it
+		questionnaires = append(questionnaires, q)
 	}
 	return questionnaires, nil
 }
