@@ -177,3 +177,22 @@ func (s *InteractionStore) GetFiltered(area *models.Circle, isAfter *time.Time, 
 	rows, err := s.relationalDB.Query(query, args...)
 	return s.process(rows, err)
 }
+
+func (s *InteractionStore) GetByExperiment(experimentID string) ([]models.Interaction, error) {
+	query := s.query + `
+		WHERE (
+			i."moment" > (SELECT "start" FROM "experiment" WHERE "ID" = $1)
+			AND
+			i."moment" < (SELECT "end" FROM "experiment" WHERE "ID" = $2)
+		) AND (
+			(SELECT "livingLabID" FROM "experiment" WHERE "ID" = $3) IS NULL
+			OR
+			i."place" <@ (SELECT l."definition" FROM "experiment" e LEFT JOIN "livingLab" l ON e."livingLabID" = l."ID" WHERE e."ID" = $4)
+		)`
+	rows, err := s.relationalDB.Query(query, experimentID, experimentID, experimentID, experimentID)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

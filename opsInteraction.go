@@ -146,3 +146,22 @@ func (o *interactionOperations) RegisterGetFilter(api huma.API) {
 		return &InteractionsHolder{Body: interactions}, nil
 	})
 }
+
+func (o *interactionOperations) RegisterGetByExperiment(api huma.API) {
+	name := "Get Interactions By Experiment"
+	description := "Retrieve all interactions that have a spatiotemporal overlap with an experiment. If the experiment is not bound to a living lab, every interaction has a spatial overlap with it."
+	path := "/" + o.Endpoint + "s/experiment/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" format:"uuid" doc:"The ID of the experiment to retrieve interactions for."`
+	}) (*InteractionsHolder, error) {
+		interactions, err := stores.NewInteractionStore(relationalDB).GetByExperiment(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &InteractionsHolder{Body: interactions}, nil
+	})
+}
