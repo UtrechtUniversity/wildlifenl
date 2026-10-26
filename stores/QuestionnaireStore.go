@@ -13,7 +13,7 @@ func NewQuestionnaireStore(db *sql.DB) *QuestionnaireStore {
 	s := QuestionnaireStore{
 		relationalDB: db,
 		query: `
-		SELECT q."ID" AS "questionnaireID", q."name", q."identifier", e."notifyAfter", e."ID", e."name", e."start", e."end", t."ID", t."name", t."description", u."ID", u."name"
+		SELECT q."ID" AS "questionnaireID", q."name", q."identifier", q."notifyAfter", e."ID", e."name", e."start", e."end", t."ID", t."name", t."description", u."ID", u."name"
 		FROM "questionnaire" q
 		INNER JOIN "experiment" e ON e."ID" = q."experimentID"
 		INNER JOIN "interactionType" t ON t."ID" = q."interactionTypeID"
