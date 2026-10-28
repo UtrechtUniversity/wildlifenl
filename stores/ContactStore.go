@@ -155,8 +155,7 @@ func (s *ContactStore) End(userID string, contactID string, location *models.Poi
 	query := `
 		UPDATE "contact" SET "end" = now(), "endLocation" = $3
 		WHERE "userID" = $1
-		AND "ID" = $2
-		AND "end" IS NULL
+		AND "ID" = $2 
 		RETURNING "ID";
 	`
 	var id string
