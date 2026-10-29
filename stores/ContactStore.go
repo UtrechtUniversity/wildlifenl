@@ -122,7 +122,7 @@ func (s *ContactStore) Exists(userID string, contactID string) (bool, error) {
 	return true, nil
 }
 
-func (s *ContactStore) Add(userID string, contactHardwareAddress string, location *models.Point) (*models.Contact, error) {
+func (s *ContactStore) Add(userID string, contactHardwareAddress string, location models.Point) (*models.Contact, error) {
 	query := `
 		INSERT INTO "contact" ("userID", "borneSensorDeploymentID", "startLocation")
 		SELECT $1, d."ID", $3
@@ -151,7 +151,7 @@ func (s *ContactStore) Add(userID string, contactHardwareAddress string, locatio
 	return s.Get(id)
 }
 
-func (s *ContactStore) End(userID string, contactID string, location *models.Point) (*models.Contact, error) {
+func (s *ContactStore) End(userID string, contactID string, location models.Point) (*models.Contact, error) {
 	query := `
 		UPDATE "contact" SET "end" = now(), "endLocation" = $3
 		WHERE "userID" = $1

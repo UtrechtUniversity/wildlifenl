@@ -12,16 +12,16 @@ import (
 type ContactStartInput struct {
 	Input
 	Body *struct {
-		ContactHardwareAddress string        `json:"contactHardwareAddress" pattern:"^([0-9A-F]{2}:){5}[0-9A-F]{2}$" doc:"The EUI-48 hardware address of the bluetooth contact tracing device."`
-		Location               *models.Point `json:"location,omitempty" doc:"The location of the user at the moment this contact started."`
+		ContactHardwareAddress string       `json:"contactHardwareAddress" pattern:"^([0-9A-F]{2}:){5}[0-9A-F]{2}$" doc:"The EUI-48 hardware address of the bluetooth contact tracing device."`
+		Location               models.Point `json:"location" doc:"The location of the user at the moment this contact started."`
 	}
 }
 
 type ContactEndInput struct {
 	Input
 	Body *struct {
-		ContactID string        `json:"contactID" format:"uuid" doc:"The ID of the contact tracing event to end."`
-		Location  *models.Point `json:"location,omitempty" doc:"The location of the user at the moment this contact finished."`
+		ContactID string       `json:"contactID" format:"uuid" doc:"The ID of the contact tracing event to end."`
+		Location  models.Point `json:"location" doc:"The location of the user at the moment this contact finished."`
 	}
 }
 
