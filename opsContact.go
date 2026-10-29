@@ -12,14 +12,16 @@ import (
 type ContactStartInput struct {
 	Input
 	Body *struct {
-		ContactHardwareAddress string `json:"contactHardwareAddress" pattern:"^([0-9A-F]{2}:){5}[0-9A-F]{2}$" doc:"The EUI-48 hardware address of the bluetooth contact tracing device."`
+		ContactHardwareAddress string       `json:"contactHardwareAddress" pattern:"^([0-9A-F]{2}:){5}[0-9A-F]{2}$" doc:"The EUI-48 hardware address of the bluetooth contact tracing device."`
+		Location               models.Point `json:"location" doc:"The location of the user at the moment this contact started."`
 	}
 }
 
 type ContactEndInput struct {
 	Input
 	Body *struct {
-		ContactID string `json:"contactID" format:"uuid" doc:"The ID of the contact tracing event to end."`
+		ContactID string       `json:"contactID" format:"uuid" doc:"The ID of the contact tracing event to end."`
+		Location  models.Point `json:"location" doc:"The location of the user at the moment this contact finished."`
 	}
 }
 
@@ -54,7 +56,7 @@ func (o *contactOperations) RegisterStart(api huma.API) {
 		if !ok {
 			return nil, huma.Error409Conflict("An existing active contact tracing record exists for the given contactHardwareAddress.")
 		}
-		contact, err := store.Add(input.credential.UserID, input.Body.ContactHardwareAddress)
+		contact, err := store.Add(input.credential.UserID, input.Body.ContactHardwareAddress, input.Body.Location)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -85,7 +87,7 @@ func (o *contactOperations) RegisterEnd(api huma.API) {
 		if !ok {
 			return nil, huma.Error409Conflict("An existing active contact tracing record was not found.")
 		}
-		contact, err := store.End(input.credential.UserID, input.Body.ContactID)
+		contact, err := store.End(input.credential.UserID, input.Body.ContactID, input.Body.Location)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -103,6 +105,25 @@ func (o *contactOperations) RegisterGetMine(api huma.API) {
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *Input) (*ContactsHolder, error) {
 		contacts, err := stores.NewContactStore(relationalDB).GetForUser(input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &ContactsHolder{Body: contacts}, nil
+	})
+}
+
+func (o *contactOperations) RegisterGetByExperiment(api huma.API) {
+	name := "Get All Contacts By Experiment"
+	description := "Retrieve all contact tracing events that have a spatiotemporal overlap with an experiment. A contact overlaps temporally if its start or end falls within the timespan of the experiment, and spatially if the location of the user at its start or end is within the living lab of the experiment. If the experiment is not bound to a living lab, every contact has a spatial overlap with it."
+	path := "/" + o.Endpoint + "s/experiment/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" format:"uuid" doc:"The ID of the experiment to retrieve contacts for."`
+	}) (*ContactsHolder, error) {
+		contacts, err := stores.NewContactStore(relationalDB).GetByExperiment(input.ID)
 		if err != nil {
 			return nil, handleError(err)
 		}
