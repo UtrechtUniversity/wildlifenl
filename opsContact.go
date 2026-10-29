@@ -89,6 +89,9 @@ func (o *contactOperations) RegisterEnd(api huma.API) {
 		if err != nil {
 			return nil, handleError(err)
 		}
+		if contact == nil {
+			return nil, huma.Error409Conflict("An existing active contact tracing record was not found.")
+		}
 		return &ContactHolder{Body: contact}, nil
 	})
 }

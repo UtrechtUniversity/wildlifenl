@@ -135,6 +135,7 @@ func (s *ContactStore) End(userID string, contactID string) (*models.Contact, er
 		UPDATE "contact" SET "end" = now()
 		WHERE "userID" = $1
 		AND "ID" = $2 
+		AND "end" IS NULL
 		RETURNING "ID";
 	`
 	var id string
