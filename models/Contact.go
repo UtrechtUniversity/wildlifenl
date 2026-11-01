@@ -9,7 +9,7 @@ type ContactRecord struct {
 	Start         time.Time  `json:"start" format:"date-time" doc:"The moment this contact started."`
 	End           *time.Time `json:"end" format:"date-time" required:"false" readOnly:"true" doc:"The moment this contact finished."`
 	StartLocation Point      `json:"startLocation" readOnly:"true" doc:"The location of the user at the moment this contact started. The north pole (latitude 90, longitude 0) for contacts recorded before locations were stored."`
-	EndLocation   Point      `json:"endLocation" readOnly:"true" doc:"The location of the user at the moment this contact finished. The north pole (latitude 90, longitude 0) while the contact has not finished, and for contacts recorded before locations were stored."`
+	EndLocation   *Point     `json:"endLocation,omitempty" readOnly:"true" doc:"The location of the user at the moment this contact finished."`
 }
 
 type Contact struct {

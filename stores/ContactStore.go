@@ -75,7 +75,7 @@ func (s *ContactStore) GetByExperiment(experimentID string) ([]models.Contact, e
 			OR
 			c."startLocation" <@ l."definition"
 			OR
-			c."endLocation" <@ l."definition"
+			(c."endLocation" IS NOT NULL AND c."endLocation" <@ l."definition")
 		)
 		ORDER BY c."start" DESC
 		`
@@ -156,6 +156,7 @@ func (s *ContactStore) End(userID string, contactID string, location models.Poin
 		UPDATE "contact" SET "end" = now(), "endLocation" = $3
 		WHERE "userID" = $1
 		AND "ID" = $2 
+		AND "end" IS NULL
 		RETURNING "ID";
 	`
 	var id string
