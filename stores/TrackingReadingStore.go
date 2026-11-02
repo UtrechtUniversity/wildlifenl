@@ -10,6 +10,8 @@ import (
 	"github.com/UtrechtUniversity/wildlifenl/timeseries"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"github.com/paulmach/orb"
+	"github.com/paulmach/orb/planar"
 )
 
 type TrackingReadingStore Store
@@ -113,4 +115,51 @@ func (s *TrackingReadingStore) GetForTimespan(start time.Time, end time.Time) ([
 	}
 	defer records.Close()
 	return s.process(records)
+}
+
+func (s *TrackingReadingStore) GetByExperiment(experimentID string) ([]models.TrackingReading, error) {
+	experiment, err := NewExperimentStore(s.relationalDB).Get(experimentID)
+	if err != nil {
+		return nil, err
+	}
+	if experiment == nil {
+		return nil, &ErrRecordInattainable{message: "experiment was not found"}
+	}
+	if !experiment.Start.Before(time.Now()) { // The timeseries database rejects an empty range.
+		return make([]models.TrackingReading, 0), nil
+	}
+	stop := "now()"
+	if experiment.End != nil {
+		stop = `time(v: "` + experiment.End.Add(time.Nanosecond).UTC().Format(time.RFC3339Nano) + `")` // The range stop is exclusive, so move it just past the end of the experiment.
+	}
+	query := `
+	from(bucket: "humans")
+		|> range(start: time(v: "` + experiment.Start.UTC().Format(time.RFC3339Nano) + `"), stop: ` + stop + `)
+		|> filter(fn: (r) => r._measurement == "human")
+	`
+	reader := s.timeseriesDB.Reader()
+	records, err := reader.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+	defer records.Close()
+	readings, err := s.process(records)
+	if err != nil {
+		return nil, err
+	}
+	if experiment.LivingLab == nil {
+		return readings, nil
+	}
+	ring := make(orb.Ring, 0)
+	for _, p := range experiment.LivingLab.Definition {
+		ring = append(ring, orb.Point{p.Longitude, p.Latitude})
+	}
+	ring = append(ring, ring[0])
+	result := make([]models.TrackingReading, 0)
+	for _, r := range readings {
+		if planar.RingContains(ring, orb.Point{r.Location.Longitude, r.Location.Latitude}) {
+			result = append(result, r)
+		}
+	}
+	return result, nil
 }
