@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
@@ -52,6 +53,9 @@ func (s *TrackingReadingStore) process(records *api.QueryTableResult) ([]models.
 			reading.Location.Latitude = r.Value().(float64)
 		case "longitude":
 			reading.Location.Longitude = r.Value().(float64)
+		case "": // A pivoted record holds both fields as columns.
+			reading.Location.Latitude, _ = r.Values()["latitude"].(float64)
+			reading.Location.Longitude, _ = r.Values()["longitude"].(float64)
 		}
 	}
 	if err := records.Err(); err != nil {
@@ -137,6 +141,20 @@ func (s *TrackingReadingStore) GetByExperiment(experimentID string) ([]models.Tr
 		|> range(start: time(v: "` + experiment.Start.UTC().Format(time.RFC3339Nano) + `"), stop: ` + stop + `)
 		|> filter(fn: (r) => r._measurement == "human")
 	`
+	var ring orb.Ring
+	if experiment.LivingLab != nil {
+		for _, p := range experiment.LivingLab.Definition {
+			ring = append(ring, orb.Point{p.Longitude, p.Latitude})
+		}
+		ring = append(ring, ring[0])
+		bound := ring.Bound()
+		format := func(v float64) string { return strconv.FormatFloat(v, 'f', -1, 64) }
+		// The timeseries database can only filter on the bounding box of the living lab, the exact check against its polygon follows below.
+		query += `
+		|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
+		|> filter(fn: (r) => r.longitude >= ` + format(bound.Min[0]) + ` and r.longitude <= ` + format(bound.Max[0]) + ` and r.latitude >= ` + format(bound.Min[1]) + ` and r.latitude <= ` + format(bound.Max[1]) + `)
+	`
+	}
 	reader := s.timeseriesDB.Reader()
 	records, err := reader.Query(context.Background(), query)
 	if err != nil {
@@ -147,14 +165,9 @@ func (s *TrackingReadingStore) GetByExperiment(experimentID string) ([]models.Tr
 	if err != nil {
 		return nil, err
 	}
-	if experiment.LivingLab == nil {
+	if ring == nil {
 		return readings, nil
 	}
-	ring := make(orb.Ring, 0)
-	for _, p := range experiment.LivingLab.Definition {
-		ring = append(ring, orb.Point{p.Longitude, p.Latitude})
-	}
-	ring = append(ring, ring[0])
 	result := make([]models.TrackingReading, 0)
 	for _, r := range readings {
 		if planar.RingContains(ring, orb.Point{r.Location.Longitude, r.Location.Latitude}) {
