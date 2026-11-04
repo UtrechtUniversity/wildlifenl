@@ -4,12 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/timeseries"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"github.com/paulmach/orb"
+	"github.com/paulmach/orb/planar"
 )
 
 type TrackingReadingStore Store
@@ -50,6 +53,9 @@ func (s *TrackingReadingStore) process(records *api.QueryTableResult) ([]models.
 			reading.Location.Latitude = r.Value().(float64)
 		case "longitude":
 			reading.Location.Longitude = r.Value().(float64)
+		case "": // A pivoted record holds both fields as columns.
+			reading.Location.Latitude, _ = r.Values()["latitude"].(float64)
+			reading.Location.Longitude, _ = r.Values()["longitude"].(float64)
 		}
 	}
 	if err := records.Err(); err != nil {
@@ -113,4 +119,60 @@ func (s *TrackingReadingStore) GetForTimespan(start time.Time, end time.Time) ([
 	}
 	defer records.Close()
 	return s.process(records)
+}
+
+func (s *TrackingReadingStore) GetByExperiment(experimentID string) ([]models.TrackingReading, error) {
+	experiment, err := NewExperimentStore(s.relationalDB).Get(experimentID)
+	if err != nil {
+		return nil, err
+	}
+	if experiment == nil {
+		return nil, &ErrRecordInattainable{message: "experiment was not found"}
+	}
+	if !experiment.Start.Before(time.Now()) { // The timeseries database rejects an empty range.
+		return make([]models.TrackingReading, 0), nil
+	}
+	stop := "now()"
+	if experiment.End != nil {
+		stop = `time(v: "` + experiment.End.Add(time.Nanosecond).UTC().Format(time.RFC3339Nano) + `")` // The range stop is exclusive, so move it just past the end of the experiment.
+	}
+	query := `
+	from(bucket: "humans")
+		|> range(start: time(v: "` + experiment.Start.UTC().Format(time.RFC3339Nano) + `"), stop: ` + stop + `)
+		|> filter(fn: (r) => r._measurement == "human")
+	`
+	var ring orb.Ring
+	if experiment.LivingLab != nil {
+		for _, p := range experiment.LivingLab.Definition {
+			ring = append(ring, orb.Point{p.Longitude, p.Latitude})
+		}
+		ring = append(ring, ring[0])
+		bound := ring.Bound()
+		format := func(v float64) string { return strconv.FormatFloat(v, 'f', -1, 64) }
+		// The timeseries database can only filter on the bounding box of the living lab, the exact check against its polygon follows below.
+		query += `
+		|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
+		|> filter(fn: (r) => r.longitude >= ` + format(bound.Min[0]) + ` and r.longitude <= ` + format(bound.Max[0]) + ` and r.latitude >= ` + format(bound.Min[1]) + ` and r.latitude <= ` + format(bound.Max[1]) + `)
+	`
+	}
+	reader := s.timeseriesDB.Reader()
+	records, err := reader.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+	defer records.Close()
+	readings, err := s.process(records)
+	if err != nil {
+		return nil, err
+	}
+	if ring == nil {
+		return readings, nil
+	}
+	result := make([]models.TrackingReading, 0)
+	for _, r := range readings {
+		if planar.RingContains(ring, orb.Point{r.Location.Longitude, r.Location.Latitude}) {
+			result = append(result, r)
+		}
+	}
+	return result, nil
 }
