@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl"
 	"github.com/golang-migrate/migrate/v4"
@@ -87,7 +88,7 @@ func main() {
 	if cacheAuthrequest != "" {
 		cacheAuthrequestMins, err := strconv.Atoi(cacheAuthrequest)
 		if err != nil || cacheAuthrequestMins <= 10 || cacheAuthrequestMins > 65535 {
-			log.Fatal("environment variable CACHE_SESSION_MINUTES must be empty for the default value of 30, or an unsigned 16-bit integer: 10 <= x <= 65535")
+			log.Fatal("environment variable CACHE_AUTHREQUEST_MINUTES must be empty for the default value of 30, or an unsigned 16-bit integer: 10 <= x <= 65535")
 		}
 		config.CacheAuthRequestDurationMinutes = cacheAuthrequestMins
 	}
@@ -112,6 +113,76 @@ func main() {
 	config.AdminEmailAddress = os.Getenv("ADMIN_EMAIL_ADDRESS")
 	if config.AdminEmailAddress == "" {
 		log.Fatal("environment variable ADMIN_EMAIL_ADDRESS cannot be empty")
+	}
+
+	config.RateLimitIPWindow = 1 * time.Minute
+	rateLimitIPWindow := os.Getenv("RATE_LIMIT_IP_WINDOW_MINUTES")
+	if rateLimitIPWindow != "" {
+		rateLimitIPWindowMins, err := strconv.Atoi(rateLimitIPWindow)
+		if err != nil || rateLimitIPWindowMins < 1 || rateLimitIPWindowMins > 10 {
+			log.Fatal("environment variable RATE_LIMIT_IP_WINDOW_MINUTES must be empty or an integer: 1 <= x <= 10")
+		}
+		config.RateLimitIPWindow = (time.Duration(rateLimitIPWindowMins) * time.Minute)
+	}
+
+	config.RateLimitIPMaxRequests = 10
+	rateLimitIPMaxRequests := os.Getenv("RATE_LIMIT_IP_MAX_REQUESTS")
+	if rateLimitIPMaxRequests != "" {
+		rateLimitIPMaxRequestsNum, err := strconv.Atoi(rateLimitIPMaxRequests)
+		if err != nil || rateLimitIPMaxRequestsNum < 1 || rateLimitIPMaxRequestsNum > 300 {
+			log.Fatal("environment variable RATE_LIMIT_IP_MAX_REQUESTS must be empty or an integer: 1 <= x <= 300")
+		}
+		config.RateLimitIPMaxRequests = rateLimitIPMaxRequestsNum
+	}
+
+	config.RateLimitWindow = 1 * time.Minute
+	rateLimitWindow := os.Getenv("RATE_LIMIT_WINDOW_MINUTES")
+	if rateLimitWindow != "" {
+		rateLimitWindowMins, err := strconv.Atoi(rateLimitWindow)
+		if err != nil || rateLimitWindowMins < 1 || rateLimitWindowMins > 10 {
+			log.Fatal("environment variable RATE_LIMIT_WINDOW_MINUTES must be empty or an unsigned 16-bit integer: 1 <= x <= 10")
+		}
+		config.RateLimitWindow = (time.Duration(rateLimitWindowMins) * time.Minute)
+	}
+
+	config.RateLimitMaxRequests = 120
+	rateLimitMaxRequests := os.Getenv("RATE_LIMIT_MAX_REQUESTS")
+	if rateLimitMaxRequests != "" {
+		rateLimitMaxRequestsNum, err := strconv.Atoi(rateLimitMaxRequests)
+		if err != nil || rateLimitMaxRequestsNum < 60 || rateLimitMaxRequestsNum > 3600 {
+			log.Fatal("environment variable RATE_LIMIT_MAX_REQUESTS must be empty or an unsigned 16-bit integer: 60 <= x <= 3600")
+		}
+		config.RateLimitMaxRequests = rateLimitMaxRequestsNum
+	}
+
+	config.RateLimitBaseCooldown = 15 * time.Second
+	rateLimitBaseCooldown := os.Getenv("RATE_LIMIT_BASE_COOLDOWN_SECONDS")
+	if rateLimitBaseCooldown != "" {
+		rateLimitBaseCooldownSecs, err := strconv.Atoi(rateLimitBaseCooldown)
+		if err != nil || rateLimitBaseCooldownSecs < 1 || rateLimitBaseCooldownSecs > 30 {
+			log.Fatal("environment variable RATE_LIMIT_BASE_COOLDOWN_SECONDS must be empty or an unsigned 16-bit integer: 1 <= x <= 30")
+		}
+		config.RateLimitBaseCooldown = (time.Duration(rateLimitBaseCooldownSecs) * time.Second)
+	}
+
+	config.RateLimitMaxCooldown = 10 * time.Minute
+	rateLimitMaxCooldown := os.Getenv("RATE_LIMIT_MAX_COOLDOWN_MINUTES")
+	if rateLimitMaxCooldown != "" {
+		rateLimitMaxCooldownMins, err := strconv.Atoi(rateLimitMaxCooldown)
+		if err != nil || rateLimitMaxCooldownMins < 5 || rateLimitMaxCooldownMins > 60 {
+			log.Fatal("environment variable RATE_LIMIT_MAX_COOLDOWN_MINUTES must be empty or an unsigned 16-bit integer: 5 <= x <= 60")
+		}
+		config.RateLimitMaxCooldown = (time.Duration(rateLimitMaxCooldownMins) * time.Minute)
+	}
+
+	config.RateLimitPenaltyDecay = 2 * time.Minute
+	rateLimitPenaltyDecay := os.Getenv("RATE_LIMIT_PENALTY_DECAY_MINUTES")
+	if rateLimitPenaltyDecay != "" {
+		rateLimitPenaltyDecayMins, err := strconv.Atoi(rateLimitPenaltyDecay)
+		if err != nil || rateLimitPenaltyDecayMins < 1 || rateLimitPenaltyDecayMins > 30 {
+			log.Fatal("environment variable RATE_LIMIT_PENALTY_DECAY_MINUTES must be empty or an unsigned 16-bit integer: 1 <= x <= 30")
+		}
+		config.RateLimitPenaltyDecay = (time.Duration(rateLimitPenaltyDecayMins) * time.Minute)
 	}
 
 	firebaseCredentials := os.Getenv("FIREBASE_CREDENTIALS_JSON")

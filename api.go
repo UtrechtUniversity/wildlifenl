@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"math/rand/v2"
+	"net"
 	"net/http"
 	"slices"
 	"strconv"
@@ -27,12 +29,14 @@ const (
 )
 
 var (
-	relationalDB *sql.DB
-	timeseriesDB *timeseries.Timeseries
-	mailer       *Mailer
-	notifier     *Notifier
-	sessions     *cache.Cache
-	authRequests *cache.Cache
+	relationalDB   *sql.DB
+	timeseriesDB   *timeseries.Timeseries
+	mailer         *Mailer
+	notifier       *Notifier
+	sessions       *cache.Cache
+	authRequests   *cache.Cache
+	ipRateLimiter  *rateLimiter
+	apiRateLimiter *rateLimiter
 )
 
 func Start(config *Configuration) error {
@@ -57,9 +61,10 @@ func Start(config *Configuration) error {
 	if err := assertAdminUserExists(config); err != nil {
 		return fmt.Errorf("could not asset that admin user exists: %w", err)
 	}
-
 	sessions = cache.New(time.Duration(config.CacheSessionDurationMinutes)*time.Minute, 12*time.Hour)
 	authRequests = cache.New(time.Duration(config.CacheAuthRequestDurationMinutes)*time.Minute, 12*time.Hour)
+	ipRateLimiter = newRateLimiter(config.RateLimitIPWindow, config.RateLimitIPMaxRequests, config.RateLimitBaseCooldown, config.RateLimitMaxCooldown, config.RateLimitPenaltyDecay)
+	apiRateLimiter = newRateLimiter(config.RateLimitWindow, config.RateLimitMaxRequests, config.RateLimitBaseCooldown, config.RateLimitMaxCooldown, config.RateLimitPenaltyDecay)
 	apiConfig := huma.DefaultConfig(appName, config.Version)
 	apiConfig.Info.Description = appDescription
 	apiConfig.Security = []map[string][]string{{"auth": {}}}
@@ -142,12 +147,26 @@ func NewMiddleware(api huma.API) func(ctx huma.Context, next func(huma.Context))
 			}
 		}
 		if !isAuthorizationRequired {
+			clientIP := ctx.RemoteAddr()
+			if host, _, err := net.SplitHostPort(clientIP); err == nil {
+				clientIP = host
+			}
+			if allowed, retryAfter := ipRateLimiter.allow(clientIP); !allowed {
+				ctx.SetHeader("Retry-After", strconv.Itoa(int(math.Ceil(retryAfter.Seconds()))))
+				huma.WriteErr(api, ctx, http.StatusTooManyRequests, "Too many requests from this IP address. Please slow down.")
+				return
+			}
 			next(ctx)
 			return
 		}
 		token := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
-		if len(token) == 0 {
+		if len(token) <= 0 {
 			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Missing bearer token.")
+			return
+		}
+		if allowed, retryAfter := apiRateLimiter.allow(token); !allowed {
+			ctx.SetHeader("Retry-After", strconv.Itoa(int(math.Ceil(retryAfter.Seconds()))))
+			huma.WriteErr(api, ctx, http.StatusTooManyRequests, "Too many requests. Please slow down.")
 			return
 		}
 		credential := getCredential(token)

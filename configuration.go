@@ -1,5 +1,7 @@
 package wildlifenl
 
+import "time"
+
 type Configuration struct {
 	Version                         string
 	Host                            string
@@ -20,5 +22,12 @@ type Configuration struct {
 	EmailUser                       string
 	EmailPassword                   string
 	AdminEmailAddress               string
+	RateLimitIPWindow               time.Duration
+	RateLimitIPMaxRequests          int
+	RateLimitWindow                 time.Duration
+	RateLimitMaxRequests            int
+	RateLimitBaseCooldown           time.Duration
+	RateLimitMaxCooldown            time.Duration
+	RateLimitPenaltyDecay           time.Duration
 	FirebaseCredentials             []byte
 }
