@@ -151,9 +151,9 @@ func (s *TrackingReadingStore) GetByExperiment(experimentID string) ([]models.Tr
 		format := func(v float64) string { return strconv.FormatFloat(v, 'f', -1, 64) }
 		// The timeseries database can only filter on the bounding box of the living lab, the exact check against its polygon follows below.
 		query += `
-		|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
-		|> filter(fn: (r) => r.longitude >= ` + format(bound.Min[0]) + ` and r.longitude <= ` + format(bound.Max[0]) + ` and r.latitude >= ` + format(bound.Min[1]) + ` and r.latitude <= ` + format(bound.Max[1]) + `)
-	`
+			|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
+			|> filter(fn: (r) => r.longitude >= ` + format(bound.Min[0]) + ` and r.longitude <= ` + format(bound.Max[0]) + ` and r.latitude >= ` + format(bound.Min[1]) + ` and r.latitude <= ` + format(bound.Max[1]) + `)
+		`
 	}
 	reader := s.timeseriesDB.Reader()
 	records, err := reader.Query(context.Background(), query)
