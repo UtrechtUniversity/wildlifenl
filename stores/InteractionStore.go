@@ -179,6 +179,13 @@ func (s *InteractionStore) GetFiltered(area *models.Circle, isAfter *time.Time, 
 }
 
 func (s *InteractionStore) GetByExperiment(experimentID string) ([]models.Interaction, error) {
+	experiment, err := NewExperimentStore(s.relationalDB).Get(experimentID)
+	if err != nil {
+		return nil, err
+	}
+	if experiment == nil {
+		return nil, &ErrRecordInattainable{message: "experiment was not found"}
+	}
 	query := s.query + `
 		WHERE (
 			i."moment" > (SELECT "start" FROM "experiment" WHERE "ID" = $1)

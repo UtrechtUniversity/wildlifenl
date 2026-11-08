@@ -63,6 +63,13 @@ func (s *ContactStore) GetForUser(userID string) ([]models.Contact, error) {
 }
 
 func (s *ContactStore) GetByExperiment(experimentID string) ([]models.Contact, error) {
+	experiment, err := NewExperimentStore(s.relationalDB).Get(experimentID)
+	if err != nil {
+		return nil, err
+	}
+	if experiment == nil {
+		return nil, &ErrRecordInattainable{message: "experiment was not found"}
+	}
 	query := s.query + `
 		INNER JOIN "experiment" e ON e."ID" = $1
 		LEFT JOIN "livingLab" l ON l."ID" = e."livingLabID"
