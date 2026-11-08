@@ -104,3 +104,22 @@ func (o *trackingReadingOperations) RegisterGetMine(api huma.API) {
 		return &TrackingReadingsHolder{Body: trackingReadings}, nil
 	})
 }
+
+func (o *trackingReadingOperations) RegisterGetByExperiment(api huma.API) {
+	name := "Get All TrackingReadings By Experiment"
+	description := "Retrieve all tracking readings that have a spatiotemporal overlap with an experiment. A tracking reading overlaps temporally if its timestamp falls within the timespan of the experiment, and spatially if its location is within the living lab of the experiment. If the experiment is not bound to a living lab, every tracking reading has a spatial overlap with it."
+	path := "/" + o.Endpoint + "s/experiment/{id}"
+	scopes := []string{"researcher"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *struct {
+		ID string `path:"id" format:"uuid" doc:"The ID of the experiment to retrieve tracking readings for."`
+	}) (*TrackingReadingsHolder, error) {
+		trackingReadings, err := stores.NewTrackingReadingStore(relationalDB, timeseriesDB).GetByExperiment(input.ID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &TrackingReadingsHolder{Body: trackingReadings}, nil
+	})
+}
