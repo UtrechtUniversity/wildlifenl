@@ -49,6 +49,21 @@ func (s *SpeciesStore) Get(speciesID string) (*models.Species, error) {
 	return &result[0], nil
 }
 
+func (s *SpeciesStore) GetByName(name string) (*models.Species, error) {
+	query := s.query + `
+		WHERE s."name" = $1
+	`
+	rows, err := s.relationalDB.Query(query, name)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	if len(result) != 1 {
+		return nil, nil
+	}
+	return &result[0], nil
+}
+
 func (s *SpeciesStore) GetAll() ([]models.Species, error) {
 	query := s.query + `
 		ORDER BY s."name"
