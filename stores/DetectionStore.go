@@ -67,12 +67,19 @@ func (s *DetectionStore) GetAll() ([]models.Detection, error) {
 }
 
 func (s *DetectionStore) Add(userID string, detection models.DetectionRecord) (*models.Detection, error) {
+	species, err := NewSpeciesStore(s.relationalDB).GetByName(detection.SpeciesName)
+	if err != nil {
+		return nil, err
+	}
+	if species == nil {
+		return nil, &ErrRecordInattainable{message: "no species with name " + detection.SpeciesName + " exists"}
+	}
 	query := `
-	INSERT INTO "detection"("userID", "location", "start", "end", "deploymentID", "sensorType", "uri", "speciesID") VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-	RETURNING "ID"
-`
+		INSERT INTO "detection"("userID", "location", "start", "end", "deploymentID", "sensorType", "uri", "speciesID") VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+		RETURNING "ID"
+	`
 	var id string
-	row := s.relationalDB.QueryRow(query, userID, detection.Location, detection.Start, detection.End, detection.DeploymentID, detection.SensorType, detection.URI, detection.SpeciesID)
+	row := s.relationalDB.QueryRow(query, userID, detection.Location, detection.Start, detection.End, detection.DeploymentID, detection.SensorType, detection.URI, species.ID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
