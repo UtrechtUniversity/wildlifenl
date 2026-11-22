@@ -99,7 +99,7 @@ func (o *questionOperations) RegisterAdd(api huma.API) {
 
 func (o *questionOperations) RegisterDelete(api huma.API) {
 	name := "Delete Question"
-	description := "Delete a question."
+	description := "Delete a question together with its answers. Answers of other questions that continue to this question will continue in order instead. A question cannot be deleted once its experiment has started, or while a message is linked to one of its answers."
 	path := "/" + o.Endpoint + "/{id}"
 	scopes := []string{}
 	method := http.MethodDelete

@@ -2,7 +2,6 @@ package stores
 
 import (
 	"database/sql"
-	"errors"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 )
@@ -90,39 +89,52 @@ func (s *QuestionStore) GetByQuestionnaire(questionnaireID string) ([]models.Que
 	return result, nil
 }
 
+// Delete removes a question together with its answers, as they form one unit. Answers of other questions that
+// continue to this question lose that jump and continue in order instead. A question with an answer that a message
+// is linked to is not deleted, because messages are managed separately.
 func (s *QuestionStore) Delete(questionID string, userID string) error {
-	query := `
-		WITH deleted AS (
-			DELETE FROM "question" q
-			USING "questionnaire" qq
-			JOIN "experiment" e ON qq."experimentID" = e."ID"
-			WHERE q."ID" = $1
-			AND e."userID" = $2
-			AND e.start > NOW()
-			RETURNING q."ID"
-		)
-		SELECT 
-			CASE 
-				WHEN NOT EXISTS (SELECT 1 FROM "question" WHERE "ID" = $1) THEN 'INVALID'
-				WHEN NOT EXISTS (SELECT 1 FROM "question" q JOIN "questionnaire" qq ON q."questionnaireID" = qq."ID" JOIN "experiment" e ON qq."experimentID" = e."ID" WHERE q."ID" = $1 AND e."userID" = $2) THEN 'USER'
-				WHEN EXISTS (SELECT 1 FROM "question" WHERE "ID" = $1) AND NOT EXISTS (SELECT 1 FROM deleted) THEN 'STARTED'
-				WHEN EXISTS (SELECT 1 FROM deleted) THEN 'OK'
-			END AS result;
-	`
-	var state string
-	row := s.relationalDB.QueryRow(query, questionID, userID)
-	if err := row.Scan(&state); err != nil {
+	tx, err := s.relationalDB.Begin()
+	if err != nil {
 		return err
 	}
-	switch state {
-	case "INVALID":
-		return &ErrRecordInattainable{message: "question was not found"}
-	case "USER":
-		return &ErrRecordInattainable{message: "question does not exist for the current user"}
-	case "STARTED":
-		return &ErrRecordImmutable{message: "cannot delete question for an experiment that has started"}
-	case "OK":
-		return nil
+	defer tx.Rollback()
+
+	query := `
+		SELECT e."userID" = $2, e."start" <= NOW(), EXISTS (
+			SELECT 1 FROM "message" m
+			JOIN "answer" a ON a."ID" = m."answerID"
+			WHERE a."questionID" = q."ID"
+		)
+		FROM "question" q
+		JOIN "questionnaire" qq ON qq."ID" = q."questionnaireID"
+		JOIN "experiment" e ON e."ID" = qq."experimentID"
+		WHERE q."ID" = $1
+		FOR UPDATE OF q
+	`
+	var owned, started, linked bool
+	if err := tx.QueryRow(query, questionID, userID).Scan(&owned, &started, &linked); err != nil {
+		if err == sql.ErrNoRows {
+			return &ErrRecordInattainable{message: "question was not found"}
+		}
+		return err
 	}
-	return errors.New("unknown error")
+	switch {
+	case !owned:
+		return &ErrRecordInattainable{message: "question does not exist for the current user"}
+	case started:
+		return &ErrRecordImmutable{message: "cannot delete question for an experiment that has started"}
+	case linked:
+		return &ErrRecordImmutable{message: "cannot delete question while a message is linked to one of its answers"}
+	}
+
+	if _, err := tx.Exec(`UPDATE "answer" SET "nextQuestionID" = NULL WHERE "nextQuestionID" = $1`, questionID); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(`DELETE FROM "answer" WHERE "questionID" = $1`, questionID); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(`DELETE FROM "question" WHERE "ID" = $1`, questionID); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
