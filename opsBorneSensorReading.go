@@ -32,7 +32,7 @@ func (o *borneSensorReadingOperations) RegisterGetAllBySensor(api huma.API) {
 	name := "Get BorneSensorReadings By Sensor"
 	description := "Retrieve all borne-sensor readings for a specific sensor."
 	path := "/" + o.Endpoint + "s/sensor/{id}"
-	scopes := []string{"land-user", "nature-area-manager", "wildlife-manager", "herd-manager"}
+	scopes := []string{"herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
