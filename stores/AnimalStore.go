@@ -31,7 +31,7 @@ func (s *AnimalStore) process(rows *sql.Rows, err error) ([]models.Animal, error
 	animals := make([]models.Animal, 0)
 	for rows.Next() {
 		var a models.Animal
-		if err := rows.Scan(&a.ID, &a.Name, &a.Location, &a.LocationTimestamp, &a.Species.ID, &a.Species.Name, &a.Species.CommonName, &a.Species.Category, &a.Species.Advice, &a.Species.RoleInNature, &a.Species.Description, &a.Species.Behaviour); err != nil {
+		if err := rows.Scan(&a.ID, &a.Identifier, &a.Location, &a.LocationTimestamp, &a.Species.ID, &a.Species.Name, &a.Species.CommonName, &a.Species.Category, &a.Species.Advice, &a.Species.RoleInNature, &a.Species.Description, &a.Species.Behaviour); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
@@ -63,7 +63,7 @@ func (s *AnimalStore) Add(animal *models.AnimalRecord) (*models.Animal, error) {
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, animal.Name, animal.SpeciesID)
+	row := s.relationalDB.QueryRow(query, animal.Identifier, animal.SpeciesID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}

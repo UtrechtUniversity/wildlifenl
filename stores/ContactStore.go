@@ -30,7 +30,7 @@ func (s *ContactStore) process(rows *sql.Rows, err error) ([]models.Contact, err
 	contacts := make([]models.Contact, 0)
 	for rows.Next() {
 		var c models.Contact
-		if err := rows.Scan(&c.ID, &c.Start, &c.End, &c.StartLocation, &c.EndLocation, &c.BorneSensorDeployment.SensorID, &c.BorneSensorDeployment.ContactHardwareAddress, &c.BorneSensorDeployment.Start, &c.BorneSensorDeployment.End, &c.BorneSensorDeployment.Animal.ID, &c.BorneSensorDeployment.Animal.Name, &c.BorneSensorDeployment.Animal.Location, &c.BorneSensorDeployment.Animal.Species.ID, &c.BorneSensorDeployment.Animal.Species.Name, &c.BorneSensorDeployment.Animal.Species.CommonName, &c.User.ID, &c.User.Name); err != nil {
+		if err := rows.Scan(&c.ID, &c.Start, &c.End, &c.StartLocation, &c.EndLocation, &c.BorneSensorDeployment.SensorID, &c.BorneSensorDeployment.ContactHardwareAddress, &c.BorneSensorDeployment.Start, &c.BorneSensorDeployment.End, &c.BorneSensorDeployment.Animal.ID, &c.BorneSensorDeployment.Animal.Identifier, &c.BorneSensorDeployment.Animal.Location, &c.BorneSensorDeployment.Animal.Species.ID, &c.BorneSensorDeployment.Animal.Species.Name, &c.BorneSensorDeployment.Animal.Species.CommonName, &c.User.ID, &c.User.Name); err != nil {
 			return nil, err
 		}
 		contacts = append(contacts, c)

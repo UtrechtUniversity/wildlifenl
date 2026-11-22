@@ -33,7 +33,7 @@ func (s *BorneSensorDeploymentStore) process(rows *sql.Rows, err error) ([]model
 		var borneSensorDeployment models.BorneSensorDeployment
 		var animal models.Animal
 		var species models.Species
-		if err := rows.Scan(&borneSensorDeployment.SensorID, &borneSensorDeployment.ContactHardwareAddress, &borneSensorDeployment.Start, &borneSensorDeployment.End, &animal.ID, &animal.Name, &animal.Location, &species.ID, &species.Name, &species.CommonName); err != nil {
+		if err := rows.Scan(&borneSensorDeployment.SensorID, &borneSensorDeployment.ContactHardwareAddress, &borneSensorDeployment.Start, &borneSensorDeployment.End, &animal.ID, &animal.Identifier, &animal.Location, &species.ID, &species.Name, &species.CommonName); err != nil {
 			return nil, err
 		}
 		animal.Species = species

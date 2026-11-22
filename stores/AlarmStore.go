@@ -45,7 +45,7 @@ func (s *AlarmStore) process(rows *sql.Rows, err error) ([]models.Alarm, error) 
 		var n models.Animal
 		var s models.Species
 		var c models.Conveyance
-		if err := rows.Scan(&a.ID, &a.Timestamp, &a.Zone.ID, &a.Zone.Deactivated, &a.Zone.Name, &a.Zone.Definition, &s.ID, &s.Name, &s.CommonName, &a.Zone.User.ID, &a.Zone.User.Name, &i.ID, &i.Timestamp, &i.Notes, &i.Location, &i.Type.ID, &i.Type.Name, &i.Type.Description, &i.User.ID, &i.User.Name, &d.ID, &d.Location, &d.Start, &d.End, &d.DeploymentID, &d.SensorType, &d.URI, &d.User.ID, &d.User.Name, &n.ID, &n.Name, &n.Location, &c.ID, &c.Timestamp, &c.Message.ID, &c.Message.Name, &c.Message.Severity, &c.Message.Text, &c.Message.Trigger, &c.Message.Experiment.ID, &c.Message.Experiment.Name, &c.Message.Experiment.Description, &c.Message.Experiment.Start, &c.Message.Experiment.End, &c.Message.Experiment.User.ID, &c.Message.Experiment.User.Name); err != nil {
+		if err := rows.Scan(&a.ID, &a.Timestamp, &a.Zone.ID, &a.Zone.Deactivated, &a.Zone.Name, &a.Zone.Definition, &s.ID, &s.Name, &s.CommonName, &a.Zone.User.ID, &a.Zone.User.Name, &i.ID, &i.Timestamp, &i.Notes, &i.Location, &i.Type.ID, &i.Type.Name, &i.Type.Description, &i.User.ID, &i.User.Name, &d.ID, &d.Location, &d.Start, &d.End, &d.DeploymentID, &d.SensorType, &d.URI, &d.User.ID, &d.User.Name, &n.ID, &n.Identifier, &n.Location, &c.ID, &c.Timestamp, &c.Message.ID, &c.Message.Name, &c.Message.Severity, &c.Message.Text, &c.Message.Trigger, &c.Message.Experiment.ID, &c.Message.Experiment.Name, &c.Message.Experiment.Description, &c.Message.Experiment.Start, &c.Message.Experiment.End, &c.Message.Experiment.User.ID, &c.Message.Experiment.User.Name); err != nil {
 			return nil, err
 		}
 		if alarm.ID != a.ID {
