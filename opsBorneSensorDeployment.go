@@ -3,6 +3,7 @@ package wildlifenl
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/UtrechtUniversity/wildlifenl/models"
 	"github.com/UtrechtUniversity/wildlifenl/stores"
@@ -18,7 +19,16 @@ type BorneSensorDeploymentsHolder struct {
 }
 
 type BorneSensorDeploymentAddInput struct {
+	Input
 	Body *models.BorneSensorDeploymentRecord `json:"borneSensorDeployment"`
+}
+
+type BorneSensorDeploymentEndInput struct {
+	Input
+	Body *struct {
+		ID        string    `json:"ID" format:"uuid" doc:"The ID of the borne-sensor deployment to be ended."`
+		TimeStamp time.Time `json:"timestamp" doc:"The moment the borne-sensor deployment ended."`
+	}
 }
 
 type borneSensorDeploymentOperations Operations
@@ -30,16 +40,33 @@ func newBorneSensorDeploymentOperations() *borneSensorDeploymentOperations {
 	return &o
 }
 
-func (o *borneSensorDeploymentOperations) RegisterGetActive(api huma.API) {
-	name := "Get Active BorneSensorDeployments"
-	description := "Get all active borne-sensor deployments."
-	path := "/" + o.Endpoint + "/active/"
+func (o *borneSensorDeploymentOperations) RegisterGetMine(api huma.API) {
+	name := "Get My BorneSensorDeployments"
+	description := "Get all borne-sensor deployments for the current user."
+	path := "/" + o.Endpoint + "/me/"
 	scopes := []string{"herd-manager"}
 	method := http.MethodGet
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
-	}, func(ctx context.Context, input *struct{}) (*BorneSensorDeploymentsHolder, error) {
-		borneSensorDeployment, err := stores.NewBorneSensorDeploymentStore(relationalDB, timeseriesDB).GetActive()
+	}, func(ctx context.Context, input *Input) (*BorneSensorDeploymentsHolder, error) {
+		borneSensorDeployment, err := stores.NewBorneSensorDeploymentStore(relationalDB, timeseriesDB).GetMine(input.credential.UserID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &BorneSensorDeploymentsHolder{Body: borneSensorDeployment}, nil
+	})
+}
+
+func (o *borneSensorDeploymentOperations) RegisterGetMyActive(api huma.API) {
+	name := "Get My Active BorneSensorDeployments"
+	description := "Get all active borne-sensor deployments for the current user."
+	path := "/" + o.Endpoint + "/me/active/"
+	scopes := []string{"herd-manager"}
+	method := http.MethodGet
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *Input) (*BorneSensorDeploymentsHolder, error) {
+		borneSensorDeployment, err := stores.NewBorneSensorDeploymentStore(relationalDB, timeseriesDB).GetMyActive(input.credential.UserID)
 		if err != nil {
 			return nil, handleError(err)
 		}
@@ -56,7 +83,25 @@ func (o *borneSensorDeploymentOperations) RegisterAdd(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
 	}, func(ctx context.Context, input *BorneSensorDeploymentAddInput) (*BorneSensorDeploymentHolder, error) {
-		borneSensorDeployment, err := stores.NewBorneSensorDeploymentStore(relationalDB, timeseriesDB).Add(input.Body)
+		userID := input.credential.UserID
+		borneSensorDeployment, err := stores.NewBorneSensorDeploymentStore(relationalDB, timeseriesDB).Add(userID, input.Body)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		return &BorneSensorDeploymentHolder{Body: borneSensorDeployment}, nil
+	})
+}
+
+func (o *borneSensorDeploymentOperations) RegisterEnd(api huma.API) {
+	name := "End BorneSensorDeployment"
+	description := "End a deployment for a borne sensor."
+	path := "/" + o.Endpoint + "/end"
+	scopes := []string{"herd-manager"}
+	method := http.MethodPut
+	huma.Register(api, huma.Operation{
+		OperationID: name, Summary: name, Path: path, Method: method, Tags: []string{o.Endpoint}, Description: generateDescription(description, scopes), Security: []map[string][]string{{"auth": scopes}},
+	}, func(ctx context.Context, input *BorneSensorDeploymentEndInput) (*BorneSensorDeploymentHolder, error) {
+		borneSensorDeployment, err := stores.NewBorneSensorDeploymentStore(relationalDB, timeseriesDB).End(input.credential.UserID, input.Body.ID, input.Body.TimeStamp)
 		if err != nil {
 			return nil, handleError(err)
 		}

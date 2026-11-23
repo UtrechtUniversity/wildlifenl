@@ -15,10 +15,11 @@ func NewBorneSensorDeploymentStore(relationalDB *sql.DB, timeseriesDB *timeserie
 		relationalDB: relationalDB,
 		timeseriesDB: timeseriesDB,
 		query: `
-			SELECT d."sensorID", d."contactHardwareAddress", d."start", d."end", a."ID", a."name", a."location", s."ID", s."name", s."commonName"
+			SELECT d."ID", d."sensorID", d."contactHardwareAddress", d."start", d."end", a."ID", a."name", a."location", s."ID", s."name", s."commonName", COALESCE(u."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(u."name", '')
 			FROM "borneSensorDeployment" d
 			INNER JOIN "animal" a ON a."ID" = d."animalID"
 			INNER JOIN "species" s ON s."ID" = a."speciesID"
+			LEFT JOIN "user" u ON u."ID" = d."userID"
 		`,
 	}
 	return &s
@@ -30,26 +31,24 @@ func (s *BorneSensorDeploymentStore) process(rows *sql.Rows, err error) ([]model
 	}
 	borneSensorDeployments := make([]models.BorneSensorDeployment, 0)
 	for rows.Next() {
-		var borneSensorDeployment models.BorneSensorDeployment
-		var animal models.Animal
-		var species models.Species
-		if err := rows.Scan(&borneSensorDeployment.SensorID, &borneSensorDeployment.ContactHardwareAddress, &borneSensorDeployment.Start, &borneSensorDeployment.End, &animal.ID, &animal.Identifier, &animal.Location, &species.ID, &species.Name, &species.CommonName); err != nil {
+		var d models.BorneSensorDeployment
+		var u models.User
+		if err := rows.Scan(&d.ID, &d.SensorID, &d.ContactHardwareAddress, &d.Start, &d.End, &d.Animal.ID, &d.Animal.Identifier, &d.Animal.Location, &d.Animal.Species.ID, &d.Animal.Species.Name, &d.Animal.Species.CommonName, &u.ID, &u.Name); err != nil {
 			return nil, err
 		}
-		animal.Species = species
-		borneSensorDeployment.Animal = animal
-		borneSensorDeployments = append(borneSensorDeployments, borneSensorDeployment)
+		if u.ID != "00000000-0000-0000-0000-000000000000" {
+			d.User = u
+		}
+		borneSensorDeployments = append(borneSensorDeployments, d)
 	}
 	return borneSensorDeployments, nil
 }
 
-func (s *BorneSensorDeploymentStore) Get(sensorID string, animalID string) (*models.BorneSensorDeployment, error) {
+func (s *BorneSensorDeploymentStore) Get(ID string) (*models.BorneSensorDeployment, error) {
 	query := s.query + `
-		WHERE d."end" IS NULL
-		AND d."sensorID" = $1
-		AND d."animalID" = $2
+		WHERE d."ID" = $1
 	`
-	rows, err := s.relationalDB.Query(query, sensorID, animalID)
+	rows, err := s.relationalDB.Query(query, ID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -60,11 +59,24 @@ func (s *BorneSensorDeploymentStore) Get(sensorID string, animalID string) (*mod
 	return &result[0], nil
 }
 
-func (s *BorneSensorDeploymentStore) GetActive() ([]models.BorneSensorDeployment, error) {
+func (s *BorneSensorDeploymentStore) GetMine(userID string) ([]models.BorneSensorDeployment, error) {
+	query := s.query + `
+		WHERE d."userID" = $1
+	`
+	rows, err := s.relationalDB.Query(query, userID)
+	result, err := s.process(rows, err)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (s *BorneSensorDeploymentStore) GetMyActive(userID string) ([]models.BorneSensorDeployment, error) {
 	query := s.query + `
 		WHERE d."end" IS NULL
+		AND d."userID" = $1
 	`
-	rows, err := s.relationalDB.Query(query)
+	rows, err := s.relationalDB.Query(query, userID)
 	result, err := s.process(rows, err)
 	if err != nil {
 		return nil, err
@@ -74,9 +86,9 @@ func (s *BorneSensorDeploymentStore) GetActive() ([]models.BorneSensorDeployment
 
 func (s *BorneSensorDeploymentStore) GetByAnimal(animalID string, start time.Time, end time.Time) ([]models.BorneSensorDeployment, error) {
 	query := s.query + `
-		AND d."animalID" = $1
 		WHERE ("end" IS NULL OR "end" >= $2)
 		AND "start" <= $3
+		AND d."animalID" = $1
 	`
 	rows, err := s.relationalDB.Query(query, animalID, start, end)
 	results, err := s.process(rows, err)
@@ -95,24 +107,39 @@ func (s *BorneSensorDeploymentStore) GetByAnimal(animalID string, start time.Tim
 	return borneSensorDeployments, nil
 }
 
-func (s *BorneSensorDeploymentStore) Add(borneSensorDeployment *models.BorneSensorDeploymentRecord) (*models.BorneSensorDeployment, error) {
+func (s *BorneSensorDeploymentStore) End(userID string, deploymentID string, end time.Time) (*models.BorneSensorDeployment, error) {
 	query := `
 		UPDATE "borneSensorDeployment"
 		SET "end" = $1
-		WHERE "sensorID" = $2
+		WHERE "ID" = $2
+		AND "userID" = $3
+		AND "end" IS NULL
+		RETURNING "ID"
 	`
-	if _, err := s.relationalDB.Exec(query, borneSensorDeployment.Start, borneSensorDeployment.SensorID); err != nil {
+	var id string
+	row := s.relationalDB.QueryRow(query, end, deploymentID, userID)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
-	query = `
-		INSERT INTO "borneSensorDeployment"("animalID", "sensorID", "contactHardwareAddress", "start") VALUES($1, $2, $3, $4)
-		RETURNING "sensorID", "animalID"
-	`
-	var sensorID string
-	var animalID string
-	row := s.relationalDB.QueryRow(query, borneSensorDeployment.AnimalID, borneSensorDeployment.SensorID, borneSensorDeployment.ContactHardwareAddress, borneSensorDeployment.Start)
-	if err := row.Scan(&sensorID, &animalID); err != nil {
+	return s.Get(id)
+}
+
+func (s *BorneSensorDeploymentStore) Add(userID string, borneSensorDeployment *models.BorneSensorDeploymentRecord) (*models.BorneSensorDeployment, error) {
+	_, err := s.End(userID, borneSensorDeployment.SensorID, borneSensorDeployment.Start)
+	if err != nil {
 		return nil, err
 	}
-	return s.Get(sensorID, animalID)
+	query := `
+		INSERT INTO "borneSensorDeployment"("animalID", "sensorID", "userID", "contactHardwareAddress", "start") VALUES($1, $2, $3, $4, $5)
+		RETURNING "ID"
+	`
+	var id string
+	row := s.relationalDB.QueryRow(query, borneSensorDeployment.AnimalID, userID, borneSensorDeployment.SensorID, borneSensorDeployment.ContactHardwareAddress, borneSensorDeployment.Start)
+	if err := row.Scan(&id); err != nil {
+		return nil, err
+	}
+	return s.Get(id)
 }
