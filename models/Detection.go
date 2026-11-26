@@ -6,7 +6,7 @@ import (
 
 type DetectionRecord struct {
 	ID           string            `json:"ID" format:"uuid" readOnly:"true" doc:"The ID of this detection."`
-	SpeciesName  string            `json:"speciesName,omitempty" minLength:"2" writeOnly:"true" required:"true" doc:"The name of the species of the detected animal(s)."`
+	SpeciesName  string            `json:"speciesName,omitempty" minLength:"2" writeOnly:"true" required:"true" doc:"The scientific binomial name of the species of the detected animal(s)."`
 	DeploymentID string            `json:"deploymentID" minLength:"2" doc:"The deployment identification for the sensor that made this detection."`
 	SensorType   *string           `json:"sensorType" enum:"visual,acoustic,motion,radio,chemical,other" doc:"The type of the sensor that made this detection."`
 	Location     Point             `json:"location" doc:"The location that the detection happened at."`
@@ -19,5 +19,5 @@ type DetectionRecord struct {
 type Detection struct {
 	DetectionRecord
 	Species Species `json:"species" doc:"The species of the animal(s) involved in this detection."`
-	User    User    `json:"user" doc:"The user that owns the sensor that made this detection."`
+	User    User    `json:"user" doc:"The data-system account that provided this detection."`
 }
