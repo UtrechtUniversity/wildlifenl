@@ -102,6 +102,7 @@ func (s *MessageStore) Delete(messageID string, userID string) error {
 			DELETE FROM "message" m
 			USING "experiment" e 
 			WHERE m."ID" = $1
+			AND m."experimentID" = e."ID"
 			AND e."userID" = $2
 			AND e.start > NOW()
 			RETURNING m."ID"
