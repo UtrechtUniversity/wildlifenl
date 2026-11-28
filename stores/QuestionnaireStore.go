@@ -13,11 +13,12 @@ func NewQuestionnaireStore(db *sql.DB) *QuestionnaireStore {
 	s := QuestionnaireStore{
 		relationalDB: db,
 		query: `
-		SELECT q."ID" AS "questionnaireID", q."name", q."identifier", q."notifyAfter", e."ID", e."name", e."start", e."end", t."ID", t."name", t."description", u."ID", u."name"
+		SELECT q."ID" AS "questionnaireID", q."name", q."identifier", q."notifyAfter", e."ID", e."name", e."start", e."end", t."ID", t."name", t."description", u."ID", u."name", COALESCE(s."ID", '00000000-0000-0000-0000-000000000000'), COALESCE(s."name", ''), COALESCE(s."commonName", '')
 		FROM "questionnaire" q
 		INNER JOIN "experiment" e ON e."ID" = q."experimentID"
 		INNER JOIN "interactionType" t ON t."ID" = q."interactionTypeID"
 		INNER JOIN "user" u ON u."ID" = e."userID"
+		LEFT JOIN "species" s ON s."ID" = q."speciesID"
 		`,
 	}
 	return &s
@@ -33,7 +34,8 @@ func (s *QuestionnaireStore) process(rows *sql.Rows, err error) ([]models.Questi
 		var e models.Experiment
 		var it models.InteractionType
 		var u models.User
-		if err := rows.Scan(&q.ID, &q.Name, &q.Identifier, &q.NotifyAfter, &e.ID, &e.Name, &e.Start, &e.End, &it.ID, &it.Name, &it.Description, &u.ID, &u.Name); err != nil {
+		var sp models.Species
+		if err := rows.Scan(&q.ID, &q.Name, &q.Identifier, &q.NotifyAfter, &e.ID, &e.Name, &e.Start, &e.End, &it.ID, &it.Name, &it.Description, &u.ID, &u.Name, &sp.ID, &sp.Name, &sp.CommonName); err != nil {
 			if err == sql.ErrNoRows {
 				return nil, nil
 			}
@@ -42,6 +44,9 @@ func (s *QuestionnaireStore) process(rows *sql.Rows, err error) ([]models.Questi
 		e.User = u
 		q.Experiment = e
 		q.InteractionType = it
+		if sp.ID != "00000000-0000-0000-0000-000000000000" {
+			q.Species = &sp
+		}
 		questionnaires = append(questionnaires, q)
 	}
 	return questionnaires, nil
@@ -69,11 +74,11 @@ func (s *QuestionnaireStore) GetAll() ([]models.Questionnaire, error) {
 
 func (s *QuestionnaireStore) Add(questionnaire *models.QuestionnaireRecord) (*models.Questionnaire, error) {
 	query := `
-		INSERT INTO "questionnaire"("name", "identifier", "experimentID", "interactionTypeID") VALUES($1, $2, $3, $4)
+		INSERT INTO "questionnaire"("name", "identifier", "experimentID", "interactionTypeID", "speciesID") VALUES($1, $2, $3, $4, $5)
 		RETURNING "ID"
 	`
 	var id string
-	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.Identifier, questionnaire.ExperimentID, questionnaire.InteractionTypeID)
+	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.Identifier, questionnaire.ExperimentID, questionnaire.InteractionTypeID, questionnaire.SpeciesID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
@@ -113,6 +118,7 @@ func (s *QuestionnaireStore) AssignRandomToInteraction(interaction *models.Inter
 			AND e."start" < $2
 			AND (e."end" IS NULL OR e."end" > $2)
 			AND (l."ID" IS NULL OR l."definition" @> $3)
+			AND (q."speciesID" IS NULL OR q."speciesID" = $5)
 			ORDER BY random()
 			LIMIT 1
 		)
@@ -122,7 +128,7 @@ func (s *QuestionnaireStore) AssignRandomToInteraction(interaction *models.Inter
 		RETURNING COALESCE((SELECT "questionnaireID" FROM selected),'00000000-0000-0000-0000-000000000000');
 		`
 	var id string
-	row := s.relationalDB.QueryRow(query, interaction.Type.ID, interaction.Moment, interaction.Place, interaction.ID)
+	row := s.relationalDB.QueryRow(query, interaction.Type.ID, interaction.Moment, interaction.Place, interaction.ID, interaction.Species.ID)
 	if err := row.Scan(&id); err != nil {
 		return nil, err
 	}
@@ -140,7 +146,7 @@ func (s *QuestionnaireStore) Update(userID string, questionnaireID string, quest
 	query := `
 		WITH update_query AS (
 			UPDATE "questionnaire" q
-			SET "name" = $1, "identifier" = $2, "interactionTypeID" = $4
+			SET "name" = $1, "identifier" = $2, "interactionTypeID" = $4, "speciesID" = $7
 			FROM "experiment" e
 			WHERE q."ID" = $5
 			AND e."userID" = $6
@@ -164,7 +170,7 @@ func (s *QuestionnaireStore) Update(userID string, questionnaireID string, quest
 	`
 	var id *string
 	var status string
-	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.Identifier, questionnaire.ExperimentID, questionnaire.InteractionTypeID, questionnaireID, userID)
+	row := s.relationalDB.QueryRow(query, questionnaire.Name, questionnaire.Identifier, questionnaire.ExperimentID, questionnaire.InteractionTypeID, questionnaireID, userID, questionnaire.SpeciesID)
 	if err := row.Scan(&id, &status); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
