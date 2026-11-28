@@ -209,6 +209,7 @@ func (s *QuestionnaireStore) Delete(questionID string, userID string) error {
 			DELETE FROM "questionnaire" qq
 			USING "experiment" e 
 			WHERE qq."ID" = $1
+			AND qq."experimentID" = e."ID"
 			AND e."userID" = $2
 			AND e.start > NOW()
 			RETURNING qq."ID"

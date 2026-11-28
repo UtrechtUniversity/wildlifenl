@@ -71,6 +71,7 @@ func (s *AnswerStore) Delete(answerID string, userID string) error {
 			JOIN "questionnaire" qq ON q."questionnaireID" = qq."ID"
 			JOIN "experiment" e ON qq."experimentID" = e."ID"
 			WHERE a."ID" = $1
+			AND a."questionID" = q."ID"
 			AND e."userID" = $2
 			AND e.start > NOW()
 			RETURNING a."ID"
